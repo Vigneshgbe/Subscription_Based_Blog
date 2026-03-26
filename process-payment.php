@@ -1,7 +1,8 @@
 <?php
 require_once 'config.php';
-require_once 'stripe-php/init.php'; // Include Stripe PHP library
+require_once 'stripe-php/init.php';
 
+// Must be first output — no HTML before this
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -12,108 +13,131 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 if (!isLoggedIn()) {
     http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
+    echo json_encode(['error' => 'You must be logged in to subscribe']);
     exit;
 }
 
 $input = json_decode(file_get_contents('php://input'), true);
 
-// Verify CSRF token
-if (!isset($input['csrf_token']) || !verifyCSRFToken($input['csrf_token'])) {
+if (!$input) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid request body']);
+    exit;
+}
+
+// CSRF validation
+if (empty($input['csrf_token']) || !verifyCSRFToken($input['csrf_token'])) {
     http_response_code(403);
-    echo json_encode(['error' => 'Invalid CSRF token']);
+    echo json_encode(['error' => 'Invalid CSRF token. Please refresh the page and try again.']);
     exit;
 }
 
 $planType = $input['plan_type'] ?? '';
-$userId = $_SESSION['user_id'];
+$userId   = $_SESSION['user_id'];
 
 if (!in_array($planType, ['monthly', 'yearly'])) {
-    echo json_encode(['error' => 'Invalid plan type']);
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid plan type selected']);
     exit;
 }
 
-// Set Stripe API key
+// Block if already subscribed to same plan
+if (hasActiveSubscription($userId)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'You already have an active subscription']);
+    exit;
+}
+
 \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
 try {
     $db = db();
-    
-    // Get user details
-    $stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+
+    // Get user
+    $stmt = $db->prepare("SELECT id, email, full_name FROM users WHERE id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $user = $stmt->fetch();
-    
+
     if (!$user) {
-        throw new Exception('User not found');
+        throw new Exception('User account not found');
     }
-    
-    // Check for existing subscription
-    $stmt = $db->prepare("SELECT stripe_customer_id FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
+
+    // Get or create Stripe customer
+    $stmt = $db->prepare("
+        SELECT stripe_customer_id FROM subscriptions
+        WHERE user_id = ? AND stripe_customer_id IS NOT NULL
+        ORDER BY created_at DESC LIMIT 1
+    ");
     $stmt->execute([$userId]);
-    $existingSubscription = $stmt->fetch();
-    
-    $customerId = $existingSubscription['stripe_customer_id'] ?? null;
-    
-    // Create or retrieve Stripe customer
+    $existingSub = $stmt->fetch();
+    $customerId  = $existingSub['stripe_customer_id'] ?? null;
+
     if (!$customerId) {
-        $customer = \Stripe\Customer::create([
-            'email' => $user['email'],
-            'name' => $user['full_name'],
-            'metadata' => [
-                'user_id' => $userId
-            ]
+        // Create new Stripe customer
+        $customer   = \Stripe\Customer::create([
+            'email'    => $user['email'],
+            'name'     => $user['full_name'],
+            'metadata' => ['user_id' => (string)$userId]
         ]);
         $customerId = $customer->id;
     }
-    
-    // Set price based on plan
-    $amount = $planType === 'monthly' ? MONTHLY_PRICE : YEARLY_PRICE;
+
+    // Plan amounts and intervals
+    $amount   = $planType === 'monthly' ? MONTHLY_PRICE  : YEARLY_PRICE;
     $interval = $planType === 'monthly' ? 'month' : 'year';
-    
+
+    $planLabel = $planType === 'monthly'
+        ? 'Monthly Subscription (₹299/month)'
+        : 'Yearly Subscription (₹2,999/year — Save 30%)';
+
     // Create Stripe Checkout Session
     $session = \Stripe\Checkout\Session::create([
-        'customer' => $customerId,
+        'customer'             => $customerId,
         'payment_method_types' => ['card'],
-        'line_items' => [[
+        'line_items'           => [[
             'price_data' => [
-                'currency' => 'inr',
+                'currency'     => 'inr',
                 'product_data' => [
-                    'name' => SITE_NAME . ' ' . ucfirst($planType) . ' Subscription',
-                    'description' => 'Unlimited access to premium articles'
+                    'name'        => SITE_NAME . ' — ' . $planLabel,
+                    'description' => 'Unlimited access to all premium articles',
                 ],
                 'unit_amount' => $amount,
-                'recurring' => [
-                    'interval' => $interval
-                ]
+                'recurring'   => ['interval' => $interval],
             ],
             'quantity' => 1,
         ]],
-        'mode' => 'subscription',
+        'mode'        => 'subscription',
         'success_url' => SITE_URL . '/payment-success.php?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => SITE_URL . '/pricing.php?canceled=1',
-        'metadata' => [
-            'user_id' => $userId,
-            'plan_type' => $planType
-        ]
+        'cancel_url'  => SITE_URL . '/pricing.php?canceled=1',
+        'metadata'    => [
+            'user_id'   => (string)$userId,
+            'plan_type' => $planType,
+        ],
+        'subscription_data' => [
+            'metadata' => [
+                'user_id'   => (string)$userId,
+                'plan_type' => $planType,
+            ]
+        ],
+        // Pre-fill customer email on Stripe checkout page
+        'customer_email' => $customerId ? null : $user['email'],
     ]);
-    
-    // Log activity
+
     logActivity($userId, 'checkout_initiated', 'subscription', null, [
-        'plan_type' => $planType,
-        'session_id' => $session->id
+        'plan_type'  => $planType,
+        'session_id' => $session->id,
     ]);
-    
-    echo json_encode([
-        'sessionId' => $session->id
-    ]);
-    
+
+    echo json_encode(['sessionId' => $session->id]);
+
 } catch (\Stripe\Exception\ApiErrorException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Payment processing failed: ' . $e->getMessage()]);
-    logActivity($userId ?? null, 'payment_error', null, null, ['error' => $e->getMessage()]);
+    error_log('Stripe API error: ' . $e->getMessage());
+    echo json_encode(['error' => 'Payment service error. Please try again or contact support.']);
+
 } catch (Exception $e) {
     http_response_code(500);
+    error_log('process-payment error: ' . $e->getMessage());
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

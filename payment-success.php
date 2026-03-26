@@ -13,85 +13,94 @@ if (empty($sessionId)) {
 
 \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
+$success      = false;
+$planType     = '';
+$amount       = 0;
+$errorMessage = '';
+
 try {
-    // Retrieve the session
-    $session = \Stripe\Checkout\Session::retrieve($sessionId);
-    
+    $session = \Stripe\Checkout\Session::retrieve([
+        'id'     => $sessionId,
+        'expand' => ['subscription'],
+    ]);
+
     if ($session->payment_status === 'paid') {
-        $db = db();
+        $db     = db();
         $userId = $_SESSION['user_id'];
-        
-        // Get subscription details
-        $subscriptionId = $session->subscription;
-        $subscription = \Stripe\Subscription::retrieve($subscriptionId);
-        
-        $planType = $session->metadata->plan_type ?? 'monthly';
-        
-        // Update or create subscription record
+
+        $subscription = $session->subscription;
+        $planType     = $session->metadata->plan_type ?? 'monthly';
+        $amount       = ($session->amount_total ?? 0) / 100;
+
+        // ── Idempotent upsert ──────────────────────────────────────
+        // The webhook (checkout.session.completed) also writes this row.
+        // ON DUPLICATE KEY UPDATE makes this safe whether the webhook
+        // fires first or the redirect hits first — no double-entries.
         $stmt = $db->prepare("
-            INSERT INTO subscriptions 
-            (user_id, stripe_customer_id, stripe_subscription_id, plan_type, status, current_period_start, current_period_end)
+            INSERT INTO subscriptions
+                (user_id, stripe_customer_id, stripe_subscription_id, plan_type, status,
+                 current_period_start, current_period_end)
             VALUES (?, ?, ?, ?, 'active', FROM_UNIXTIME(?), FROM_UNIXTIME(?))
             ON DUPLICATE KEY UPDATE
-            stripe_subscription_id = VALUES(stripe_subscription_id),
-            plan_type = VALUES(plan_type),
-            status = 'active',
-            current_period_start = VALUES(current_period_start),
-            current_period_end = VALUES(current_period_end)
+                stripe_subscription_id = VALUES(stripe_subscription_id),
+                plan_type              = VALUES(plan_type),
+                status                 = 'active',
+                current_period_start   = VALUES(current_period_start),
+                current_period_end     = VALUES(current_period_end)
         ");
-        
         $stmt->execute([
             $userId,
             $session->customer,
-            $subscriptionId,
+            $subscription->id,
             $planType,
             $subscription->current_period_start,
-            $subscription->current_period_end
+            $subscription->current_period_end,
         ]);
-        
-        // Record transaction
+
+        // ── Transaction record (insert only if not already logged) ──
         $stmt = $db->prepare("
-            INSERT INTO transactions 
-            (user_id, stripe_payment_intent_id, amount, currency, status, payment_method, description)
-            VALUES (?, ?, ?, 'INR', 'succeeded', 'card', ?)
+            SELECT id FROM transactions
+            WHERE stripe_payment_intent_id = ?
+            LIMIT 1
         ");
-        
-        $amount = $session->amount_total / 100; // Convert from paisa to rupees
-        $description = ucfirst($planType) . ' subscription';
-        
-        $stmt->execute([
-            $userId,
-            $session->payment_intent,
-            $amount,
-            $description
-        ]);
-        
-        // Log activity
-        logActivity($userId, 'subscription_activated', 'subscription', $db->lastInsertId(), [
+        $stmt->execute([$session->payment_intent]);
+        if (!$stmt->fetch()) {
+            $stmt = $db->prepare("
+                INSERT INTO transactions
+                    (user_id, stripe_payment_intent_id, amount, currency, status, payment_method, description)
+                VALUES (?, ?, ?, 'INR', 'succeeded', 'card', ?)
+            ");
+            $stmt->execute([
+                $userId,
+                $session->payment_intent,
+                $amount,
+                ucfirst($planType) . ' subscription',
+            ]);
+        }
+
+        logActivity($userId, 'subscription_activated', 'subscription', null, [
             'plan_type' => $planType,
-            'amount' => $amount
+            'amount'    => $amount,
         ]);
-        
-        // Send confirmation email
+
+        // Confirmation email
         $emailBody = "
             <h2>Subscription Activated!</h2>
-            <p>Thank you for subscribing to " . SITE_NAME . ".</p>
+            <p>Thank you for subscribing to " . htmlspecialchars(SITE_NAME) . ".</p>
             <p><strong>Plan:</strong> " . ucfirst($planType) . "</p>
             <p><strong>Amount:</strong> ₹" . number_format($amount, 2) . "</p>
             <p>You now have unlimited access to all premium content.</p>
-            <p><a href='" . SITE_URL . "'>Start Reading</a></p>
+            <p><a href='" . SITE_URL . "'>Start Reading →</a></p>
         ";
-        
-        sendEmail($_SESSION['user_email'], 'Subscription Activated - ' . SITE_NAME, $emailBody);
-        
+        sendEmail($_SESSION['user_email'] ?? $session->customer_details->email ?? '', 
+                  'Subscription Activated — ' . SITE_NAME, $emailBody);
+
         $success = true;
-    } else {
-        $success = false;
     }
-    
+
 } catch (Exception $e) {
-    $success = false;
     $errorMessage = $e->getMessage();
+    error_log('payment-success error: ' . $e->getMessage());
 }
 ?>
 <!DOCTYPE html>
@@ -99,120 +108,166 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment <?php echo $success ? 'Success' : 'Failed'; ?> - <?php echo SITE_NAME; ?></title>
+    <title><?php echo $success ? 'Payment Successful' : 'Payment Failed'; ?> — <?php echo htmlspecialchars(SITE_NAME); ?></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
         }
-        
-        .result-container {
-            background: white;
-            max-width: 500px;
+
+        .card {
+            background: #fff;
+            max-width: 480px;
             width: 100%;
-            padding: 50px 40px;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 24px;
+            padding: 56px 48px 52px;
+            box-shadow: 0 24px 64px rgba(0,0,0,.28);
             text-align: center;
         }
-        
-        .icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+
+        .icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
         }
-        
-        .success-icon {
-            color: #28a745;
+
+        .icon-circle {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
         }
-        
-        .error-icon {
-            color: #dc3545;
-        }
-        
+        .icon-circle.success { background: #dcfce7; }
+        .icon-circle.error   { background: #fee2e2; }
+
         h1 {
-            font-size: 32px;
-            margin-bottom: 15px;
-            color: #333;
+            font-family: 'Playfair Display', serif;
+            font-size: 30px; font-weight: 900;
+            color: #0a0a0a;
+            margin-bottom: 12px; line-height: 1.2;
         }
-        
-        p {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
+
+        .subtitle {
+            font-size: 16px; color: #4a5568;
+            line-height: 1.6; margin-bottom: 28px;
         }
-        
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: #667eea;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 700;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
-        
-        .details {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
+
+        .details-box {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 28px;
             text-align: left;
         }
-        
-        .details p {
-            margin-bottom: 10px;
-            font-size: 16px;
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
         }
-        
-        .details strong {
-            color: #333;
+        .details-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .details-row .label { color: #718096; font-weight: 500; }
+        .details-row .value { color: #1a1a1a; font-weight: 600; }
+        .value.green { color: #16a34a; }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px; font-weight: 700;
+            text-decoration: none; text-align: center;
+            transition: all .2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(102,126,234,.38);
+            margin-bottom: 10px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(102,126,234,.48); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #e5e7eb;
+            color: #718096;
+        }
+        .btn-outline:hover { border-color: #667eea; color: #667eea; }
+
+        @media (max-width: 520px) {
+            body { padding: 16px; align-items: flex-start; padding-top: 40px; }
+            .card { padding: 40px 24px 44px; border-radius: 20px; }
+            h1 { font-size: 24px; }
+            .icon-circle { width: 72px; height: 72px; font-size: 32px; }
+        }
+        @media (max-width: 380px) {
+            .card { padding: 32px 18px 36px; }
+            h1 { font-size: 21px; }
         }
     </style>
 </head>
 <body>
-    <div class="result-container">
+    <div class="card">
         <?php if ($success): ?>
-            <div class="icon success-icon">✓</div>
-            <h1>Payment Successful!</h1>
-            <p>Your subscription has been activated. Welcome to the premium experience!</p>
-            
-            <div class="details">
-                <p><strong>Plan:</strong> <?php echo ucfirst($planType); ?> Subscription</p>
-                <p><strong>Status:</strong> Active</p>
-                <p><strong>Access:</strong> Unlimited Premium Articles</p>
+            <div class="icon-wrap">
+                <div class="icon-circle success">✓</div>
             </div>
-            
-            <a href="index.php" class="btn">Start Reading</a>
-        <?php else: ?>
-            <div class="icon error-icon">✗</div>
-            <h1>Payment Failed</h1>
-            <p>We couldn't process your payment. Please try again or contact support.</p>
-            
-            <?php if (isset($errorMessage)): ?>
-                <div class="details">
-                    <p><strong>Error:</strong> <?php echo htmlspecialchars($errorMessage); ?></p>
+            <h1>Payment Successful!</h1>
+            <p class="subtitle">Your subscription is now active. Enjoy unlimited access to all premium articles.</p>
+
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="label">Plan</span>
+                    <span class="value"><?php echo ucfirst($planType); ?> Subscription</span>
                 </div>
+                <div class="details-row">
+                    <span class="label">Amount</span>
+                    <span class="value">₹<?php echo number_format($amount, 2); ?></span>
+                </div>
+                <div class="details-row">
+                    <span class="label">Status</span>
+                    <span class="value green">✓ Active</span>
+                </div>
+                <div class="details-row">
+                    <span class="label">Access</span>
+                    <span class="value">Unlimited Premium Articles</span>
+                </div>
+            </div>
+
+            <a href="index.php" class="btn btn-primary">Start Reading →</a>
+            <a href="pricing.php" class="btn btn-outline">View Subscription Details</a>
+
+        <?php else: ?>
+            <div class="icon-wrap">
+                <div class="icon-circle error">✗</div>
+            </div>
+            <h1>Payment Failed</h1>
+            <p class="subtitle">We couldn't process your payment. No charges have been made.</p>
+
+            <?php if ($errorMessage): ?>
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="label">Reason</span>
+                    <span class="value"><?php echo htmlspecialchars($errorMessage); ?></span>
+                </div>
+            </div>
             <?php endif; ?>
-            
-            <a href="pricing.php" class="btn">Try Again</a>
+
+            <a href="pricing.php" class="btn btn-primary">Try Again</a>
+            <a href="index.php" class="btn btn-outline">Back to Home</a>
         <?php endif; ?>
     </div>
 </body>
