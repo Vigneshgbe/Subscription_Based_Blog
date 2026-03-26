@@ -32,29 +32,20 @@ $freeRemaining = getFreeArticlesRemaining();
 
 // Determine if user can read this article
 if (!$article['is_premium']) {
-    // Free articles are always accessible
     $canRead = true;
 } elseif (isLoggedIn()) {
-    // User is logged in - check subscription or free limit
     if ($hasSubscription) {
-        // Premium subscriber - full access
         $canRead = true;
     } else {
-        // Not a subscriber - check free articles remaining
         if ($freeRemaining > 0) {
-            // Has free articles left
             $canRead = true;
-            
-            // Record this view and decrement count
             recordArticleRead($article['id']);
         } else {
-            // No free articles remaining
             $canRead = false;
             $blockReason = 'limit_reached';
         }
     }
 } else {
-    // Not logged in and article is premium
     $canRead = false;
     $blockReason = 'not_logged_in';
 }
@@ -84,95 +75,124 @@ if (!$canRead && $article['is_premium']) {
                 padding: 20px;
             }
             .paywall-container {
-                max-width: 600px;
+                max-width: 580px;
+                width: 100%;
                 text-align: center;
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.97);
                 backdrop-filter: blur(10px);
                 border-radius: 24px;
-                padding: 64px 48px;
+                /* FIX: padding-top increased so icon has room; overflow visible */
+                padding: 48px 48px 56px;
                 box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
                 color: #1a1a1a;
+                overflow: visible;
+            }
+            /* FIX: icon wrapper with explicit size control, no clipping */
+            .paywall-icon-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 24px;
+                line-height: 1;
             }
             .paywall-icon {
-                font-size: 80px;
-                margin-bottom: 24px;
+                font-size: 72px;
+                line-height: 1;
+                display: block;
+                /* FIX: prevent emoji font from rendering as outline/letter */
+                font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
                 animation: pulse 2s infinite;
             }
             @keyframes pulse {
                 0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.05); }
+                50% { transform: scale(1.06); }
             }
             h1 {
-                font-size: 40px;
+                font-size: 36px;
                 font-weight: 900;
-                margin-bottom: 16px;
+                margin-bottom: 14px;
                 font-family: 'Playfair Display', serif;
                 color: #0a0a0a;
                 line-height: 1.2;
             }
             p {
-                font-size: 18px;
-                margin-bottom: 32px;
+                font-size: 17px;
+                margin-bottom: 28px;
                 color: #4a5568;
                 line-height: 1.6;
             }
             .stats-box {
                 background: linear-gradient(135deg, #FF6B6B 0%, #E74C3C 100%);
                 color: white;
-                padding: 32px;
+                padding: 28px 24px;
                 border-radius: 16px;
-                margin-bottom: 32px;
+                margin-bottom: 28px;
             }
+            /* FIX: force number font to Inter so "0" renders as digit not serif O */
             .stats-box .number {
-                font-size: 64px;
+                font-size: 60px;
                 font-weight: 900;
-                font-family: 'Playfair Display', serif;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
                 margin-bottom: 8px;
+                line-height: 1;
+                font-variant-numeric: tabular-nums;
+                letter-spacing: -2px;
             }
             .stats-box .label {
-                font-size: 14px;
+                font-size: 13px;
                 text-transform: uppercase;
-                letter-spacing: 1px;
-                opacity: 0.9;
+                letter-spacing: 1.5px;
+                opacity: 0.92;
+                font-weight: 600;
             }
             .benefits {
                 text-align: left;
-                margin: 32px 0;
+                margin: 24px 0;
                 background: #f9fafb;
-                padding: 28px;
+                padding: 24px 28px;
                 border-radius: 12px;
             }
             .benefit {
                 display: flex;
-                align-items: center;
+                align-items: flex-start;
                 gap: 12px;
-                margin-bottom: 14px;
-                font-size: 16px;
+                margin-bottom: 12px;
+                font-size: 15px;
                 color: #1a1a1a;
+                line-height: 1.5;
             }
+            .benefit:last-child { margin-bottom: 0; }
             .benefit::before {
                 content: '✓';
                 color: #10b981;
                 font-weight: 900;
-                font-size: 20px;
+                font-size: 18px;
                 flex-shrink: 0;
+                margin-top: 1px;
+            }
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 8px;
             }
             .btn {
-                display: inline-block;
-                padding: 16px 40px;
+                display: block;
+                width: 100%;
+                padding: 15px 32px;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
                 text-decoration: none;
                 border-radius: 12px;
                 font-weight: 700;
                 font-size: 16px;
-                transition: all 0.3s;
-                margin: 8px;
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                transition: all 0.25s;
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+                text-align: center;
             }
             .btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 28px rgba(102, 126, 234, 0.45);
             }
             .btn-outline {
                 background: transparent;
@@ -184,18 +204,34 @@ if (!$canRead && $article['is_premium']) {
                 background: #667eea;
                 color: white;
             }
-            @media (max-width: 640px) {
-                .paywall-container { padding: 48px 32px; }
-                h1 { font-size: 32px; }
-                .paywall-icon { font-size: 64px; }
-                .stats-box .number { font-size: 48px; }
-                .btn { display: block; margin: 8px 0; }
+
+            /* ===== RESPONSIVE ===== */
+            @media (max-width: 600px) {
+                body { padding: 16px; align-items: flex-start; padding-top: 32px; }
+                .paywall-container {
+                    padding: 40px 24px 48px;
+                    border-radius: 20px;
+                }
+                h1 { font-size: 28px; }
+                p { font-size: 15px; }
+                .paywall-icon { font-size: 60px; }
+                .stats-box .number { font-size: 52px; }
+                .benefits { padding: 20px; }
+                .benefit { font-size: 14px; }
+            }
+            @media (max-width: 380px) {
+                .paywall-container { padding: 32px 18px 40px; border-radius: 16px; }
+                h1 { font-size: 24px; }
+                .stats-box .number { font-size: 44px; }
+                .btn { font-size: 14px; padding: 13px 24px; }
             }
         </style>
     </head>
     <body>
         <div class="paywall-container">
-            <div class="paywall-icon">🔒</div>
+            <div class="paywall-icon-wrap">
+                <span class="paywall-icon">🔒</span>
+            </div>
             
             <?php if ($blockReason === 'not_logged_in'): ?>
                 <h1>Premium Content</h1>
@@ -212,8 +248,10 @@ if (!$canRead && $article['is_premium']) {
                     <div class="benefit">Upgrade anytime for unlimited access</div>
                 </div>
                 
-                <a href="login.php?redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn">Sign In to Read</a>
-                <a href="register.php" class="btn btn-outline">Create Free Account</a>
+                <div class="btn-group">
+                    <a href="login.php?redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn">Sign In to Read</a>
+                    <a href="register.php" class="btn btn-outline">Create Free Account</a>
+                </div>
                 
             <?php else: // limit_reached ?>
                 <h1>You've Reached Your Limit</h1>
@@ -231,8 +269,10 @@ if (!$canRead && $article['is_premium']) {
                     <div class="benefit">Cancel anytime, no strings attached</div>
                 </div>
                 
-                <a href="pricing.php" class="btn">View Subscription Plans</a>
-                <a href="index.php" class="btn btn-outline">Back to Home</a>
+                <div class="btn-group">
+                    <a href="pricing.php" class="btn">View Subscription Plans</a>
+                    <a href="index.php" class="btn btn-outline">Back to Home</a>
+                </div>
             <?php endif; ?>
         </div>
     </body>
@@ -264,7 +304,7 @@ $relatedArticles = $relatedStmt->fetchAll();
 
 // Estimate reading time
 $wordCount = str_word_count(strip_tags($article['content']));
-$readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
+$readingTime = ceil($wordCount / 200);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -344,7 +384,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 18px 0;
         }
         
         .logo {
@@ -357,13 +397,11 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             transition: opacity 0.2s;
         }
         
-        .logo:hover {
-            opacity: 0.8;
-        }
+        .logo:hover { opacity: 0.8; }
         
         .nav {
             display: flex;
-            gap: 24px;
+            gap: 20px;
             align-items: center;
         }
         
@@ -375,9 +413,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             transition: color 0.2s;
         }
         
-        .nav a:hover {
-            color: var(--accent);
-        }
+        .nav a:hover { color: var(--accent); }
         
         /* Article Header */
         .article-header {
@@ -453,6 +489,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             color: white;
             font-weight: 700;
             font-size: 16px;
+            flex-shrink: 0;
         }
         
         .author-details strong {
@@ -496,9 +533,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             font-family: 'Merriweather', Georgia, serif;
         }
         
-        .article-content > * {
-            margin-bottom: 28px;
-        }
+        .article-content > * { margin-bottom: 28px; }
         
         .article-content p {
             margin-bottom: 28px;
@@ -533,23 +568,21 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         
         .article-content ul,
         .article-content ol {
-            margin-left: 32px;
+            margin-left: 28px;
             margin-bottom: 28px;
             line-height: 1.8;
         }
         
         .article-content li {
             margin-bottom: 12px;
-            padding-left: 8px;
+            padding-left: 6px;
         }
         
-        .article-content ul li::marker {
-            color: var(--accent);
-        }
+        .article-content ul li::marker { color: var(--accent); }
         
         .article-content blockquote {
             border-left: 4px solid var(--accent);
-            padding-left: 32px;
+            padding-left: 28px;
             margin: 40px 0;
             font-style: italic;
             font-size: 24px;
@@ -565,9 +598,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             transition: color 0.2s;
         }
         
-        .article-content a:hover {
-            color: var(--accent-dark);
-        }
+        .article-content a:hover { color: var(--accent-dark); }
         
         .article-content img {
             width: 100%;
@@ -611,9 +642,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         }
         
         .article-content em,
-        .article-content i {
-            font-style: italic;
-        }
+        .article-content i { font-style: italic; }
         
         .article-content hr {
             border: none;
@@ -639,8 +668,8 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         
         .related-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 28px;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
@@ -670,7 +699,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         }
         
         .related-card h3 {
-            font-size: 22px;
+            font-size: 20px;
             margin-bottom: 12px;
             font-weight: 700;
             line-height: 1.4;
@@ -683,13 +712,11 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             transition: color 0.2s;
         }
         
-        .related-card h3 a:hover {
-            color: var(--accent);
-        }
+        .related-card h3 a:hover { color: var(--accent); }
         
         .related-card-excerpt {
             color: var(--text-light);
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.6;
         }
         
@@ -704,9 +731,10 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         .footer-links {
             display: flex;
             justify-content: center;
-            gap: 32px;
+            gap: 28px;
             margin-bottom: 24px;
             flex-wrap: wrap;
+            padding: 0 24px;
         }
         
         .footer a {
@@ -717,72 +745,86 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             transition: color 0.2s;
         }
         
-        .footer a:hover {
-            color: var(--accent);
+        .footer a:hover { color: var(--accent); }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .article-title { font-size: 40px; }
+            .article-content { font-size: 18px; }
+            .related-articles h2 { font-size: 34px; }
         }
-        
-        /* Mobile Responsive */
+
         @media (max-width: 768px) {
-            .article-title {
-                font-size: 32px;
-            }
-            
-            .article-excerpt {
-                font-size: 18px;
-            }
+            .article-header { margin: 36px auto 32px; }
+            .article-title { font-size: 32px; }
+            .article-excerpt { font-size: 17px; }
             
             .article-content {
                 font-size: 17px;
                 padding: 0 20px;
             }
-            
-            .article-content h2 {
-                font-size: 28px;
-                margin: 40px 0 20px;
-            }
-            
-            .article-content h3 {
-                font-size: 24px;
-            }
-            
+            .article-content h2 { font-size: 26px; margin: 40px 0 18px; }
+            .article-content h3 { font-size: 22px; margin: 32px 0 16px; }
+            .article-content h4 { font-size: 19px; }
             .article-content blockquote {
                 font-size: 20px;
-                padding-left: 24px;
-                margin: 32px 0;
+                padding-left: 20px;
+                margin: 28px 0;
             }
+            .article-content ul,
+            .article-content ol { margin-left: 20px; }
             
             .article-meta {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 16px;
+                gap: 14px;
             }
             
-            .related-grid {
-                grid-template-columns: 1fr;
-            }
+            .featured-image { margin: 20px auto; }
+            .featured-image img { max-height: 260px; }
             
-            .featured-image {
-                margin: 24px auto;
-            }
+            .related-articles { padding: 56px 0; margin-top: 56px; }
+            .related-articles h2 { font-size: 28px; margin-bottom: 32px; }
+            .related-grid { grid-template-columns: 1fr; gap: 20px; }
+            .related-card { padding: 22px; }
             
-            .featured-image img {
-                max-height: 280px;
-                border-radius: 6px;
-            }
+            .footer-links { gap: 16px; }
+            .footer a { font-size: 14px; }
         }
         
         @media (max-width: 480px) {
-            .article-title {
-                font-size: 28px;
-            }
+            .container { padding: 0 16px; }
+            .header-content { padding: 14px 0; }
+            .logo { font-size: 20px; }
+            .nav { gap: 14px; }
+            .nav a { font-size: 14px; }
             
-            .article-header {
-                margin: 32px auto 32px;
-            }
+            .article-header { margin: 24px auto 24px; padding: 0 16px; }
+            .article-title { font-size: 26px; letter-spacing: -0.3px; }
+            .article-excerpt { font-size: 16px; margin-bottom: 24px; }
+            .article-category { font-size: 11px; }
             
-            .featured-image {
-                margin: 24px auto;
-            }
+            .article-content { font-size: 16px; padding: 0 16px; }
+            .article-content p { text-align: left; }
+            .article-content h2 { font-size: 22px; margin: 32px 0 14px; }
+            .article-content h3 { font-size: 19px; }
+            .article-content blockquote { font-size: 17px; padding-left: 16px; }
+            .article-content code { font-size: 14px; }
+
+            .featured-image { padding: 0 16px; }
+            .featured-image img { max-height: 200px; border-radius: 6px; }
+            
+            .related-grid { padding: 0 16px; }
+            .related-card h3 { font-size: 18px; }
+
+            .footer { padding: 36px 0 20px; }
+            .footer-links { gap: 12px; }
+        }
+
+        @media (max-width: 360px) {
+            .article-title { font-size: 22px; }
+            .article-content { font-size: 15px; }
+            .nav a:not(:first-child) { display: none; }
         }
     </style>
 </head>
