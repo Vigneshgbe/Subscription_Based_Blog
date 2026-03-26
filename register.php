@@ -90,6 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - <?php echo SITE_NAME; ?></title>
+    <meta name="description" content="Create your account and start reading premium content">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -97,140 +101,348 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-sizing: border-box;
         }
         
+        :root {
+            --primary: #0a0a0a;
+            --secondary: #ffffff;
+            --accent: #FF6B6B;
+            --accent-dark: #E74C3C;
+            --text: #1a1a1a;
+            --text-light: #6b7280;
+            --text-lighter: #9ca3af;
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --bg-light: #fafafa;
+            --bg-lighter: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
         }
         
         .auth-container {
-            background: white;
-            max-width: 450px;
+            background: var(--secondary);
+            max-width: 520px;
             width: 100%;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            z-index: 1;
+            border: 1px solid var(--border-light);
+        }
+        
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
         }
         
         .logo {
             font-size: 32px;
             font-weight: 900;
-            text-align: center;
-            margin-bottom: 10px;
-            color: #667eea;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .logo-tagline {
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
         }
         
         h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
             text-align: center;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.5px;
         }
         
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-size: 16px;
+            font-weight: 500;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: #333;
+            color: var(--text);
+            font-size: 14px;
+            letter-spacing: 0.2px;
         }
         
-        input {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
             font-size: 15px;
-            transition: border-color 0.3s;
+            transition: all 0.2s;
             font-family: inherit;
+            background: var(--secondary);
+            color: var(--text);
         }
         
         input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+        
+        input::placeholder {
+            color: var(--text-lighter);
         }
         
         .btn {
             width: 100%;
-            padding: 14px;
-            background: #667eea;
-            color: white;
+            padding: 16px;
+            background: var(--accent);
+            color: var(--secondary);
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            margin-top: 8px;
         }
         
         .btn:hover {
-            background: #5568d3;
+            background: var(--accent-dark);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         }
         
-        .error {
-            background: #fee;
-            border: 1px solid #fcc;
-            color: #c33;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-left: 4px solid;
+            font-weight: 500;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
             font-size: 14px;
+            line-height: 1.5;
         }
         
-        .error ul {
-            margin-left: 20px;
+        .alert-danger {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
         }
         
-        .divider {
-            text-align: center;
-            margin: 30px 0;
-            color: #999;
-            font-size: 14px;
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .alert li {
+            margin-bottom: 4px;
+        }
+        
+        .alert li:last-child {
+            margin-bottom: 0;
         }
         
         .link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+            font-size: 15px;
+            color: var(--text-light);
         }
         
         .link a {
-            color: #667eea;
+            color: var(--accent);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            transition: color 0.2s;
         }
         
         .link a:hover {
+            color: var(--accent-dark);
             text-decoration: underline;
+        }
+        
+        .back-home {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .back-home a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        
+        .back-home a:hover {
+            color: var(--text);
+        }
+        
+        .back-home svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .benefits {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .benefits-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .benefit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+        
+        .benefit-icon {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .password-hint {
+            font-size: 13px;
+            color: var(--text-lighter);
+            margin-top: 6px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        @media (max-width: 640px) {
+            .auth-container {
+                padding: 32px 24px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            .logo {
+                font-size: 28px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="auth-container">
-        <div class="logo"><?php echo SITE_NAME; ?></div>
+        <div class="back-home">
+            <a href="index.php">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Home
+            </a>
+        </div>
+        
+        <div class="logo-section">
+            <span class="logo"><?php echo SITE_NAME; ?></span>
+            <p class="logo-tagline">Premium insights for curious minds</p>
+        </div>
+        
         <h1>Create Account</h1>
-        <p class="subtitle">Join thousands of readers</p>
+        <p class="subtitle">Join thousands of readers today</p>
         
         <?php if (!empty($errors)): ?>
-            <div class="error">
-                <ul>
-                    <?php foreach ($errors as $error): ?>
-                        <li><?php echo htmlspecialchars($error); ?></li>
-                    <?php endforeach; ?>
-                </ul>
+            <div class="alert alert-danger">
+                <span style="font-size: 20px;">⚠️</span>
+                <div>
+                    <ul>
+                        <?php foreach ($errors as $error): ?>
+                            <li><?php echo htmlspecialchars($error); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
             </div>
         <?php endif; ?>
         
@@ -238,30 +450,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
             
             <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="full_name" required 
-                       value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>">
+                <label for="full_name">Full Name</label>
+                <input type="text" 
+                       id="full_name"
+                       name="full_name" 
+                       required 
+                       placeholder="John Doe"
+                       value="<?php echo htmlspecialchars($_POST['full_name'] ?? ''); ?>"
+                       autofocus>
             </div>
             
             <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" required 
+                <label for="email">Email Address</label>
+                <input type="email" 
+                       id="email"
+                       name="email" 
+                       required
+                       placeholder="you@example.com"
                        value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
             </div>
             
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required 
-                       placeholder="At least 8 characters">
+                <label for="password">Password</label>
+                <input type="password" 
+                       id="password"
+                       name="password" 
+                       required 
+                       placeholder="Create a strong password">
+                <p class="password-hint">Must be at least 8 characters long</p>
             </div>
             
             <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" required>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" 
+                       id="confirm_password"
+                       name="confirm_password" 
+                       required
+                       placeholder="Re-enter your password">
             </div>
             
             <button type="submit" class="btn">Create Account</button>
         </form>
+        
+        <div class="benefits">
+            <p class="benefits-title">What You Get</p>
+            <div class="benefit-list">
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span><strong>3 free premium articles</strong> to start your journey</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span><strong>Unlimited access</strong> to all free content</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span><strong>Personalized recommendations</strong> based on your interests</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span><strong>Reading history</strong> across all your devices</span>
+                </div>
+            </div>
+        </div>
         
         <div class="link">
             Already have an account? <a href="login.php">Sign in</a>
