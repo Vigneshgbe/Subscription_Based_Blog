@@ -91,104 +91,15 @@ $recentActivity = $db->query("
             min-height: 100vh;
         }
         
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            color: white;
-            padding: 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar-brand {
-            padding: 32px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.03);
-        }
-        
-        .sidebar-brand h1 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-        
-        .sidebar-brand p {
-            font-size: 13px;
-            opacity: 0.6;
-            font-weight: 500;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 16px 12px;
-        }
-        
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            margin-bottom: 4px;
-        }
-        
-        .sidebar-menu a:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            transform: translateX(4px);
-        }
-        
-        .sidebar-menu a.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-        
-        .sidebar-menu a svg,
-        .sidebar-menu a .icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-        
+        /* ── Main content area ─────────────────────────────────────── */
         .main-content {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 280px; /* matches sidebar width */
             padding: 32px;
             transition: margin-left 0.3s ease;
         }
         
-        .mobile-header {
-            display: none;
-            background: white;
-            padding: 16px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
-            color: #1e293b;
-        }
-        
+        /* ── Top bar ───────────────────────────────────────────────── */
         .top-bar {
             background: white;
             padding: 28px 32px;
@@ -254,6 +165,7 @@ $recentActivity = $db->query("
             color: #64748b;
         }
         
+        /* ── Stat Cards ────────────────────────────────────────────── */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -358,6 +270,7 @@ $recentActivity = $db->query("
             margin-top: 8px;
         }
         
+        /* ── Cards ─────────────────────────────────────────────────── */
         .card {
             background: white;
             padding: 28px;
@@ -381,6 +294,7 @@ $recentActivity = $db->query("
             color: #0f172a;
         }
         
+        /* ── Buttons ────────────────────────────────────────────────── */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -412,6 +326,7 @@ $recentActivity = $db->query("
             font-size: 13px;
         }
         
+        /* ── Quick Actions ──────────────────────────────────────────── */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -484,6 +399,7 @@ $recentActivity = $db->query("
             z-index: 1;
         }
         
+        /* ── Tables ─────────────────────────────────────────────────── */
         .table-container {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -521,6 +437,7 @@ $recentActivity = $db->query("
             background: #f8fafc;
         }
         
+        /* ── Badges ─────────────────────────────────────────────────── */
         .badge {
             display: inline-flex;
             align-items: center;
@@ -552,19 +469,7 @@ $recentActivity = $db->query("
             color: #7c3aed;
         }
         
-        .overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-        
-        .overlay.active {
-            display: block;
-        }
-        
-        /* Responsive */
+        /* ── Responsive ─────────────────────────────────────────────── */
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -572,21 +477,9 @@ $recentActivity = $db->query("
         }
         
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
             .main-content {
                 margin-left: 0;
                 padding: 20px 16px;
-            }
-            
-            .mobile-header {
-                display: flex;
             }
             
             .stats-grid {
@@ -613,249 +506,201 @@ $recentActivity = $db->query("
     </style>
 </head>
 <body>
-    <div class="mobile-header">
-        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-        <h1><?php echo SITE_NAME; ?></h1>
-    </div>
-    
-    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-    
-    <div class="admin-layout">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
-                <h1><?php echo SITE_NAME; ?></h1>
-                <p>Admin Dashboard</p>
-            </div>
-            <ul class="sidebar-menu">
-                <li><a href="dashboard.php" class="active">
-                    <span class="icon">📊</span> Dashboard
-                </a></li>
-                <li><a href="articles.php">
-                    <span class="icon">📝</span> Articles
-                </a></li>
-                <li><a href="users.php">
-                    <span class="icon">👥</span> Users
-                </a></li>
-                <li><a href="subscriptions.php">
-                    <span class="icon">💳</span> Subscriptions
-                </a></li>
-                <li><a href="transactions.php">
-                    <span class="icon">💰</span> Transactions
-                </a></li>
-                <li><a href="categories.php">
-                    <span class="icon">🏷️</span> Categories
-                </a></li>
-                <li><a href="settings.php">
-                    <span class="icon">⚙️</span> Settings
-                </a></li>
-                <li><a href="../index.php">
-                    <span class="icon">🌐</span> View Site
-                </a></li>
-                <li><a href="../logout.php">
-                    <span class="icon">🚪</span> Logout
-                </a></li>
-            </ul>
-        </aside>
-        
-        <main class="main-content">
-            <div class="top-bar">
-                <div class="top-bar-content">
-                    <div>
-                        <h1>Dashboard Overview</h1>
-                        <p class="top-bar-time"><?php echo date('l, F j, Y'); ?></p>
+<div class="admin-layout">
+
+    <?php require_once 'sidebar.php'; ?>
+
+    <main class="main-content">
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-content">
+                <div>
+                    <h1>Dashboard Overview</h1>
+                    <p class="top-bar-time"><?php echo date('l, F j, Y'); ?></p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?>
                     </div>
-                    <div class="user-info">
-                        <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?></div>
-                        <div class="user-details">
-                            <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong>
-                            <span>Administrator</span>
-                        </div>
+                    <div class="user-details">
+                        <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong>
+                        <span>Administrator</span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">👥</div>
+                </div>
+                <div class="stat-value"><?php echo number_format($stats['total_users']); ?></div>
+                <div class="stat-label">Total Users</div>
+                <span class="stat-change">↗ Growing</span>
             </div>
             
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">👥</div>
-                    </div>
-                    <div class="stat-value"><?php echo number_format($stats['total_users']); ?></div>
-                    <div class="stat-label">Total Users</div>
-                    <span class="stat-change">↗ Growing</span>
+            <div class="stat-card card-green">
+                <div class="stat-header">
+                    <div class="stat-icon">💎</div>
                 </div>
-                
-                <div class="stat-card card-green">
-                    <div class="stat-header">
-                        <div class="stat-icon">💎</div>
-                    </div>
-                    <div class="stat-value"><?php echo number_format($stats['active_subscriptions']); ?></div>
-                    <div class="stat-label">Active Subscribers</div>
-                    <span class="stat-change">↗ Active</span>
-                </div>
-                
-                <div class="stat-card card-blue">
-                    <div class="stat-header">
-                        <div class="stat-icon">📝</div>
-                    </div>
-                    <div class="stat-value"><?php echo number_format($stats['published_articles']); ?></div>
-                    <div class="stat-label">Published Articles</div>
-                    <span class="stat-change">of <?php echo number_format($stats['total_articles']); ?> total</span>
-                </div>
-                
-                <div class="stat-card card-orange">
-                    <div class="stat-header">
-                        <div class="stat-icon">💰</div>
-                    </div>
-                    <div class="stat-value">₹<?php echo number_format($stats['total_revenue'], 0); ?></div>
-                    <div class="stat-label">Total Revenue</div>
-                    <span class="stat-change">₹<?php echo number_format($stats['monthly_revenue'], 0); ?> this month</span>
-                </div>
+                <div class="stat-value"><?php echo number_format($stats['active_subscriptions']); ?></div>
+                <div class="stat-label">Active Subscribers</div>
+                <span class="stat-change">↗ Active</span>
             </div>
             
-            <div class="quick-actions">
-                <a href="article-create.php" class="quick-action-card">
-                    <div class="quick-action-icon">✨</div>
-                    <h3>New Article</h3>
-                    <p>Create a new blog post</p>
-                </a>
-                <a href="users.php" class="quick-action-card card-green">
-                    <div class="quick-action-icon">👥</div>
-                    <h3>Manage Users</h3>
-                    <p>View and edit users</p>
-                </a>
-                <a href="subscriptions.php" class="quick-action-card card-orange">
-                    <div class="quick-action-icon">📊</div>
-                    <h3>Subscriptions</h3>
-                    <p>Monitor subscriptions</p>
-                </a>
-                <a href="settings.php" class="quick-action-card card-blue">
-                    <div class="quick-action-icon">⚙️</div>
-                    <h3>Settings</h3>
-                    <p>Configure your site</p>
-                </a>
+            <div class="stat-card card-blue">
+                <div class="stat-header">
+                    <div class="stat-icon">📝</div>
+                </div>
+                <div class="stat-value"><?php echo number_format($stats['published_articles']); ?></div>
+                <div class="stat-label">Published Articles</div>
+                <span class="stat-change">of <?php echo number_format($stats['total_articles']); ?> total</span>
             </div>
             
-            <div class="card">
-                <div class="card-header">
-                    <h2>Recent Articles</h2>
-                    <a href="articles.php" class="btn btn-sm btn-primary">View All →</a>
+            <div class="stat-card card-orange">
+                <div class="stat-header">
+                    <div class="stat-icon">💰</div>
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Author</th>
-                                <th>Status</th>
-                                <th>Views</th>
-                                <th>Published</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($recentArticles as $article): ?>
-                            <tr>
-                                <td><strong><?php echo htmlspecialchars($article['title']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($article['author_name']); ?></td>
-                                <td>
-                                    <?php if ($article['is_published']): ?>
-                                        <span class="badge badge-success">Published</span>
-                                    <?php else: ?>
-                                        <span class="badge badge-warning">Draft</span>
-                                    <?php endif; ?>
-                                    <?php if ($article['is_premium']): ?>
-                                        <span class="badge badge-purple">Premium</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo number_format($article['views']); ?></td>
-                                <td><?php echo timeAgo($article['created_at']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="stat-value">₹<?php echo number_format($stats['total_revenue'], 0); ?></div>
+                <div class="stat-label">Total Revenue</div>
+                <span class="stat-change">₹<?php echo number_format($stats['monthly_revenue'], 0); ?> this month</span>
             </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h2>Recent Subscriptions</h2>
-                    <a href="subscriptions.php" class="btn btn-sm btn-primary">View All →</a>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Email</th>
-                                <th>Plan</th>
-                                <th>Status</th>
-                                <th>Subscribed</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($recentSubscriptions as $sub): ?>
-                            <tr>
-                                <td><strong><?php echo htmlspecialchars($sub['full_name']); ?></strong></td>
-                                <td><?php echo htmlspecialchars($sub['email']); ?></td>
-                                <td><span class="badge badge-info"><?php echo ucfirst($sub['plan_type']); ?></span></td>
-                                <td>
-                                    <?php if ($sub['status'] === 'active'): ?>
-                                        <span class="badge badge-success">Active</span>
-                                    <?php else: ?>
-                                        <span class="badge badge-warning"><?php echo ucfirst($sub['status']); ?></span>
-                                    <?php endif; ?>
-                                </td>
-                                <td><?php echo timeAgo($sub['created_at']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="article-create.php" class="quick-action-card">
+                <div class="quick-action-icon">✨</div>
+                <h3>New Article</h3>
+                <p>Create a new blog post</p>
+            </a>
+            <a href="users.php" class="quick-action-card card-green">
+                <div class="quick-action-icon">👥</div>
+                <h3>Manage Users</h3>
+                <p>View and edit users</p>
+            </a>
+            <a href="subscriptions.php" class="quick-action-card card-orange">
+                <div class="quick-action-icon">📊</div>
+                <h3>Subscriptions</h3>
+                <p>Monitor subscriptions</p>
+            </a>
+            <a href="settings.php" class="quick-action-card card-blue">
+                <div class="quick-action-icon">⚙️</div>
+                <h3>Settings</h3>
+                <p>Configure your site</p>
+            </a>
+        </div>
+
+        <!-- Recent Articles -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Articles</h2>
+                <a href="articles.php" class="btn btn-sm btn-primary">View All →</a>
             </div>
-            
-            <div class="card">
-                <div class="card-header">
-                    <h2>Recent Activity</h2>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($recentActivity as $activity): ?>
-                            <tr>
-                                <td><strong><?php echo htmlspecialchars($activity['full_name'] ?: 'System'); ?></strong></td>
-                                <td><?php echo htmlspecialchars(str_replace('_', ' ', ucwords($activity['action'], '_'))); ?></td>
-                                <td><?php echo timeAgo($activity['created_at']); ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Status</th>
+                            <th>Views</th>
+                            <th>Published</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recentArticles as $article): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($article['title']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($article['author_name']); ?></td>
+                            <td>
+                                <?php if ($article['is_published']): ?>
+                                    <span class="badge badge-success">Published</span>
+                                <?php else: ?>
+                                    <span class="badge badge-warning">Draft</span>
+                                <?php endif; ?>
+                                <?php if ($article['is_premium']): ?>
+                                    <span class="badge badge-purple">Premium</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo number_format($article['views']); ?></td>
+                            <td><?php echo timeAgo($article['created_at']); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-        </main>
-    </div>
-    
-    <script>
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-        
-        // Close sidebar when clicking menu items on mobile
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    toggleMenu();
-                }
-            });
-        });
-    </script>
+        </div>
+
+        <!-- Recent Subscriptions -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Subscriptions</h2>
+                <a href="subscriptions.php" class="btn btn-sm btn-primary">View All →</a>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Plan</th>
+                            <th>Status</th>
+                            <th>Subscribed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recentSubscriptions as $sub): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($sub['full_name']); ?></strong></td>
+                            <td><?php echo htmlspecialchars($sub['email']); ?></td>
+                            <td><span class="badge badge-info"><?php echo ucfirst($sub['plan_type']); ?></span></td>
+                            <td>
+                                <?php if ($sub['status'] === 'active'): ?>
+                                    <span class="badge badge-success">Active</span>
+                                <?php else: ?>
+                                    <span class="badge badge-warning"><?php echo ucfirst($sub['status']); ?></span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?php echo timeAgo($sub['created_at']); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Activity</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($recentActivity as $activity): ?>
+                        <tr>
+                            <td><strong><?php echo htmlspecialchars($activity['full_name'] ?: 'System'); ?></strong></td>
+                            <td><?php echo htmlspecialchars(str_replace('_', ' ', ucwords($activity['action'], '_'))); ?></td>
+                            <td><?php echo timeAgo($activity['created_at']); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
 </body>
 </html>
