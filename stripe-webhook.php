@@ -1,6 +1,6 @@
 <?php
 require_once 'config.php';
-require_once 'stripe-php/init.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 

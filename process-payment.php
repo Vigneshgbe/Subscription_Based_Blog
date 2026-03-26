@@ -1,6 +1,6 @@
 <?php
 require_once 'config.php';
-require_once 'stripe-php/init.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Must be first output — no HTML before this
 header('Content-Type: application/json');
