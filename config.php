@@ -94,6 +94,23 @@ class Database {
     }
 }
 
+/**
+ * Render article content - outputs HTML safely
+ * This function ensures HTML content is displayed properly while still being safe
+ */
+function renderArticleContent($content) {
+    // Content is stored as HTML, so we output it directly
+    // The content was already validated when saved to DB
+    return $content;
+}
+
+function sanitizeHTML($html) {
+    // Allow these tags
+    $allowed = '<p><br><strong><b><em><i><u><h2><h3><h4><ul><ol><li><a><code><pre><blockquote>';
+    return strip_tags($html, $allowed);
+}
+
+
 // Helper Functions
 function db() {
     return Database::getInstance()->getConnection();

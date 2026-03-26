@@ -5,7 +5,6 @@ requireAdmin();
 $db = db();
 
 $errors   = [];
-$success  = false;
 $formData = [
     'title' => '', 'slug' => '', 'excerpt' => '', 'content' => '',
     'featured_image' => '', 'category_id' => '', 'is_premium' => 0,
@@ -17,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'title'            => sanitizeInput($_POST['title'] ?? ''),
         'slug'             => sanitizeInput($_POST['slug'] ?? ''),
         'excerpt'          => sanitizeInput($_POST['excerpt'] ?? ''),
-        'content'          => $_POST['content'] ?? '',
+        'content'          => $_POST['content'] ?? '', // Don't sanitize - we need HTML
         'featured_image'   => sanitizeInput($_POST['featured_image'] ?? ''),
         'category_id'      => intval($_POST['category_id'] ?? 0) ?: null,
         'is_premium'       => isset($_POST['is_premium']) ? 1 : 0,
@@ -52,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $formData['meta_title'], $formData['meta_description'], $formData['meta_keywords'],
             $publishedAt
         ]);
-        $newId = $db->lastInsertId();
-        setFlashMessage('Article created successfully!', 'success');
+        
+        flashMessage('success', 'Article created successfully!');
         header('Location: articles.php');
         exit;
     }
@@ -89,7 +88,7 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         input[type=text],input[type=url],textarea,select{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s}
         input[type=text]:focus,input[type=url]:focus,textarea:focus,select:focus{outline:none;border-color:#667eea}
         textarea{resize:vertical;min-height:80px}
-        #content{min-height:350px;font-family:inherit}
+        #content{min-height:350px;font-family:inherit;font-size:15px;line-height:1.6}
         .toggle-group{display:flex;flex-direction:column;gap:12px}
         .toggle-item{display:flex;align-items:center;gap:12px;padding:12px;background:#f8f9fa;border-radius:8px;cursor:pointer}
         .toggle-item input{width:18px;height:18px;cursor:pointer;accent-color:#667eea}
@@ -107,8 +106,9 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         .hint{font-size:12px;color:#999;margin-top:4px}
         .char-count{font-size:11px;color:#999;text-align:right;margin-top:3px}
         .toolbar-btns{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-        .toolbar-btns button{padding:5px 12px;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer;font-size:12px;font-weight:600}
+        .toolbar-btns button{padding:6px 14px;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
         .toolbar-btns button:hover{background:#667eea;color:white;border-color:#667eea}
+        .toolbar-btns button:active{transform:scale(0.95)}
         @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
     </style>
 </head>
@@ -164,20 +164,22 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
                     </div>
                     <div class="form-group">
                         <label>Excerpt</label>
-                        <textarea name="excerpt" rows="3" maxlength="500" placeholder="Short summary (shown in article cards)..."><?php echo htmlspecialchars($formData['excerpt']); ?></textarea>
+                        <textarea name="excerpt" id="excerpt" rows="3" maxlength="500" placeholder="Short summary (shown in article cards)..."><?php echo htmlspecialchars($formData['excerpt']); ?></textarea>
                     </div>
                     <div class="form-group">
-                        <label>Content *</label>
+                        <label>Content * (HTML supported)</label>
                         <div class="toolbar-btns">
-                            <button type="button" onclick="wrapText('**','**')"><b>B</b></button>
-                            <button type="button" onclick="wrapText('*','*')"><i>I</i></button>
-                            <button type="button" onclick="insertLine('## ')">H2</button>
-                            <button type="button" onclick="insertLine('### ')">H3</button>
-                            <button type="button" onclick="wrapText('`','`')">Code</button>
-                            <button type="button" onclick="insertLine('- ')">• List</button>
-                            <button type="button" onclick="insertLink()">Link</button>
+                            <button type="button" onclick="insertHTML('<strong>','</strong>')"><b>Bold</b></button>
+                            <button type="button" onclick="insertHTML('<em>','</em>')"><i>Italic</i></button>
+                            <button type="button" onclick="insertHTML('<h2>','</h2>')">H2</button>
+                            <button type="button" onclick="insertHTML('<h3>','</h3>')">H3</button>
+                            <button type="button" onclick="insertHTML('<code>','</code>')">Code</button>
+                            <button type="button" onclick="insertList()">• List</button>
+                            <button type="button" onclick="insertLink()">🔗 Link</button>
+                            <button type="button" onclick="insertParagraph()">¶ Para</button>
                         </div>
-                        <textarea name="content" id="content" placeholder="Write your article content here... HTML is supported."><?php echo htmlspecialchars($formData['content']); ?></textarea>
+                        <textarea name="content" id="content" placeholder="Write your article content here... Use the toolbar buttons to add formatting." required><?php echo htmlspecialchars($formData['content']); ?></textarea>
+                        <div class="hint">Tip: Write in paragraphs using &lt;p&gt; tags. Use toolbar buttons for formatting.</div>
                     </div>
                     <div class="form-group">
                         <label>Featured Image URL</label>
@@ -265,6 +267,7 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
 // Auto-generate slug from title
 const titleInput = document.getElementById('title');
 const slugInput  = document.getElementById('slug');
+const excerptInput = document.getElementById('excerpt');
 let slugEdited = false;
 
 titleInput.addEventListener('input', function(){
@@ -277,9 +280,10 @@ titleInput.addEventListener('input', function(){
             .substring(0,100);
     }
 });
+
 slugInput.addEventListener('input', function(){ slugEdited = true; });
 
-document.querySelector('[name=excerpt]').addEventListener('input', function(){
+excerptInput.addEventListener('input', function(){
     document.getElementById('preview-excerpt').textContent = this.value || 'Excerpt will appear here';
 });
 
@@ -288,35 +292,60 @@ const metaTitle = document.getElementById('meta_title');
 const metaDesc  = document.getElementById('meta_desc');
 const mtCount   = document.getElementById('mt_count');
 const mdCount   = document.getElementById('md_count');
+
 metaTitle.addEventListener('input', () => mtCount.textContent = metaTitle.value.length);
 metaDesc.addEventListener('input',  () => mdCount.textContent = metaDesc.value.length);
+
 mtCount.textContent = metaTitle.value.length;
 mdCount.textContent = metaDesc.value.length;
 
-// Toolbar helpers
-function wrapText(before, after) {
+// FIXED TOOLBAR FUNCTIONS
+function insertHTML(openTag, closeTag) {
     const ta = document.getElementById('content');
-    const s = ta.selectionStart, e = ta.selectionEnd;
-    const selected = ta.value.substring(s, e);
-    ta.value = ta.value.substring(0,s) + before + selected + after + ta.value.substring(e);
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = ta.value.substring(start, end);
+    
+    const newText = openTag + (selected || 'text here') + closeTag;
+    ta.value = ta.value.substring(0, start) + newText + ta.value.substring(end);
+    
+    // Set cursor position
+    const newCursorPos = selected ? end + openTag.length + closeTag.length : start + openTag.length;
     ta.focus();
-    ta.setSelectionRange(s + before.length, e + before.length);
+    ta.setSelectionRange(newCursorPos, newCursorPos);
 }
-function insertLine(prefix) {
+
+function insertList() {
     const ta = document.getElementById('content');
-    const s = ta.selectionStart;
-    const lineStart = ta.value.lastIndexOf('\n', s-1) + 1;
-    ta.value = ta.value.substring(0, lineStart) + prefix + ta.value.substring(lineStart);
+    const start = ta.selectionStart;
+    const listHTML = '\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</ul>\n';
+    ta.value = ta.value.substring(0, start) + listHTML + ta.value.substring(start);
     ta.focus();
 }
+
 function insertLink() {
     const url = prompt('Enter URL:');
     if (!url) return;
+    
     const ta = document.getElementById('content');
-    const s = ta.selectionStart, e = ta.selectionEnd;
-    const text = ta.value.substring(s, e) || 'Link Text';
-    const link = `<a href="${url}">${text}</a>`;
-    ta.value = ta.value.substring(0,s) + link + ta.value.substring(e);
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const text = ta.value.substring(start, end) || 'link text';
+    
+    const linkHTML = `<a href="${url}">${text}</a>`;
+    ta.value = ta.value.substring(0, start) + linkHTML + ta.value.substring(end);
+    ta.focus();
+}
+
+function insertParagraph() {
+    const ta = document.getElementById('content');
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = ta.value.substring(start, end);
+    
+    const paraHTML = `<p>${selected || 'Your paragraph text here.'}</p>\n\n`;
+    ta.value = ta.value.substring(0, start) + paraHTML + ta.value.substring(end);
+    ta.focus();
 }
 </script>
 </body>
