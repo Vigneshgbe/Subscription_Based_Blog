@@ -256,17 +256,19 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         /* Featured Image */
         .featured-image {
             width: 100%;
-            max-width: 1000px;
-            margin: 48px auto;
+            max-width: 740px;  /* Match article content width */
+            margin: 32px auto;  /* Reduced from 48px */
             padding: 0 24px;
         }
         
         .featured-image img {
             width: 100%;
             height: auto;
+            max-height: 420px;  /* ADD THIS - caps the height */
+            object-fit: cover;  /* ADD THIS - crops intelligently */
             display: block;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
+            border-radius: 8px;  /* Reduced from 12px for subtlety */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);  /* Softer shadow */
         }
         
         /* Article Content - THE MOST IMPORTANT PART */
@@ -356,9 +358,11 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         .article-content img {
             width: 100%;
             height: auto;
-            border-radius: 8px;
-            margin: 40px 0;
-            box-shadow: var(--shadow);
+            max-height: 500px;  
+            object-fit: cover;  
+            border-radius: 6px;  
+            margin: 32px 0;  
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);  
         }
         
         .article-content code {
@@ -693,6 +697,17 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
                 grid-template-columns: 1fr;
             }
         }
+
+        @media (max-width: 768px) {
+            .featured-image {
+                margin: 24px auto;  /* Even tighter on mobile */
+            }
+            
+            .featured-image img {
+                max-height: 280px;  /* Mobile-friendly height */
+                border-radius: 6px;
+            }
+        }
         
         @media (max-width: 480px) {
             .article-title {
@@ -704,7 +719,7 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             }
             
             .featured-image {
-                margin: 32px auto;
+                margin: 24px auto;
             }
         }
     </style>
