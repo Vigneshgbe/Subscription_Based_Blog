@@ -6,7 +6,6 @@ requireLogin();
 $db = db();
 $userId = $_SESSION['user_id'];
 
-// Check current subscription
 $stmt = $db->prepare("
     SELECT * FROM subscriptions 
     WHERE user_id = ? 
@@ -23,734 +22,523 @@ $hasActiveSubscription = hasActiveSubscription($userId);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing - <?php echo SITE_NAME; ?></title>
+    <title>Pricing — <?php echo htmlspecialchars(SITE_NAME); ?></title>
     <script src="https://js.stripe.com/v3/"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ink:       #0d0d12;
-            --ink-soft:  #4a4a5a;
-            --ink-muted: #9090a0;
-            --surface:   #ffffff;
-            --surface-2: #f7f7fa;
-            --accent:    #5b4cdb;
-            --accent-2:  #8b5cf6;
-            --gold:      #f59e0b;
-            --emerald:   #10b981;
-            --rose:      #f43f5e;
-            --border:    #e8e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-            --shadow-lg: 0 20px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
-            --shadow-xl: 0 32px 64px rgba(91,76,219,0.18), 0 8px 24px rgba(91,76,219,0.1);
-        }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ink:      #0d0d1a;
+            --ink-2:    #3d3d55;
+            --ink-3:    #8888a0;
+            --surface:  #ffffff;
+            --surface-2:#f7f7fb;
+            --border:   #e8e8f0;
+            --accent:   #5b4cf5;
+            --accent-2: #7c6ff7;
+            --gold:     #f5a623;
+            --green:    #16a34a;
+            --red:      #dc2626;
+        }
 
         body {
             font-family: 'DM Sans', sans-serif;
             background: var(--surface-2);
             color: var(--ink);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* ── Background ──────────────────────────────────────── */
-        .page-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background: #fafafd;
-        }
-
-        .page-bg::before {
-            content: '';
-            position: absolute;
-            top: -200px;
-            left: -200px;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(91,76,219,0.08) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        .page-bg::after {
-            content: '';
-            position: absolute;
-            bottom: -100px;
-            right: -100px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        /* ── Layout ──────────────────────────────────────────── */
-        .wrap {
+        /* ── Hero ──────────────────────────────────────────────────── */
+        .hero {
+            background: var(--ink);
+            padding: 72px 24px 120px;
+            text-align: center;
             position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 24px 80px;
+            overflow: hidden;
         }
 
-        /* ── Nav bar ─────────────────────────────────────────── */
-        .topnav {
-            display: flex;
-            align-items: center;
-            padding: 24px 0 0;
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 80% at 20% 50%, rgba(91,76,245,.35) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 80% 30%, rgba(124,111,247,.2) 0%, transparent 70%);
+            pointer-events: none;
         }
 
-        .back-link {
+        .hero-back {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: var(--ink-soft);
+            gap: 6px;
+            color: rgba(255,255,255,.5);
             text-decoration: none;
             font-size: 14px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border: 1.5px solid var(--border);
-            border-radius: 10px;
-            background: var(--surface);
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
+            font-weight: 500;
+            margin-bottom: 40px;
+            transition: color .2s;
         }
-
-        .back-link:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(91,76,219,0.08);
-        }
-
-        /* ── Hero ────────────────────────────────────────────── */
-        .hero {
-            text-align: center;
-            padding: 64px 0 56px;
-        }
+        .hero-back:hover { color: rgba(255,255,255,.9); }
 
         .hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(91,76,219,0.08);
-            color: var(--accent);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
+            position: relative;
+            display: inline-block;
+            background: rgba(91,76,245,.2);
+            border: 1px solid rgba(91,76,245,.45);
+            color: #b0a8ff;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            padding: 6px 16px;
+            padding: 6px 18px;
             border-radius: 100px;
-            border: 1px solid rgba(91,76,219,0.15);
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
         .hero h1 {
+            position: relative;
             font-family: 'Playfair Display', serif;
-            font-size: clamp(40px, 6vw, 68px);
+            font-size: clamp(38px, 6vw, 68px);
             font-weight: 900;
-            color: var(--ink);
-            line-height: 1.05;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
+            color: #fff;
+            line-height: 1.1;
+            margin-bottom: 16px;
         }
 
-        .hero h1 em {
-            font-style: normal;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        .hero h1 span {
+            background: linear-gradient(120deg, #a89eff 0%, #f5a623 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero p {
+            position: relative;
             font-size: 18px;
-            color: var(--ink-soft);
-            max-width: 480px;
+            color: rgba(255,255,255,.55);
+            max-width: 460px;
             margin: 0 auto;
-            line-height: 1.6;
-            font-weight: 400;
+            line-height: 1.65;
         }
 
-        /* ── Active subscription banner ──────────────────────── */
+        /* ── Active banner ──────────────────────────────────────────── */
+        .active-banner-wrap {
+            max-width: 660px;
+            margin: -30px auto 0;
+            padding: 0 24px;
+            position: relative;
+            z-index: 10;
+        }
+
         .active-banner {
+            background: #fff;
+            border: 2px solid var(--green);
+            border-radius: 16px;
+            padding: 16px 22px;
             display: flex;
             align-items: center;
             gap: 14px;
-            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-            border: 1.5px solid #6ee7b7;
-            border-radius: 14px;
-            padding: 18px 24px;
-            margin-bottom: 40px;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 0 8px 32px rgba(22,163,74,.13);
         }
 
-        .active-banner-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--emerald);
+        .active-banner .chk-circle {
+            width: 34px; height: 34px;
+            background: var(--green);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 16px; flex-shrink: 0;
         }
 
-        .active-banner strong {
-            display: block;
-            color: #065f46;
-            font-size: 15px;
-            font-weight: 700;
+        .active-banner strong { color: var(--green); display: block; font-size: 15px; }
+        .active-banner p { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+
+        /* ── Pricing section ────────────────────────────────────────── */
+        .pricing-wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 64px 24px 80px;
         }
 
-        .active-banner span {
-            color: #047857;
-            font-size: 13px;
-        }
-
-        /* ── Pricing grid ────────────────────────────────────── */
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             align-items: start;
-            margin-bottom: 80px;
         }
 
-        @media (max-width: 900px) {
-            .pricing-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; }
-        }
-
-        /* ── Card base ───────────────────────────────────────── */
-        .plan-card {
+        /* ── Card ───────────────────────────────────────────────────── */
+        .card {
             background: var(--surface);
-            border: 1.5px solid var(--border);
+            border: 2px solid var(--border);
             border-radius: 20px;
-            padding: 36px 32px;
+            padding: 36px 26px 30px;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-            box-shadow: var(--shadow-md);
+            transition: border-color .25s, box-shadow .25s, transform .25s;
         }
 
-        .plan-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lg);
+        .card:hover {
+            border-color: #c5bfff;
+            box-shadow: 0 18px 48px rgba(91,76,245,.1);
+            transform: translateY(-4px);
         }
 
-        /* ── Featured card ───────────────────────────────────── */
-        .plan-card.featured {
-            background: linear-gradient(160deg, #1a1033 0%, #2d1f5e 50%, #1e1040 100%);
-            border-color: rgba(139,92,246,0.4);
-            box-shadow: var(--shadow-xl);
-            transform: scale(1.03);
+        .card.featured {
+            border-color: var(--accent);
+            box-shadow: 0 24px 56px rgba(91,76,245,.2);
+            transform: translateY(-10px);
         }
 
-        .plan-card.featured:hover {
-            transform: scale(1.03) translateY(-6px);
+        .card.featured:hover {
+            transform: translateY(-16px);
+            box-shadow: 0 32px 64px rgba(91,76,245,.26);
         }
 
-        .plan-card.featured .plan-name,
-        .plan-card.featured .plan-price,
-        .plan-card.featured .plan-duration,
-        .plan-card.featured .feature-list li {
-            color: rgba(255,255,255,0.9);
-        }
-
-        .plan-card.featured .feature-list li {
-            border-color: rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.8);
-        }
-
-        .plan-card.featured .feature-list li::before {
-            color: #a78bfa;
-        }
-
-        .plan-card.featured .plan-duration {
-            color: rgba(255,255,255,0.55);
-        }
-
-        /* ── Pill badge ──────────────────────────────────────── */
-        .pill-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            padding: 5px 14px;
+        .pill {
+            position: absolute;
+            top: -14px; left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 18px;
             border-radius: 100px;
-            margin-bottom: 24px;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .pill-purple { background: var(--accent); color: #fff; }
+        .pill-green  { background: var(--green);  color: #fff; }
+
+        .plan-label {
+            font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--ink-3); margin-bottom: 6px;
         }
 
-        .pill-popular {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: #78350f;
-        }
-
-        .pill-save {
-            background: linear-gradient(135deg, #10b981, #34d399);
-            color: #064e3b;
-        }
-
-        .pill-free {
-            background: var(--surface-2);
-            color: var(--ink-muted);
-            border: 1.5px solid var(--border);
-        }
-
-        /* ── Plan info ───────────────────────────────────────── */
         .plan-name {
             font-family: 'Playfair Display', serif;
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--ink);
-            margin-bottom: 16px;
+            font-size: 27px; font-weight: 700;
+            color: var(--ink); margin-bottom: 20px;
         }
 
-        .plan-price {
+        .price-row {
+            display: flex; align-items: flex-end; gap: 3px; margin-bottom: 5px;
+        }
+
+        .price-cur {
+            font-size: 19px; font-weight: 600;
+            color: var(--accent); line-height: 1; margin-bottom: 9px;
+        }
+
+        .price-amt {
             font-family: 'Playfair Display', serif;
-            font-size: 56px;
-            font-weight: 900;
-            color: var(--accent);
-            line-height: 1;
-            letter-spacing: -2px;
-            margin-bottom: 6px;
+            font-size: 50px; font-weight: 900;
+            color: var(--ink); line-height: 1;
         }
 
-        .plan-card.featured .plan-price {
-            color: #a78bfa;
+        .price-amt.muted { color: var(--ink-3); }
+
+        .price-period {
+            font-size: 13px; color: var(--ink-3); margin-bottom: 26px;
         }
 
-        .plan-price .currency {
-            font-size: 28px;
-            vertical-align: top;
-            margin-top: 10px;
-            display: inline-block;
-            letter-spacing: 0;
-        }
+        .divider { height: 1px; background: var(--border); margin-bottom: 22px; }
 
-        .plan-duration {
-            font-size: 14px;
-            color: var(--ink-muted);
-            margin-bottom: 28px;
-            font-weight: 500;
-        }
+        .features { list-style: none; margin-bottom: 28px; }
 
-        /* ── Divider ─────────────────────────────────────────── */
-        .plan-divider {
-            height: 1px;
-            background: var(--border);
-            margin-bottom: 24px;
-        }
-
-        .plan-card.featured .plan-divider {
-            background: rgba(255,255,255,0.1);
-        }
-
-        /* ── Feature list ────────────────────────────────────── */
-        .feature-list {
-            list-style: none;
-            margin-bottom: 32px;
-        }
-
-        .feature-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 0;
+        .features li {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 9px 0; font-size: 14px; color: var(--ink-2);
             border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            color: var(--ink-soft);
-            font-weight: 500;
-            line-height: 1.4;
+        }
+        .features li:last-child { border-bottom: none; }
+
+        .features li .chk {
+            width: 18px; height: 18px;
+            background: #eef2ff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
+            font-size: 10px; color: var(--accent); font-weight: 700;
         }
 
-        .feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        .feature-list li::before {
-            content: '✓';
-            color: var(--emerald);
-            font-weight: 900;
-            font-size: 13px;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        /* ── Buttons ─────────────────────────────────────────── */
-        .btn-plan {
-            width: 100%;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 12px;
+        /* ── Buttons ─────────────────────────────────────────────────── */
+        .btn {
+            width: 100%; padding: 14px;
+            border: none; border-radius: 12px;
+            font-size: 15px; font-weight: 600;
             font-family: 'DM Sans', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s;
-            letter-spacing: 0.3px;
-            position: relative;
-            overflow: hidden;
+            cursor: pointer; transition: all .2s;
+            display: block; text-align: center;
         }
 
-        .btn-plan::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0);
-            transition: background 0.2s;
+        .btn-accent {
+            background: var(--accent); color: #fff;
+            box-shadow: 0 4px 16px rgba(91,76,245,.32);
         }
-
-        .btn-plan:hover::after {
-            background: rgba(255,255,255,0.12);
-        }
-
-        .btn-subscribe {
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            color: white;
-            box-shadow: 0 4px 14px rgba(91,76,219,0.35);
-        }
-
-        .btn-subscribe:hover:not(:disabled) {
+        .btn-accent:hover:not(:disabled) {
+            background: var(--accent-2);
+            box-shadow: 0 8px 24px rgba(91,76,245,.44);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(91,76,219,0.45);
-        }
-
-        .btn-subscribe:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Featured card uses a lighter button */
-        .plan-card.featured .btn-subscribe {
-            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
-            box-shadow: 0 4px 20px rgba(167,139,250,0.4);
-        }
-
-        .btn-active {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            color: #065f46;
-            border: 1.5px solid #6ee7b7;
-            cursor: default;
         }
 
         .btn-ghost {
             background: transparent;
-            border: 1.5px solid var(--border);
-            color: var(--ink-muted);
-            cursor: default;
+            border: 2px solid var(--border);
+            color: var(--ink-3);
         }
 
-        /* ── Payment message ─────────────────────────────────── */
+        .btn-active {
+            background: #f0fdf4;
+            border: 2px solid var(--green);
+            color: var(--green); font-weight: 700;
+        }
+
+        .btn:disabled { opacity: .65; cursor: not-allowed; transform: none !important; }
+
+        /* payment message */
         .pay-msg {
-            display: none;
-            margin-top: 14px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            line-height: 1.4;
+            display: none; margin-top: 12px;
+            padding: 11px 14px; border-radius: 10px;
+            font-size: 13px; font-weight: 500; text-align: center;
         }
-
         .pay-msg.error {
-            background: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
             display: block;
+            background: #fef2f2; border: 1px solid #fecaca; color: var(--red);
         }
-
         .pay-msg.success {
-            background: #ecfdf5;
-            color: #065f46;
-            border: 1px solid #6ee7b7;
             display: block;
+            background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--green);
         }
 
-        /* ── Why subscribe section ───────────────────────────── */
+        /* ── Why Subscribe ───────────────────────────────────────────── */
         .why-section {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: 24px;
-            padding: 56px 48px;
-            box-shadow: var(--shadow-md);
+            background: var(--ink);
+            padding: 80px 24px 90px;
         }
 
-        .why-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
+        .why-inner { max-width: 1080px; margin: 0 auto; }
 
-        .why-header h2 {
+        .why-inner h2 {
             font-family: 'Playfair Display', serif;
             font-size: clamp(28px, 4vw, 42px);
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            color: var(--ink);
-            margin-bottom: 12px;
-        }
-
-        .why-header p {
-            color: var(--ink-muted);
-            font-size: 16px;
+            font-weight: 900; color: #fff;
+            text-align: center; margin-bottom: 56px;
         }
 
         .why-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 36px;
         }
 
-        @media (max-width: 900px) {
-            .why-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-            .why-section { padding: 40px 24px; }
-        }
-
-        @media (max-width: 560px) {
-            .why-grid { grid-template-columns: 1fr; }
-        }
-
-        .why-item {
-            text-align: center;
-        }
+        .why-item { text-align: center; }
 
         .why-icon {
-            width: 64px;
-            height: 64px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 18px;
+            width: 58px; height: 58px;
+            border-radius: 16px;
+            background: rgba(91,76,245,.18);
+            border: 1px solid rgba(91,76,245,.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 25px; margin: 0 auto 18px;
         }
 
-        .why-icon.purple  { background: rgba(91,76,219,0.1); }
-        .why-icon.amber   { background: rgba(245,158,11,0.1); }
-        .why-icon.emerald { background: rgba(16,185,129,0.1); }
-        .why-icon.rose    { background: rgba(244,63,94,0.1); }
+        .why-item h3 { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .why-item p  { font-size: 14px; color: rgba(255,255,255,.48); line-height: 1.7; }
 
-        .why-item h3 {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--ink);
-            margin-bottom: 8px;
+        /* ── Responsive ──────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            .card.featured { transform: none; order: -1; }
+            .card.featured:hover { transform: translateY(-4px); }
         }
-
-        .why-item p {
-            font-size: 14px;
-            color: var(--ink-muted);
-            line-height: 1.6;
-        }
-
-        /* ── Loading spinner ─────────────────────────────────── */
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.4);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        /* ── Fade-in animations ──────────────────────────────── */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero        { animation: fadeUp 0.5s ease both; }
-        .plan-card   { animation: fadeUp 0.5s ease both; }
-        .plan-card:nth-child(1) { animation-delay: 0.1s; }
-        .plan-card:nth-child(2) { animation-delay: 0.2s; }
-        .plan-card:nth-child(3) { animation-delay: 0.3s; }
-        .why-section { animation: fadeUp 0.5s 0.35s ease both; }
     </style>
 </head>
 <body>
-<div class="page-bg"></div>
 
-<div class="wrap">
+<!-- Hero -->
+<section class="hero">
+    <a href="index.php" class="hero-back">← Back to Home</a>
+    <div class="hero-eyebrow">Simple, transparent pricing</div>
+    <h1>Choose Your <span>Plan</span></h1>
+    <p>Unlock unlimited access to premium articles, exclusive content, and an ad-free experience.</p>
+</section>
 
-    <!-- Nav -->
-    <nav class="topnav">
-        <a href="index.php" class="back-link">← Back to Home</a>
-    </nav>
-
-    <!-- Hero -->
-    <div class="hero">
-        <div class="hero-eyebrow">✦ Membership Plans</div>
-        <h1>Simple, <em>transparent</em><br>pricing.</h1>
-        <p>Pick the plan that works for you. Cancel anytime, no questions asked.</p>
-    </div>
-
-    <?php if ($hasActiveSubscription): ?>
+<?php if ($hasActiveSubscription): ?>
+<div class="active-banner-wrap">
     <div class="active-banner">
-        <div class="active-banner-icon">✓</div>
+        <div class="chk-circle">✓</div>
         <div>
             <strong>You have an active subscription</strong>
-            <span>Thank you for your support! You have full access to all premium content.</span>
+            <p>Thank you for being a premium member. Your support means everything.</p>
         </div>
     </div>
-    <?php endif; ?>
+</div>
+<?php endif; ?>
 
-    <!-- Pricing Cards -->
+<!-- Pricing Cards -->
+<div class="pricing-wrap">
     <div class="pricing-grid">
 
         <!-- Free -->
-        <div class="plan-card">
-            <div class="pill-badge pill-free">Free tier</div>
-            <div class="plan-name">Starter</div>
-            <div class="plan-price"><span class="currency">₹</span>0</div>
-            <div class="plan-duration">Forever free</div>
-            <div class="plan-divider"></div>
-            <ul class="feature-list">
-                <li>3 premium articles per month</li>
-                <li>Access to all free articles</li>
-                <li>Weekly email newsletter</li>
-                <li>Community access</li>
+        <div class="card">
+            <div class="plan-label">Get started</div>
+            <div class="plan-name">Free</div>
+            <div class="price-row">
+                <span class="price-cur">₹</span>
+                <span class="price-amt muted">0</span>
+            </div>
+            <div class="price-period">Forever — no credit card needed</div>
+            <div class="divider"></div>
+            <ul class="features">
+                <li><span class="chk">✓</span> 3 premium articles per month</li>
+                <li><span class="chk">✓</span> Access to all free articles</li>
+                <li><span class="chk">✓</span> Email newsletter</li>
+                <li><span class="chk">✓</span> Community access</li>
             </ul>
-            <button class="btn-plan btn-ghost" disabled>Current Plan</button>
+            <button class="btn btn-ghost" disabled>Current Plan</button>
         </div>
 
-        <!-- Monthly (featured) -->
-        <div class="plan-card featured">
-            <div class="pill-badge pill-popular">⚡ Most Popular</div>
+        <!-- Monthly -->
+        <div class="card featured">
+            <span class="pill pill-purple">Most Popular</span>
+            <div class="plan-label">For readers</div>
             <div class="plan-name">Monthly</div>
-            <div class="plan-price"><span class="currency">₹</span>299</div>
-            <div class="plan-duration">Billed monthly · cancel anytime</div>
-            <div class="plan-divider"></div>
-            <ul class="feature-list">
-                <li>Unlimited premium articles</li>
-                <li>Ad-free reading experience</li>
-                <li>Exclusive members-only content</li>
-                <li>Early access to new articles</li>
-                <li>Download articles as PDF</li>
-                <li>Priority support</li>
+            <div class="price-row">
+                <span class="price-cur">₹</span>
+                <span class="price-amt">299</span>
+            </div>
+            <div class="price-period">Per month — cancel anytime</div>
+            <div class="divider"></div>
+            <ul class="features">
+                <li><span class="chk">✓</span> Unlimited premium articles</li>
+                <li><span class="chk">✓</span> Ad-free reading experience</li>
+                <li><span class="chk">✓</span> Exclusive member content</li>
+                <li><span class="chk">✓</span> Early access to articles</li>
+                <li><span class="chk">✓</span> Download articles as PDF</li>
+                <li><span class="chk">✓</span> Priority support</li>
             </ul>
             <?php if ($hasActiveSubscription && $currentSubscription['plan_type'] === 'monthly'): ?>
-                <button class="btn-plan btn-active" disabled>✓ Your Active Plan</button>
+                <button class="btn btn-active" disabled>✓ Active Plan</button>
             <?php else: ?>
-                <button class="btn-plan btn-subscribe" id="btn-monthly" onclick="subscribe('monthly', this)">Subscribe Now →</button>
+                <button class="btn btn-accent" onclick="subscribe('monthly', this)">Subscribe Now</button>
             <?php endif; ?>
             <div class="pay-msg" id="msg-monthly"></div>
         </div>
 
         <!-- Yearly -->
-        <div class="plan-card">
-            <div class="pill-badge pill-save">🎉 Save 30%</div>
+        <div class="card">
+            <span class="pill pill-green">Save 30%</span>
+            <div class="plan-label">Best value</div>
             <div class="plan-name">Yearly</div>
-            <div class="plan-price"><span class="currency">₹</span>2,499</div>
-            <div class="plan-duration">₹208/month · billed annually</div>
-            <div class="plan-divider"></div>
-            <ul class="feature-list">
-                <li>Everything in Monthly</li>
-                <li>2 months completely free</li>
-                <li>Exclusive yearly member perks</li>
-                <li>Invitation to annual event</li>
-                <li>Premium member badge</li>
-                <li>Dedicated account manager</li>
+            <div class="price-row">
+                <span class="price-cur">₹</span>
+                <span class="price-amt">2,999</span>
+            </div>
+            <div class="price-period">Per year — just ₹250/month</div>
+            <div class="divider"></div>
+            <ul class="features">
+                <li><span class="chk">✓</span> Everything in Monthly</li>
+                <li><span class="chk">✓</span> 2 months completely free</li>
+                <li><span class="chk">✓</span> Exclusive yearly member perks</li>
+                <li><span class="chk">✓</span> Invitation to annual event</li>
+                <li><span class="chk">✓</span> Premium member badge</li>
+                <li><span class="chk">✓</span> Dedicated account manager</li>
             </ul>
             <?php if ($hasActiveSubscription && $currentSubscription['plan_type'] === 'yearly'): ?>
-                <button class="btn-plan btn-active" disabled>✓ Your Active Plan</button>
+                <button class="btn btn-active" disabled>✓ Active Plan</button>
             <?php else: ?>
-                <button class="btn-plan btn-subscribe" id="btn-yearly" onclick="subscribe('yearly', this)">Subscribe Now →</button>
+                <button class="btn btn-accent" onclick="subscribe('yearly', this)">Subscribe Now</button>
             <?php endif; ?>
             <div class="pay-msg" id="msg-yearly"></div>
         </div>
 
     </div>
+</div>
 
-    <!-- Why Subscribe -->
-    <div class="why-section">
-        <div class="why-header">
-            <h2>Why go Premium?</h2>
-            <p>Join thousands of readers who already enjoy unlimited access.</p>
-        </div>
+<!-- Why Subscribe -->
+<section class="why-section">
+    <div class="why-inner">
+        <h2>Why Subscribe?</h2>
         <div class="why-grid">
             <div class="why-item">
-                <div class="why-icon purple">📚</div>
+                <div class="why-icon">📚</div>
                 <h3>Unlimited Access</h3>
-                <p>Every article, every day. No caps, no limits. New content added daily.</p>
+                <p>Read every premium article without limits. Fresh content added daily by expert writers.</p>
             </div>
             <div class="why-item">
-                <div class="why-icon amber">🚫</div>
-                <h3>Zero Ads</h3>
-                <p>Clean, distraction-free reading. Your experience, uninterrupted.</p>
+                <div class="why-icon">🚫</div>
+                <h3>Ad-Free Experience</h3>
+                <p>Enjoy clean, distraction-free reading. No ads, no interruptions — ever.</p>
             </div>
             <div class="why-item">
-                <div class="why-icon emerald">⭐</div>
+                <div class="why-icon">⭐</div>
                 <h3>Exclusive Content</h3>
-                <p>Members-only deep-dives, interviews, and behind-the-scenes insights.</p>
+                <p>Members-only deep-dives, interviews, and insights you won't find anywhere else.</p>
             </div>
             <div class="why-item">
-                <div class="why-icon rose">🔔</div>
-                <h3>First to Know</h3>
-                <p>Get early access to articles before they're available to the public.</p>
+                <div class="why-icon">🔔</div>
+                <h3>Early Access</h3>
+                <p>Be the first to read every new article before it goes public.</p>
             </div>
         </div>
     </div>
-
-</div>
+</section>
 
 <script>
     const stripe = Stripe('<?php echo STRIPE_PUBLISHABLE_KEY; ?>');
 
     async function subscribe(planType, btn) {
-        const msgEl = document.getElementById('msg-' + planType);
+        const msgDiv = document.getElementById('msg-' + planType);
+        const originalText = btn.textContent;
 
-        // Reset state
+        // Reset
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner"></span>Processing…';
-        msgEl.className = 'pay-msg';
-        msgEl.textContent = '';
+        btn.textContent = 'Processing…';
+        msgDiv.className = 'pay-msg';
+        msgDiv.textContent = '';
 
         try {
             const response = await fetch('process-payment.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    plan_type: planType,
+                    plan_type:  planType,
                     csrf_token: '<?php echo generateCSRFToken(); ?>'
                 })
             });
 
-            // ── Key fix: check content-type before parsing ──
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                const text = await response.text();
-                console.error('Server returned non-JSON:', text);
-                throw new Error('Server error. Please try again or contact support.');
+            // ── KEY FIX: read raw text first, then parse ─────────────
+            // If PHP outputs a warning/notice before JSON, json() throws.
+            // Parsing manually lets us catch it and show a clean error.
+            const rawText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (parseErr) {
+                console.error('Server returned non-JSON response:', rawText);
+                throw new Error('Server error — please check your configuration or contact support.');
             }
 
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error(data.error);
+            if (!response.ok || data.error) {
+                throw new Error(data.error || 'Something went wrong. Please try again.');
             }
 
             if (data.sessionId) {
                 const result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
                 if (result.error) throw new Error(result.error.message);
             } else {
-                throw new Error('Could not create checkout session. Please try again.');
+                throw new Error('Failed to create checkout session.');
             }
 
         } catch (err) {
             console.error('Payment error:', err);
-            msgEl.className = 'pay-msg error';
-            msgEl.textContent = err.message || 'Payment failed. Please try again.';
+            msgDiv.className = 'pay-msg error';
+            msgDiv.textContent = err.message || 'Payment failed. Please try again.';
             btn.disabled = false;
-            btn.textContent = 'Subscribe Now →';
+            btn.textContent = originalText;
         }
     }
 </script>
