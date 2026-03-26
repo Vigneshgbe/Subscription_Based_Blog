@@ -83,6 +83,10 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Article - Admin | <?php echo SITE_NAME; ?></title>
+    
+    <!-- TinyMCE CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.7.0/tinymce.min.js" referrerpolicy="origin"></script>
+    
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
@@ -98,7 +102,11 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         input[type=text],input[type=url],textarea,select{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s}
         input[type=text]:focus,input[type=url]:focus,textarea:focus,select:focus{outline:none;border-color:#667eea}
         textarea{resize:vertical;min-height:80px}
-        #content{min-height:350px;font-family:inherit;font-size:15px;line-height:1.6}
+        
+        /* TinyMCE Editor Styling */
+        .editor-wrapper{border:2px solid #e0e0e0;border-radius:6px;overflow:hidden;transition:border-color .2s}
+        .editor-wrapper:focus-within{border-color:#667eea}
+        
         .toggle-group{display:flex;flex-direction:column;gap:12px}
         .toggle-item{display:flex;align-items:center;gap:12px;padding:12px;background:#f8f9fa;border-radius:8px;cursor:pointer}
         .toggle-item input{width:18px;height:18px;cursor:pointer;accent-color:#667eea}
@@ -117,12 +125,13 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         .alert-danger ul{margin:8px 0 0 20px}
         .hint{font-size:12px;color:#999;margin-top:4px}
         .char-count{font-size:11px;color:#999;text-align:right;margin-top:3px}
-        .toolbar-btns{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
-        .toolbar-btns button{padding:6px 14px;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
-        .toolbar-btns button:hover{background:#667eea;color:white;border-color:#667eea}
-        .toolbar-btns button:active{transform:scale(0.95)}
         .meta-info{background:#f8f9fa;border-radius:8px;padding:15px;font-size:13px;color:#666}
         .meta-info strong{color:#333}
+        
+        /* Editor info badge */
+        .editor-info{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:#e8f4fd;border-radius:6px;font-size:12px;color:#0066cc;margin-top:8px}
+        .editor-info i{font-style:normal;font-weight:700}
+        
         @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
     </style>
 </head>
@@ -164,26 +173,22 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
                     <div class="form-group">
                         <label>Excerpt</label>
                         <textarea name="excerpt" rows="3" maxlength="500"><?php echo htmlspecialchars($article['excerpt']); ?></textarea>
+                        <div class="hint">Brief summary shown in article listings (max 500 characters).</div>
                     </div>
                     <div class="form-group">
-                        <label>Content * (HTML supported)</label>
-                        <div class="toolbar-btns">
-                            <button type="button" onclick="insertHTML('<strong>','</strong>')"><b>Bold</b></button>
-                            <button type="button" onclick="insertHTML('<em>','</em>')"><i>Italic</i></button>
-                            <button type="button" onclick="insertHTML('<h2>','</h2>')">H2</button>
-                            <button type="button" onclick="insertHTML('<h3>','</h3>')">H3</button>
-                            <button type="button" onclick="insertHTML('<code>','</code>')">Code</button>
-                            <button type="button" onclick="insertList()">• List</button>
-                            <button type="button" onclick="insertLink()">🔗 Link</button>
-                            <button type="button" onclick="insertParagraph()">¶ Para</button>
+                        <label>Content * (Rich Text Editor)</label>
+                        <div class="editor-wrapper">
+                            <textarea name="content" id="rich-text-editor"><?php echo htmlspecialchars($article['content']); ?></textarea>
                         </div>
-                        <textarea name="content" id="content" required><?php echo htmlspecialchars($article['content']); ?></textarea>
-                        <div class="hint">Tip: Write in paragraphs using &lt;p&gt; tags. Use toolbar buttons for formatting.</div>
+                        <div class="editor-info">
+                            <i>ℹ️</i> Use the toolbar above to format your article with headings, bold, italic, lists, links, images, and more.
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Featured Image URL</label>
                         <input type="url" name="featured_image" value="<?php echo htmlspecialchars($article['featured_image'] ?? ''); ?>"
                                placeholder="https://...">
+                        <div class="hint">Main image displayed with the article.</div>
                     </div>
                 </div>
 
@@ -192,16 +197,19 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
                     <div class="form-group">
                         <label>Meta Title</label>
                         <input type="text" name="meta_title" id="meta_title" value="<?php echo htmlspecialchars($article['meta_title'] ?? ''); ?>" maxlength="255">
-                        <div class="char-count"><span id="mt_count">0</span>/255</div>
+                        <div class="char-count"><span id="mt_count">0</span>/255 characters</div>
+                        <div class="hint">Title shown in search results (leave empty to use article title).</div>
                     </div>
                     <div class="form-group">
                         <label>Meta Description</label>
                         <textarea name="meta_description" id="meta_desc" rows="2" maxlength="500"><?php echo htmlspecialchars($article['meta_description'] ?? ''); ?></textarea>
-                        <div class="char-count"><span id="md_count">0</span>/500</div>
+                        <div class="char-count"><span id="md_count">0</span>/500 characters</div>
+                        <div class="hint">Description shown in search results (leave empty to use excerpt).</div>
                     </div>
                     <div class="form-group">
                         <label>Meta Keywords</label>
-                        <input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($article['meta_keywords'] ?? ''); ?>" placeholder="keyword1, keyword2">
+                        <input type="text" name="meta_keywords" value="<?php echo htmlspecialchars($article['meta_keywords'] ?? ''); ?>" placeholder="keyword1, keyword2, keyword3">
+                        <div class="hint">Comma-separated keywords for SEO.</div>
                     </div>
                 </div>
             </div>
@@ -258,7 +266,9 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         </form>
     </main>
 </div>
+
 <script>
+// Character counters for SEO fields
 const metaTitle = document.getElementById('meta_title');
 const metaDesc  = document.getElementById('meta_desc');
 const mtCount = document.getElementById('mt_count');
@@ -270,54 +280,255 @@ mdCount.textContent = metaDesc.value.length;
 metaTitle.addEventListener('input', () => mtCount.textContent = metaTitle.value.length);
 metaDesc.addEventListener('input',  () => mdCount.textContent = metaDesc.value.length);
 
-// FIXED TOOLBAR FUNCTIONS
-function insertHTML(openTag, closeTag) {
-    const ta = document.getElementById('content');
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = ta.value.substring(start, end);
+// Initialize TinyMCE Rich Text Editor
+tinymce.init({
+    selector: '#rich-text-editor',
+    height: 500,
     
-    const newText = openTag + (selected || 'text here') + closeTag;
-    ta.value = ta.value.substring(0, start) + newText + ta.value.substring(end);
+    // Plugins for rich functionality
+    plugins: [
+        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
+        'emoticons', 'codesample', 'hr', 'pagebreak', 'nonbreaking'
+    ],
     
-    // Set cursor position
-    const newCursorPos = selected ? end + openTag.length + closeTag.length : start + openTag.length;
-    ta.focus();
-    ta.setSelectionRange(newCursorPos, newCursorPos);
-}
+    // Comprehensive toolbar
+    toolbar: 'undo redo | styles | fontsizeselect lineheight | ' +
+             'bold italic underline strikethrough | forecolor backcolor | ' +
+             'alignleft aligncenter alignright alignjustify | ' +
+             'bullist numlist outdent indent | ' +
+             'link image media table hr | ' +
+             'charmap emoticons | removeformat | code fullscreen',
+    
+    // Toolbar mode
+    toolbar_mode: 'sliding',
+    
+    // Menu bar
+    menubar: 'file edit view insert format tools table help',
+    
+    // Font size options
+    fontsize_formats: '8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 24pt 30pt 36pt 48pt',
+    
+    // Line height options
+    lineheight_formats: '1 1.1 1.2 1.3 1.4 1.5 1.6 1.8 2.0 2.5 3.0',
+    
+    // Style formats
+    style_formats: [
+        { title: 'Headings', items: [
+            { title: 'Heading 1', format: 'h1' },
+            { title: 'Heading 2', format: 'h2' },
+            { title: 'Heading 3', format: 'h3' },
+            { title: 'Heading 4', format: 'h4' },
+            { title: 'Heading 5', format: 'h5' },
+            { title: 'Heading 6', format: 'h6' }
+        ]},
+        { title: 'Inline', items: [
+            { title: 'Bold', format: 'bold' },
+            { title: 'Italic', format: 'italic' },
+            { title: 'Underline', format: 'underline' },
+            { title: 'Strikethrough', format: 'strikethrough' },
+            { title: 'Code', format: 'code' }
+        ]},
+        { title: 'Blocks', items: [
+            { title: 'Paragraph', format: 'p' },
+            { title: 'Blockquote', format: 'blockquote' },
+            { title: 'Div', format: 'div' },
+            { title: 'Pre', format: 'pre' }
+        ]},
+        { title: 'Alignment', items: [
+            { title: 'Left', format: 'alignleft' },
+            { title: 'Center', format: 'aligncenter' },
+            { title: 'Right', format: 'alignright' },
+            { title: 'Justify', format: 'alignjustify' }
+        ]}
+    ],
+    
+    // Content style
+    content_style: `
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            padding: 15px;
+        }
+        p { 
+            margin: 0 0 1em 0;
+            line-height: inherit;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            margin: 1.5em 0 0.5em 0;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 2em; }
+        h3 { font-size: 1.75em; }
+        h4 { font-size: 1.5em; }
+        h5 { font-size: 1.25em; }
+        h6 { font-size: 1em; }
+        ul, ol {
+            margin: 0 0 1em 0;
+            padding-left: 2em;
+        }
+        li {
+            margin-bottom: 0.5em;
+        }
+        blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #666;
+            font-style: italic;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 1em;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1em 0;
+        }
+        table td, table th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        table th {
+            background-color: #f4f4f4;
+            font-weight: 600;
+        }
+        a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    `,
+    
+    // Image settings
+    image_advtab: true,
+    image_caption: true,
+    image_title: true,
+    
+    // Link settings
+    link_title: true,
+    link_target_list: [
+        { title: 'Same window', value: '' },
+        { title: 'New window', value: '_blank' }
+    ],
+    
+    // Additional settings
+    branding: false,
+    promotion: false,
+    resize: true,
+    elementpath: true,
+    statusbar: true,
+    
+    // Custom line height button
+    setup: function(editor) {
+        // Add line height dropdown
+        editor.ui.registry.addMenuButton('lineheight', {
+            icon: 'line-height',
+            tooltip: 'Line Height',
+            fetch: function(callback) {
+                const items = [
+                    { type: 'menuitem', text: '1.0', onAction: () => applyLineHeight(editor, '1') },
+                    { type: 'menuitem', text: '1.1', onAction: () => applyLineHeight(editor, '1.1') },
+                    { type: 'menuitem', text: '1.2', onAction: () => applyLineHeight(editor, '1.2') },
+                    { type: 'menuitem', text: '1.3', onAction: () => applyLineHeight(editor, '1.3') },
+                    { type: 'menuitem', text: '1.4', onAction: () => applyLineHeight(editor, '1.4') },
+                    { type: 'menuitem', text: '1.5', onAction: () => applyLineHeight(editor, '1.5') },
+                    { type: 'menuitem', text: '1.6', onAction: () => applyLineHeight(editor, '1.6') },
+                    { type: 'menuitem', text: '1.8', onAction: () => applyLineHeight(editor, '1.8') },
+                    { type: 'menuitem', text: '2.0', onAction: () => applyLineHeight(editor, '2.0') },
+                    { type: 'menuitem', text: '2.5', onAction: () => applyLineHeight(editor, '2.5') },
+                    { type: 'menuitem', text: '3.0', onAction: () => applyLineHeight(editor, '3.0') }
+                ];
+                callback(items);
+            }
+        });
+        
+        // Function to apply line height
+        function applyLineHeight(editor, value) {
+            editor.formatter.apply('lineheight', { value: value });
+            const node = editor.selection.getNode();
+            editor.dom.setStyle(node, 'line-height', value);
+        }
+        
+        // Set default content on init
+        editor.on('init', function() {
+            // Editor is ready
+            console.log('TinyMCE editor initialized');
+        });
+    },
+    
+    // Valid elements (allow most HTML)
+    extended_valid_elements: 'style,script[src|async|defer|type|charset]',
+    
+    // Paste settings
+    paste_as_text: false,
+    paste_enable_default_filters: false,
+    
+    // Content filtering
+    verify_html: false,
+    
+    // Template settings
+    template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
+    template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
+    
+    // Custom formats
+    formats: {
+        lineheight: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li', styles: { 'line-height': '%value' } }
+    }
+});
 
-function insertList() {
-    const ta = document.getElementById('content');
-    const start = ta.selectionStart;
-    const listHTML = '\n<ul>\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n</ul>\n';
-    ta.value = ta.value.substring(0, start) + listHTML + ta.value.substring(start);
-    ta.focus();
-}
+// Form validation before submit
+document.getElementById('articleForm').addEventListener('submit', function(e) {
+    // Update textarea with TinyMCE content
+    tinymce.triggerSave();
+    
+    // You can add additional validation here if needed
+    const content = tinymce.get('rich-text-editor').getContent();
+    if (!content || content.trim() === '') {
+        e.preventDefault();
+        alert('Please add content to your article.');
+        return false;
+    }
+});
 
-function insertLink() {
-    const url = prompt('Enter URL:');
-    if (!url) return;
-    
-    const ta = document.getElementById('content');
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const text = ta.value.substring(start, end) || 'link text';
-    
-    const linkHTML = `<a href="${url}">${text}</a>`;
-    ta.value = ta.value.substring(0, start) + linkHTML + ta.value.substring(end);
-    ta.focus();
-}
+// Warn user before leaving with unsaved changes
+let formChanged = false;
+document.getElementById('articleForm').addEventListener('change', function() {
+    formChanged = true;
+});
 
-function insertParagraph() {
-    const ta = document.getElementById('content');
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    const selected = ta.value.substring(start, end);
-    
-    const paraHTML = `<p>${selected || 'Your paragraph text here.'}</p>\n\n`;
-    ta.value = ta.value.substring(0, start) + paraHTML + ta.value.substring(end);
-    ta.focus();
-}
+window.addEventListener('beforeunload', function(e) {
+    if (formChanged) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+// Clear flag on submit
+document.getElementById('articleForm').addEventListener('submit', function() {
+    formChanged = false;
+});
 </script>
 </body>
 </html>
