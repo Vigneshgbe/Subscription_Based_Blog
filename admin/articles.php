@@ -12,8 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete' && $articleId) {
         $stmt = $db->prepare("DELETE FROM articles WHERE id = ?");
         $stmt->execute([$articleId]);
-        setFlashMessage('Article deleted successfully.', 'success');
-    } elseif ($action === 'toggle_publish' && $articleId) {
+        flashMessage('success', 'Article deleted successfully.'); // Changed from setFlashMessage
+    }
+
+    elseif ($action === 'toggle_publish' && $articleId) {
         $stmt = $db->prepare("SELECT is_published FROM articles WHERE id = ?");
         $stmt->execute([$articleId]);
         $article = $stmt->fetch();
@@ -21,12 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $publishedAt = $newStatus ? date('Y-m-d H:i:s') : null;
         $stmt = $db->prepare("UPDATE articles SET is_published = ?, published_at = ? WHERE id = ?");
         $stmt->execute([$newStatus, $publishedAt, $articleId]);
-        setFlashMessage($newStatus ? 'Article published.' : 'Article unpublished.', 'success');
-    } elseif ($action === 'toggle_premium' && $articleId) {
+        flashMessage('success', $newStatus ? 'Article published.' : 'Article unpublished.'); // Changed from setFlashMessage
+    } 
+    
+    elseif ($action === 'toggle_premium' && $articleId) {
         $stmt = $db->prepare("UPDATE articles SET is_premium = NOT is_premium WHERE id = ?");
         $stmt->execute([$articleId]);
-        setFlashMessage('Premium status updated.', 'success');
+        flashMessage('success', 'Premium status updated.'); // Changed from setFlashMessage
     }
+
     header('Location: articles.php?' . http_build_query(array_filter([
         'page' => $_POST['current_page'] ?? 1,
         'search' => $_POST['current_search'] ?? '',
@@ -78,6 +83,7 @@ $stmt->execute($params);
 $articles = $stmt->fetchAll();
 
 $flash = getFlashMessage();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

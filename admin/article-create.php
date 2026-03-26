@@ -46,22 +46,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $publishedAt = $formData['is_published'] ? date('Y-m-d H:i:s') : null;
         
-        $stmt = $db->prepare("
-            INSERT INTO articles (title,slug,excerpt,content,featured_image,category_id,
-                is_premium,is_published,meta_title,meta_description,meta_keywords,published_at,created_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW())
-        ");
-        $stmt->execute([
-            $formData['title'], $formData['slug'], $formData['excerpt'], $formData['content'],
-            $formData['featured_image'], $formData['category_id'],
-            $formData['is_premium'], $formData['is_published'],
-            $formData['meta_title'], $formData['meta_description'], $formData['meta_keywords'],
-            $publishedAt
-        ]);
+        // Get the logged-in admin user ID
+        $authorId = $_SESSION['user_id'] ?? null; // Adjust based on your session variable name
         
-        flashMessage('success', 'Article created successfully!');
-        header('Location: articles.php');
-        exit;
+        if (!$authorId) {
+            $errors[] = 'User not authenticated. Please log in again.';
+        } else {
+            $stmt = $db->prepare("
+                INSERT INTO articles (title, slug, excerpt, content, featured_image, category_id,
+                    is_premium, is_published, author_id, meta_title, meta_description, meta_keywords, 
+                    published_at, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([
+                $formData['title'], 
+                $formData['slug'], 
+                $formData['excerpt'], 
+                $formData['content'],
+                $formData['featured_image'], 
+                $formData['category_id'],
+                $formData['is_premium'], 
+                $formData['is_published'],
+                $authorId,  // ADD THIS
+                $formData['meta_title'], 
+                $formData['meta_description'], 
+                $formData['meta_keywords'],
+                $publishedAt
+            ]);
+            
+            flashMessage('success', 'Article created successfully!');
+            header('Location: articles.php');
+            exit;
+        }
     }
 }
 
