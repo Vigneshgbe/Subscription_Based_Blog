@@ -70,14 +70,7 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .sidebar{width:260px;background:#1a1d29;color:white;padding:30px 0;position:fixed;height:100vh;overflow-y:auto}
-        .sidebar-brand{padding:0 30px 30px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:30px}
-        .sidebar-brand h1{font-size:24px;font-weight:900}
-        .sidebar-brand p{font-size:12px;opacity:.6;margin-top:5px}
-        .sidebar-menu{list-style:none}
-        .sidebar-menu a{display:block;padding:15px 30px;color:rgba(255,255,255,.8);text-decoration:none;font-weight:600;transition:all .2s}
-        .sidebar-menu a:hover,.sidebar-menu a.active{background:rgba(255,255,255,.1);color:white}
-        .main-content{flex:1;margin-left:260px;padding:30px}
+        .main-content{flex:1;margin-left:280px;padding:30px}
         .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
         .grid-2{display:grid;grid-template-columns:1fr 340px;gap:25px;align-items:start}
@@ -114,24 +107,7 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
 </head>
 <body>
 <div class="admin-layout">
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <h1><?php echo SITE_NAME; ?></h1>
-            <p>Admin Panel</p>
-        </div>
-        <ul class="sidebar-menu">
-            <li><a href="dashboard.php">📊 Dashboard</a></li>
-            <li><a href="articles.php" class="active">📝 Articles</a></li>
-            <li><a href="users.php">👥 Users</a></li>
-            <li><a href="subscriptions.php">💳 Subscriptions</a></li>
-            <li><a href="transactions.php">💰 Transactions</a></li>
-            <li><a href="categories.php">🏷️ Categories</a></li>
-            <li><a href="settings.php">⚙️ Settings</a></li>
-            <li><a href="../index.php">🌐 View Site</a></li>
-            <li><a href="../logout.php">🚪 Logout</a></li>
-        </ul>
-    </aside>
-
+    <?php require_once 'sidebar.php'; ?>
     <main class="main-content">
         <div class="top-bar">
             <h1>✍️ New Article</h1>
