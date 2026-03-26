@@ -11,11 +11,14 @@ date_default_timezone_set('Asia/Kolkata');
 
 // Session Configuration (Security Hardening)
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1); // Enable if using HTTPS
+ini_set('session.cookie_secure', 0); // Set to 1 when using HTTPS in production
 ini_set('session.use_only_cookies', 1);
 ini_set('session.cookie_samesite', 'Strict');
 session_name('BLOG_SESSION');
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Database Configuration
 define('DB_HOST', 'localhost');
@@ -39,7 +42,11 @@ define('SITE_URL', 'http://localhost/blog'); // Update for production
 define('SITE_EMAIL', 'noreply@yourblog.com');
 define('ADMIN_EMAIL', 'admin@yourblog.com');
 
-// Free Article Limit
+// ============================================================
+// FREE ARTICLE LIMIT — Single source of truth: 3
+// article.php paywall UI, pricing.php, and all logic must
+// reference this constant — never hardcode 5 or any other value
+// ============================================================
 define('FREE_ARTICLE_LIMIT', 3);
 
 // Security Keys (Generate unique keys for production)
@@ -55,7 +62,7 @@ define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'image/we
 define('ARTICLES_PER_PAGE', 12);
 define('ADMIN_ITEMS_PER_PAGE', 20);
 
-// Database Connection Class
+// ── Database Singleton ──────────────────────────────────────
 class Database {
     private static $instance = null;
     private $conn;
@@ -63,9 +70,9 @@ class Database {
     private function __construct() {
         $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
         $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_EMULATE_PREPARES   => false,
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
         ];
         
@@ -94,24 +101,7 @@ class Database {
     }
 }
 
-/**
- * Render article content - outputs HTML safely
- * This function ensures HTML content is displayed properly while still being safe
- */
-function renderArticleContent($content) {
-    // Content is stored as HTML, so we output it directly
-    // The content was already validated when saved to DB
-    return $content;
-}
-
-function sanitizeHTML($html) {
-    // Allow these tags
-    $allowed = '<p><br><strong><b><em><i><u><h2><h3><h4><ul><ol><li><a><code><pre><blockquote>';
-    return strip_tags($html, $allowed);
-}
-
-
-// Helper Functions
+// ── Core Helpers ────────────────────────────────────────────
 function db() {
     return Database::getInstance()->getConnection();
 }
@@ -157,10 +147,7 @@ function requireAdmin() {
 }
 
 function sanitizeInput($data) {
-    $data = trim($data);
-    $data = stripslashes($data);
-    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
-    return $data;
+    return htmlspecialchars(stripslashes(trim($data)), ENT_QUOTES, 'UTF-8');
 }
 
 function generateToken($length = 32) {
@@ -182,8 +169,7 @@ function createSlug($string) {
     $string = strtolower($string);
     $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
     $string = preg_replace('/[\s-]+/', '-', $string);
-    $string = trim($string, '-');
-    return $string;
+    return trim($string, '-');
 }
 
 function formatDate($date) {
@@ -191,12 +177,11 @@ function formatDate($date) {
 }
 
 function timeAgo($datetime) {
-    $time = strtotime($datetime);
-    $diff = time() - $time;
+    $diff = time() - strtotime($datetime);
     
-    if ($diff < 60) return 'just now';
-    if ($diff < 3600) return floor($diff / 60) . ' minutes ago';
-    if ($diff < 86400) return floor($diff / 3600) . ' hours ago';
+    if ($diff < 60)     return 'just now';
+    if ($diff < 3600)   return floor($diff / 60) . ' minutes ago';
+    if ($diff < 86400)  return floor($diff / 3600) . ' hours ago';
     if ($diff < 604800) return floor($diff / 86400) . ' days ago';
     
     return formatDate($datetime);
@@ -208,35 +193,35 @@ function truncateText($text, $length = 150) {
 }
 
 function getClientIP() {
-    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-        return $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } else {
-        return $_SERVER['REMOTE_ADDR'];
-    }
+    if (!empty($_SERVER['HTTP_CLIENT_IP']))       return $_SERVER['HTTP_CLIENT_IP'];
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    return $_SERVER['REMOTE_ADDR'];
 }
 
 function logActivity($userId, $action, $entityType = null, $entityId = null, $details = null) {
-    $db = db();
-    $stmt = $db->prepare("
-        INSERT INTO activity_logs (user_id, action, entity_type, entity_id, ip_address, user_agent, details)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->execute([
-        $userId,
-        $action,
-        $entityType,
-        $entityId,
-        getClientIP(),
-        $_SERVER['HTTP_USER_AGENT'] ?? '',
-        $details ? json_encode($details) : null
-    ]);
+    try {
+        $db = db();
+        $stmt = $db->prepare("
+            INSERT INTO activity_logs (user_id, action, entity_type, entity_id, ip_address, user_agent, details)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $userId,
+            $action,
+            $entityType,
+            $entityId,
+            getClientIP(),
+            $_SERVER['HTTP_USER_AGENT'] ?? '',
+            $details ? json_encode($details) : null
+        ]);
+    } catch (Exception $e) {
+        // Silent fail — logging must never break user flow
+    }
 }
 
 function sendEmail($to, $subject, $message) {
     // Basic email sending - Replace with proper SMTP in production
-    $headers = "From: " . SITE_EMAIL . "\r\n";
+    $headers  = "From: " . SITE_EMAIL . "\r\n";
     $headers .= "Reply-To: " . SITE_EMAIL . "\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
     
@@ -250,6 +235,8 @@ function getSessionId() {
     return $_SESSION['anonymous_session_id'];
 }
 
+// ── Subscription / Reading Logic ────────────────────────────
+
 function hasActiveSubscription($userId) {
     $db = db();
     $stmt = $db->prepare("
@@ -262,6 +249,58 @@ function hasActiveSubscription($userId) {
     ");
     $stmt->execute([$userId]);
     return $stmt->fetch() !== false;
+}
+
+/**
+ * Returns how many free premium article reads the current visitor has left.
+ * Uses FREE_ARTICLE_LIMIT (3) as the cap.
+ */
+function getFreeArticlesRemaining() {
+    $db        = db();
+    $userId    = isLoggedIn() ? $_SESSION['user_id'] : null;
+    $sessionId = getSessionId();
+    
+    $stmt = $db->prepare("
+        SELECT COUNT(DISTINCT article_id) AS count 
+        FROM reading_history 
+        WHERE (user_id = ? OR session_id = ?)
+        AND article_id IN (SELECT id FROM articles WHERE is_premium = 1)
+    ");
+    $stmt->execute([$userId, $sessionId]);
+    $result = $stmt->fetch();
+    
+    return max(0, FREE_ARTICLE_LIMIT - (int)$result['count']);
+}
+
+/**
+ * Records that the current visitor has read a premium article.
+ * ON DUPLICATE KEY UPDATE prevents double-counting.
+ */
+function recordArticleRead($articleId) {
+    $db        = db();
+    $userId    = isLoggedIn() ? $_SESSION['user_id'] : null;
+    $sessionId = getSessionId();
+    
+    try {
+        $stmt = $db->prepare("
+            INSERT INTO reading_history (user_id, session_id, article_id, ip_address, user_agent)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE read_at = CURRENT_TIMESTAMP
+        ");
+        $stmt->execute([
+            $userId,
+            $sessionId,
+            $articleId,
+            getClientIP(),
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        ]);
+        
+        // Increment article views
+        $stmt = $db->prepare("UPDATE articles SET views = views + 1 WHERE id = ?");
+        $stmt->execute([$articleId]);
+    } catch (Exception $e) {
+        // Silent fail - don't break user experience
+    }
 }
 
 function canReadArticle($articleId) {
@@ -292,78 +331,23 @@ function canReadArticle($articleId) {
     }
     
     // Check free article limit
-    $userId = isLoggedIn() ? $_SESSION['user_id'] : null;
-    $sessionId = getSessionId();
-    
-    $stmt = $db->prepare("
-        SELECT COUNT(DISTINCT article_id) as count 
-        FROM reading_history 
-        WHERE (user_id = ? OR session_id = ?)
-        AND article_id IN (SELECT id FROM articles WHERE is_premium = 1)
-    ");
-    $stmt->execute([$userId, $sessionId]);
-    $result = $stmt->fetch();
-    
-    return $result['count'] < FREE_ARTICLE_LIMIT;
+    return getFreeArticlesRemaining() > 0;
 }
 
-function recordArticleRead($articleId) {
-    $db = db();
-    $userId = isLoggedIn() ? $_SESSION['user_id'] : null;
-    $sessionId = getSessionId();
-    
-    try {
-        $stmt = $db->prepare("
-            INSERT INTO reading_history (user_id, session_id, article_id, ip_address, user_agent)
-            VALUES (?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE read_at = CURRENT_TIMESTAMP
-        ");
-        $stmt->execute([
-            $userId,
-            $sessionId,
-            $articleId,
-            getClientIP(),
-            $_SERVER['HTTP_USER_AGENT'] ?? ''
-        ]);
-        
-        // Increment article views
-        $stmt = $db->prepare("UPDATE articles SET views = views + 1 WHERE id = ?");
-        $stmt->execute([$articleId]);
-    } catch (Exception $e) {
-        // Silent fail - don't break user experience
-    }
+/**
+ * Render article content - outputs HTML safely
+ * This function ensures HTML content is displayed properly while still being safe
+ */
+function renderArticleContent($content) {
+    // Content is stored as HTML, so we output it directly
+    // The content was already validated when saved to DB
+    return $content;
 }
 
-function getFreeArticlesRemaining() {
-    $db = db();
-    $userId = isLoggedIn() ? $_SESSION['user_id'] : null;
-    $sessionId = getSessionId();
-    
-    $stmt = $db->prepare("
-        SELECT COUNT(DISTINCT article_id) as count 
-        FROM reading_history 
-        WHERE (user_id = ? OR session_id = ?)
-        AND article_id IN (SELECT id FROM articles WHERE is_premium = 1)
-    ");
-    $stmt->execute([$userId, $sessionId]);
-    $result = $stmt->fetch();
-    
-    $remaining = FREE_ARTICLE_LIMIT - $result['count'];
-    return max(0, $remaining);
-}
-
-function recordArticleView($userId, $articleId) {
-    $db = db();
-    
-    // Check if this view already exists (to prevent double counting)
-    $check = $db->prepare("SELECT id FROM reading_history WHERE user_id = ? AND article_id = ?");
-    $check->execute([$userId, $articleId]);
-    
-    if (!$check->fetch()) {
-        // Record new view
-        $stmt = $db->prepare("INSERT INTO reading_history (user_id, article_id, read_at) VALUES (?, ?, NOW())");
-        $stmt->execute([$userId, $articleId]);
-    }
+function sanitizeHTML($html) {
+    // Allow these tags (including <img> for article images)
+    $allowed = '<p><br><strong><b><em><i><u><h2><h3><h4><ul><ol><li><a><code><pre><blockquote><img>';
+    return strip_tags($html, $allowed);
 }
 
 // Auto-load any additional functions or classes
