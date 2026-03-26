@@ -47,6 +47,10 @@ $relatedStmt = $db->prepare("
 ");
 $relatedStmt->execute([$article['id'], $article['category_id']]);
 $relatedArticles = $relatedStmt->fetchAll();
+
+// Estimate reading time
+$wordCount = str_word_count(strip_tags($article['content']));
+$readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,6 +75,10 @@ $relatedArticles = $relatedStmt->fetchAll();
     <meta name="twitter:description" content="<?php echo htmlspecialchars($article['excerpt']); ?>">
     <meta name="twitter:image" content="<?php echo htmlspecialchars($article['featured_image']); ?>">
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400&display=swap" rel="stylesheet">
+    
     <style>
         * {
             margin: 0;
@@ -79,34 +87,43 @@ $relatedArticles = $relatedStmt->fetchAll();
         }
         
         :root {
-            --primary: #000000;
+            --primary: #0a0a0a;
             --secondary: #ffffff;
-            --accent: #ff0055;
+            --accent: #FF6B6B;
+            --accent-dark: #E74C3C;
             --text: #1a1a1a;
-            --text-light: #666666;
-            --border: #e0e0e0;
+            --text-light: #4a5568;
+            --text-lighter: #718096;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --premium: #FFD700;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
         
         body {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            line-height: 1.8;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
             color: var(--text);
             background: var(--secondary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
+        /* Header */
         .header {
-            border-bottom: 4px solid var(--primary);
             background: var(--secondary);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
         
         .header-content {
@@ -117,149 +134,288 @@ $relatedArticles = $relatedStmt->fetchAll();
         }
         
         .logo {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 900;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
             color: var(--primary);
             text-decoration: none;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Playfair Display', serif;
+            transition: opacity 0.2s;
+        }
+        
+        .logo:hover {
+            opacity: 0.8;
         }
         
         .nav {
             display: flex;
-            gap: 25px;
+            gap: 24px;
             align-items: center;
         }
         
         .nav a {
             color: var(--text);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: 500;
+            font-size: 15px;
             transition: color 0.2s;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         .nav a:hover {
             color: var(--accent);
         }
         
+        /* Article Header */
         .article-header {
-            max-width: 800px;
-            margin: 60px auto;
-            text-align: center;
+            max-width: 740px;
+            margin: 48px auto 40px;
+            padding: 0 24px;
         }
         
         .article-category {
             display: inline-block;
             background: var(--primary);
             color: var(--secondary);
-            padding: 6px 16px;
+            padding: 6px 14px;
             font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            border-radius: 4px;
         }
         
         .article-title {
             font-size: 48px;
-            font-weight: 900;
-            line-height: 1.2;
+            font-weight: 800;
+            line-height: 1.15;
             margin-bottom: 20px;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
         }
         
         .article-excerpt {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--text-light);
-            margin-bottom: 30px;
+            margin-bottom: 32px;
             line-height: 1.6;
+            font-weight: 400;
         }
         
         .article-meta {
             display: flex;
-            justify-content: center;
-            gap: 30px;
+            align-items: center;
+            gap: 24px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
             font-size: 14px;
-            color: var(--text-light);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-lighter);
+            flex-wrap: wrap;
         }
         
-        .article-meta span {
+        .article-meta-item {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 500;
         }
         
+        .author-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .author-details strong {
+            display: block;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .author-details span {
+            font-size: 13px;
+            color: var(--text-lighter);
+        }
+        
+        /* Featured Image */
         .featured-image {
             width: 100%;
             max-width: 1000px;
-            margin: 0 auto 60px;
-            display: block;
+            margin: 48px auto;
+            padding: 0 24px;
         }
         
         .featured-image img {
             width: 100%;
             height: auto;
             display: block;
-            border: 4px solid var(--primary);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
         }
         
+        /* Article Content - THE MOST IMPORTANT PART */
         .article-content {
-            max-width: 700px;
-            margin: 0 auto 60px;
+            max-width: 680px;
+            margin: 0 auto 64px;
+            padding: 0 24px;
             font-size: 19px;
             line-height: 1.8;
+            color: var(--text);
+            font-family: 'Merriweather', Georgia, serif;
+        }
+        
+        .article-content > * {
+            margin-bottom: 28px;
         }
         
         .article-content p {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
+            text-align: justify;
         }
         
         .article-content h2 {
-            font-size: 32px;
-            margin: 40px 0 20px;
-            font-weight: 900;
+            font-size: 36px;
+            font-weight: 800;
+            margin: 56px 0 24px;
+            line-height: 1.3;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            letter-spacing: -0.5px;
         }
         
         .article-content h3 {
-            font-size: 24px;
-            margin: 30px 0 15px;
+            font-size: 28px;
             font-weight: 700;
+            margin: 40px 0 20px;
+            line-height: 1.3;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
         }
         
-        .article-content ul, .article-content ol {
-            margin-left: 30px;
-            margin-bottom: 24px;
+        .article-content h4 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 32px 0 16px;
+            color: var(--primary);
+        }
+        
+        .article-content ul,
+        .article-content ol {
+            margin-left: 32px;
+            margin-bottom: 28px;
+            line-height: 1.8;
         }
         
         .article-content li {
             margin-bottom: 12px;
+            padding-left: 8px;
+        }
+        
+        .article-content ul li::marker {
+            color: var(--accent);
         }
         
         .article-content blockquote {
-            border-left: 4px solid var(--primary);
-            padding-left: 30px;
-            margin: 30px 0;
+            border-left: 4px solid var(--accent);
+            padding-left: 32px;
+            margin: 40px 0;
             font-style: italic;
-            font-size: 22px;
+            font-size: 24px;
+            line-height: 1.6;
             color: var(--text-light);
+            font-family: 'Playfair Display', serif;
         }
         
+        .article-content a {
+            color: var(--accent);
+            text-decoration: underline;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .article-content a:hover {
+            color: var(--accent-dark);
+        }
+        
+        .article-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 40px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .article-content code {
+            background: var(--bg-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 16px;
+            color: var(--accent-dark);
+        }
+        
+        .article-content pre {
+            background: var(--bg-light);
+            padding: 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 32px 0;
+            border: 1px solid var(--border);
+        }
+        
+        .article-content pre code {
+            background: none;
+            padding: 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+        
+        .article-content strong,
+        .article-content b {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .article-content em,
+        .article-content i {
+            font-style: italic;
+        }
+        
+        .article-content hr {
+            border: none;
+            border-top: 2px solid var(--border);
+            margin: 48px 0;
+        }
+        
+        /* Paywall */
         .paywall-overlay {
             position: relative;
-            max-width: 700px;
+            max-width: 680px;
             margin: 40px auto;
+            padding: 0 24px;
         }
         
         .blurred-content {
-            filter: blur(5px);
+            filter: blur(8px);
             user-select: none;
             pointer-events: none;
+            opacity: 0.4;
         }
         
         .paywall-box {
@@ -268,66 +424,109 @@ $relatedArticles = $relatedStmt->fetchAll();
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            border: 4px solid var(--primary);
-            padding: 40px;
+            border-radius: 16px;
+            padding: 48px;
             text-align: center;
             max-width: 500px;
             width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+        }
+        
+        .paywall-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
         
         .paywall-box h2 {
             font-size: 32px;
-            margin-bottom: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin-bottom: 16px;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
         }
         
         .paywall-box p {
-            font-size: 18px;
-            margin-bottom: 25px;
+            font-size: 17px;
+            margin-bottom: 28px;
             color: var(--text-light);
+            line-height: 1.6;
         }
         
         .paywall-stats {
-            background: #f5f5f5;
-            padding: 20px;
-            margin-bottom: 25px;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--secondary) 100%);
+            padding: 32px;
+            margin-bottom: 28px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
         }
         
         .paywall-stats .number {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 900;
             color: var(--accent);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .paywall-stats .label {
+            font-size: 14px;
+            color: var(--text-lighter);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .paywall-benefits {
+            text-align: left;
+            margin: 28px 0;
+        }
+        
+        .paywall-benefit {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            color: var(--text);
+        }
+        
+        .paywall-benefit::before {
+            content: '✓';
+            color: var(--accent);
+            font-weight: 900;
+            font-size: 18px;
         }
         
         .btn {
             padding: 14px 32px;
-            background: var(--accent);
-            color: white;
             border: none;
             font-weight: 700;
-            text-transform: uppercase;
-            font-size: 14px;
-            letter-spacing: 1px;
+            font-size: 15px;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
             transition: all 0.3s;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
         }
         
-        .btn:hover {
-            background: #cc0044;
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: var(--accent-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
         }
         
         .btn-outline {
             background: transparent;
             border: 2px solid var(--primary);
             color: var(--primary);
-            margin-left: 10px;
+            margin-left: 12px;
         }
         
         .btn-outline:hover {
@@ -335,61 +534,107 @@ $relatedArticles = $relatedStmt->fetchAll();
             color: var(--secondary);
         }
         
+        /* Related Articles */
         .related-articles {
-            background: #fafafa;
-            padding: 60px 0;
+            background: var(--bg-light);
+            padding: 80px 0;
             margin-top: 80px;
         }
         
         .related-articles h2 {
             text-align: center;
-            font-size: 36px;
-            margin-bottom: 40px;
-            font-weight: 900;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 40px;
+            margin-bottom: 48px;
+            font-weight: 800;
+            font-family: 'Playfair Display', serif;
+            color: var(--primary);
         }
         
         .related-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
         
         .related-card {
             background: white;
-            border: 2px solid var(--border);
-            padding: 25px;
+            border-radius: 12px;
+            padding: 28px;
             transition: all 0.3s;
+            border: 1px solid var(--border);
         }
         
         .related-card:hover {
-            border-color: var(--primary);
             transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+        
+        .related-card-category {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-lighter);
+            margin-bottom: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
         
         .related-card h3 {
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 12px;
             font-weight: 700;
+            line-height: 1.4;
+            font-family: 'Playfair Display', serif;
         }
         
         .related-card h3 a {
             color: var(--text);
             text-decoration: none;
+            transition: color 0.2s;
         }
         
         .related-card h3 a:hover {
             color: var(--accent);
         }
         
+        .related-card-excerpt {
+            color: var(--text-light);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Footer */
         .footer {
             background: var(--primary);
             color: var(--secondary);
-            padding: 40px 0;
+            padding: 48px 0 24px;
             text-align: center;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+        
+        .footer a:hover {
+            color: var(--accent);
+        }
+        
+        /* Mobile Responsive */
         @media (max-width: 768px) {
             .article-title {
                 font-size: 32px;
@@ -401,10 +646,65 @@ $relatedArticles = $relatedStmt->fetchAll();
             
             .article-content {
                 font-size: 17px;
+                padding: 0 20px;
+            }
+            
+            .article-content h2 {
+                font-size: 28px;
+                margin: 40px 0 20px;
+            }
+            
+            .article-content h3 {
+                font-size: 24px;
+            }
+            
+            .article-content blockquote {
+                font-size: 20px;
+                padding-left: 24px;
+                margin: 32px 0;
             }
             
             .paywall-box {
-                padding: 30px 20px;
+                padding: 32px 24px;
+            }
+            
+            .paywall-stats {
+                padding: 24px;
+            }
+            
+            .paywall-stats .number {
+                font-size: 48px;
+            }
+            
+            .btn-outline {
+                margin-left: 0;
+                margin-top: 12px;
+                display: block;
+                width: 100%;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .article-title {
+                font-size: 28px;
+            }
+            
+            .article-header {
+                margin: 32px auto 32px;
+            }
+            
+            .featured-image {
+                margin: 32px auto;
             }
         }
     </style>
@@ -415,7 +715,7 @@ $relatedArticles = $relatedStmt->fetchAll();
             <div class="header-content">
                 <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
                 <nav class="nav">
-                    <a href="index.php">← Back to Articles</a>
+                    <a href="index.php">← Articles</a>
                     <?php if (!isLoggedIn()): ?>
                         <a href="login.php">Login</a>
                     <?php endif; ?>
@@ -425,22 +725,39 @@ $relatedArticles = $relatedStmt->fetchAll();
     </header>
 
     <article>
-        <div class="container">
-            <div class="article-header">
-                <?php if ($article['category_name']): ?>
-                    <span class="article-category"><?php echo htmlspecialchars($article['category_name']); ?></span>
-                <?php endif; ?>
-                
-                <h1 class="article-title"><?php echo htmlspecialchars($article['title']); ?></h1>
-                
-                <?php if ($article['excerpt']): ?>
-                    <p class="article-excerpt"><?php echo htmlspecialchars($article['excerpt']); ?></p>
-                <?php endif; ?>
-                
-                <div class="article-meta">
-                    <span>✍️ <?php echo htmlspecialchars($article['author_name']); ?></span>
-                    <span>📅 <?php echo formatDate($article['published_at']); ?></span>
-                    <span>👁 <?php echo number_format($article['views']); ?> views</span>
+        <div class="article-header">
+            <?php if ($article['category_name']): ?>
+                <span class="article-category"><?php echo htmlspecialchars($article['category_name']); ?></span>
+            <?php endif; ?>
+            
+            <h1 class="article-title"><?php echo htmlspecialchars($article['title']); ?></h1>
+            
+            <?php if ($article['excerpt']): ?>
+                <p class="article-excerpt"><?php echo htmlspecialchars($article['excerpt']); ?></p>
+            <?php endif; ?>
+            
+            <div class="article-meta">
+                <div class="author-info">
+                    <div class="author-avatar">
+                        <?php echo strtoupper(substr($article['author_name'], 0, 1)); ?>
+                    </div>
+                    <div class="author-details">
+                        <strong><?php echo htmlspecialchars($article['author_name']); ?></strong>
+                        <span><?php echo formatDate($article['published_at']); ?></span>
+                    </div>
+                </div>
+                <div class="article-meta-item">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <?php echo $readingTime; ?> min read
+                </div>
+                <div class="article-meta-item">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <?php echo number_format($article['views']); ?> views
                 </div>
             </div>
         </div>
@@ -452,52 +769,66 @@ $relatedArticles = $relatedStmt->fetchAll();
             </div>
         <?php endif; ?>
         
-        <div class="container">
-            <?php if ($canRead): ?>
-                <div class="article-content">
-                    <?php echo $article['content']; ?>
+        <?php if ($canRead): ?>
+            <div class="article-content">
+                <?php echo $article['content']; ?>
+            </div>
+        <?php else: ?>
+            <div class="paywall-overlay">
+                <div class="article-content blurred-content">
+                    <?php echo substr(strip_tags($article['content']), 0, 400); ?>...
                 </div>
-            <?php else: ?>
-                <div class="paywall-overlay">
-                    <div class="article-content blurred-content">
-                        <?php echo substr($article['content'], 0, 500); ?>...
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit...
-                    </div>
+                
+                <div class="paywall-box">
+                    <div class="paywall-icon">🔒</div>
+                    <h2>Continue Reading</h2>
                     
-                    <div class="paywall-box">
-                        <h2>🔒 Premium Content</h2>
+                    <?php if (!isLoggedIn()): ?>
+                        <p>Join thousands of readers getting premium insights delivered daily.</p>
                         
-                        <?php if (!isLoggedIn()): ?>
-                            <p>You've reached your free article limit. Subscribe to continue reading.</p>
-                            <div class="paywall-stats">
-                                <div class="number"><?php echo $freeRemaining; ?></div>
-                                <div>Free articles remaining</div>
-                            </div>
-                            <a href="register.php" class="btn">Subscribe Now</a>
-                            <a href="login.php" class="btn btn-outline">Sign In</a>
-                        <?php else: ?>
-                            <p>Upgrade to premium to unlock unlimited articles.</p>
-                            <div class="paywall-stats">
-                                <div class="number">₹299</div>
-                                <div>Per month</div>
-                            </div>
-                            <a href="pricing.php" class="btn">Upgrade Now</a>
-                        <?php endif; ?>
-                    </div>
+                        <div class="paywall-stats">
+                            <div class="number"><?php echo $freeRemaining; ?></div>
+                            <div class="label">Free articles remaining</div>
+                        </div>
+                        
+                        <div class="paywall-benefits">
+                            <div class="paywall-benefit">Unlimited access to all articles</div>
+                            <div class="paywall-benefit">Ad-free reading experience</div>
+                            <div class="paywall-benefit">Support quality journalism</div>
+                        </div>
+                        
+                        <a href="register.php" class="btn btn-primary">Subscribe Now</a>
+                        <a href="login.php" class="btn btn-outline">Sign In</a>
+                    <?php else: ?>
+                        <p>Upgrade to premium and unlock unlimited access to our entire library of in-depth articles.</p>
+                        
+                        <div class="paywall-stats">
+                            <div class="number">₹299</div>
+                            <div class="label">Per month</div>
+                        </div>
+                        
+                        <div class="paywall-benefits">
+                            <div class="paywall-benefit">Unlimited premium articles</div>
+                            <div class="paywall-benefit">Exclusive member content</div>
+                            <div class="paywall-benefit">Cancel anytime</div>
+                        </div>
+                        
+                        <a href="pricing.php" class="btn btn-primary">Upgrade Now</a>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
-        </div>
+            </div>
+        <?php endif; ?>
     </article>
 
     <?php if (!empty($relatedArticles)): ?>
     <section class="related-articles">
         <div class="container">
-            <h2>Related Articles</h2>
+            <h2>Continue Reading</h2>
             <div class="related-grid">
                 <?php foreach ($relatedArticles as $related): ?>
                 <div class="related-card">
                     <?php if ($related['category_name']): ?>
-                        <div style="font-size: 11px; text-transform: uppercase; color: #999; margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+                        <div class="related-card-category">
                             <?php echo htmlspecialchars($related['category_name']); ?>
                         </div>
                     <?php endif; ?>
@@ -506,7 +837,7 @@ $relatedArticles = $relatedStmt->fetchAll();
                             <?php echo htmlspecialchars($related['title']); ?>
                         </a>
                     </h3>
-                    <p style="color: #666; font-size: 15px; margin-top: 10px;">
+                    <p class="related-card-excerpt">
                         <?php echo htmlspecialchars(truncateText(strip_tags($related['content']), 120)); ?>
                     </p>
                 </div>
@@ -518,7 +849,17 @@ $relatedArticles = $relatedStmt->fetchAll();
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="index.php">Home</a>
+                <a href="pricing.php">Pricing</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </div>
+            <p style="color: rgba(255, 255, 255, 0.6); font-size: 14px;">
+                &copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.
+            </p>
         </div>
     </footer>
 </body>
