@@ -28,6 +28,16 @@ $stats['published_articles'] = $stmt->fetch()['total'];
 $stmt = $db->query("SELECT SUM(amount) as total FROM transactions WHERE status = 'succeeded'");
 $stats['total_revenue'] = $stmt->fetch()['total'] ?? 0;
 
+// Monthly revenue (current month)
+$stmt = $db->query("
+    SELECT SUM(amount) as total 
+    FROM transactions 
+    WHERE status = 'succeeded' 
+    AND MONTH(created_at) = MONTH(CURRENT_DATE())
+    AND YEAR(created_at) = YEAR(CURRENT_DATE())
+");
+$stats['monthly_revenue'] = $stmt->fetch()['total'] ?? 0;
+
 // Recent articles
 $recentArticles = $db->query("
     SELECT a.*, u.full_name as author_name 
@@ -61,7 +71,8 @@ $recentActivity = $db->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - <?php echo SITE_NAME; ?></title>
+    <title>Dashboard - <?php echo SITE_NAME; ?></title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -70,8 +81,9 @@ $recentActivity = $db->query("
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f5f7fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
         }
         
         .admin-layout {
@@ -80,193 +92,440 @@ $recentActivity = $db->query("
         }
         
         .sidebar {
-            width: 260px;
-            background: #1a1d29;
+            width: 280px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             color: white;
-            padding: 30px 0;
+            padding: 0;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
         }
         
         .sidebar-brand {
-            padding: 0 30px 30px;
+            padding: 32px 24px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 30px;
+            background: rgba(255,255,255,0.03);
         }
         
         .sidebar-brand h1 {
-            font-size: 24px;
-            font-weight: 900;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
         
         .sidebar-brand p {
-            font-size: 12px;
+            font-size: 13px;
             opacity: 0.6;
-            margin-top: 5px;
+            font-weight: 500;
         }
         
         .sidebar-menu {
             list-style: none;
+            padding: 16px 12px;
         }
         
         .sidebar-menu a {
-            display: block;
-            padding: 15px 30px;
-            color: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
             font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
             transition: all 0.2s;
+            margin-bottom: 4px;
         }
         
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
+        .sidebar-menu a:hover {
             background: rgba(255,255,255,0.1);
             color: white;
+            transform: translateX(4px);
+        }
+        
+        .sidebar-menu a.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .sidebar-menu a svg,
+        .sidebar-menu a .icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
         }
         
         .main-content {
             flex: 1;
-            margin-left: 260px;
-            padding: 30px;
+            margin-left: 280px;
+            padding: 32px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .mobile-header {
+            display: none;
+            background: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            color: #1e293b;
         }
         
         .top-bar {
             background: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
+            padding: 28px 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .top-bar-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 16px;
         }
         
         .top-bar h1 {
             font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+        
+        .top-bar-time {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
         }
         
         .user-info {
             display: flex;
-            gap: 15px;
             align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .user-details strong {
+            display: block;
+            font-size: 14px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        
+        .user-details span {
+            font-size: 12px;
+            color: #64748b;
         }
         
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 32px;
         }
         
         .stat-card {
             background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card.card-green::before {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        }
+        
+        .stat-card.card-blue::before {
+            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .stat-card.card-orange::before {
+            background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
         
         .stat-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        }
+        
+        .stat-card.card-green .stat-icon {
+            background: linear-gradient(135deg, #10b98115 0%, #05966915 100%);
+        }
+        
+        .stat-card.card-blue .stat-icon {
+            background: linear-gradient(135deg, #3b82f615 0%, #2563eb15 100%);
+        }
+        
+        .stat-card.card-orange .stat-icon {
+            background: linear-gradient(135deg, #f59e0b15 0%, #d9770615 100%);
         }
         
         .stat-value {
-            font-size: 36px;
-            font-weight: 900;
-            color: #667eea;
-            margin-bottom: 5px;
+            font-size: 32px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 4px;
+            letter-spacing: -1px;
         }
         
         .stat-label {
-            color: #666;
-            font-size: 14px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+        
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
             font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #dcfce7;
+            color: #059669;
+            margin-top: 8px;
         }
         
         .card {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 32px;
         }
         
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
         }
         
         .card-header h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
+            color: #0f172a;
         }
         
         .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             transition: all 0.2s;
+            font-size: 14px;
+            font-family: inherit;
         }
         
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
         
         .btn-primary:hover {
-            background: #5568d3;
-        }
-        
-        .btn-success {
-            background: #28a745;
-            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
         }
         
         .btn-sm {
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 13px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .quick-action-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quick-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.2);
+        }
+        
+        .quick-action-card.card-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .quick-action-card.card-orange {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .quick-action-card.card-blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+        
+        .quick-action-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-action-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .quick-action-card p {
+            font-size: 13px;
+            opacity: 0.9;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 700px;
         }
         
         th {
             text-align: left;
-            padding: 12px;
-            background: #f8f9fa;
+            padding: 12px 16px;
+            background: #f8fafc;
             font-weight: 700;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            color: #666;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
         }
         
         td {
-            padding: 15px 12px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 14px;
         }
         
         tr:last-child td {
             border-bottom: none;
         }
         
+        tr:hover td {
+            background: #f8fafc;
+        }
+        
         .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
@@ -274,236 +533,329 @@ $recentActivity = $db->query("
         }
         
         .badge-success {
-            background: #d4edda;
-            color: #155724;
+            background: #dcfce7;
+            color: #059669;
         }
         
         .badge-warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .badge-danger {
-            background: #f8d7da;
-            color: #721c24;
+            background: #fef3c7;
+            color: #d97706;
         }
         
         .badge-info {
-            background: #d1ecf1;
-            color: #0c5460;
+            background: #dbeafe;
+            color: #2563eb;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 8px;
+        .badge-purple {
+            background: #f3e8ff;
+            color: #7c3aed;
         }
         
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
         }
         
-        .quick-action-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-decoration: none;
+        .overlay.active {
             display: block;
-            transition: transform 0.2s;
         }
         
-        .quick-action-card:hover {
-            transform: translateY(-4px);
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
-        .quick-action-card h3 {
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-        
-        .quick-action-card p {
-            font-size: 13px;
-            opacity: 0.9;
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px;
+            }
+            
+            .mobile-header {
+                display: flex;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .top-bar {
+                padding: 20px;
+            }
+            
+            .top-bar h1 {
+                font-size: 24px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="mobile-header">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <h1><?php echo SITE_NAME; ?></h1>
+    </div>
+    
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+    
     <div class="admin-layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-brand">
                 <h1><?php echo SITE_NAME; ?></h1>
-                <p>Admin Panel</p>
+                <p>Admin Dashboard</p>
             </div>
             <ul class="sidebar-menu">
-                <li><a href="dashboard.php" class="active">📊 Dashboard</a></li>
-                <li><a href="articles.php">📝 Articles</a></li>
-                <li><a href="users.php">👥 Users</a></li>
-                <li><a href="subscriptions.php">💳 Subscriptions</a></li>
-                <li><a href="transactions.php">💰 Transactions</a></li>
-                <li><a href="categories.php">🏷️ Categories</a></li>
-                <li><a href="settings.php">⚙️ Settings</a></li>
-                <li><a href="../index.php">🌐 View Site</a></li>
-                <li><a href="../logout.php">🚪 Logout</a></li>
+                <li><a href="dashboard.php" class="active">
+                    <span class="icon">📊</span> Dashboard
+                </a></li>
+                <li><a href="articles.php">
+                    <span class="icon">📝</span> Articles
+                </a></li>
+                <li><a href="users.php">
+                    <span class="icon">👥</span> Users
+                </a></li>
+                <li><a href="subscriptions.php">
+                    <span class="icon">💳</span> Subscriptions
+                </a></li>
+                <li><a href="transactions.php">
+                    <span class="icon">💰</span> Transactions
+                </a></li>
+                <li><a href="categories.php">
+                    <span class="icon">🏷️</span> Categories
+                </a></li>
+                <li><a href="settings.php">
+                    <span class="icon">⚙️</span> Settings
+                </a></li>
+                <li><a href="../index.php">
+                    <span class="icon">🌐</span> View Site
+                </a></li>
+                <li><a href="../logout.php">
+                    <span class="icon">🚪</span> Logout
+                </a></li>
             </ul>
         </aside>
         
         <main class="main-content">
             <div class="top-bar">
-                <h1>Dashboard Overview</h1>
-                <div class="user-info">
-                    <span>Welcome, <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong></span>
+                <div class="top-bar-content">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p class="top-bar-time"><?php echo date('l, F j, Y'); ?></p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['user_name'], 0, 1)); ?></div>
+                        <div class="user-details">
+                            <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong>
+                            <span>Administrator</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">👥</div>
+                    <div class="stat-header">
+                        <div class="stat-icon">👥</div>
+                    </div>
                     <div class="stat-value"><?php echo number_format($stats['total_users']); ?></div>
                     <div class="stat-label">Total Users</div>
+                    <span class="stat-change">↗ Growing</span>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon">💎</div>
+                <div class="stat-card card-green">
+                    <div class="stat-header">
+                        <div class="stat-icon">💎</div>
+                    </div>
                     <div class="stat-value"><?php echo number_format($stats['active_subscriptions']); ?></div>
                     <div class="stat-label">Active Subscribers</div>
+                    <span class="stat-change">↗ Active</span>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon">📝</div>
+                <div class="stat-card card-blue">
+                    <div class="stat-header">
+                        <div class="stat-icon">📝</div>
+                    </div>
                     <div class="stat-value"><?php echo number_format($stats['published_articles']); ?></div>
                     <div class="stat-label">Published Articles</div>
+                    <span class="stat-change">of <?php echo number_format($stats['total_articles']); ?> total</span>
                 </div>
                 
-                <div class="stat-card">
-                    <div class="stat-icon">💰</div>
+                <div class="stat-card card-orange">
+                    <div class="stat-header">
+                        <div class="stat-icon">💰</div>
+                    </div>
                     <div class="stat-value">₹<?php echo number_format($stats['total_revenue'], 0); ?></div>
                     <div class="stat-label">Total Revenue</div>
+                    <span class="stat-change">₹<?php echo number_format($stats['monthly_revenue'], 0); ?> this month</span>
                 </div>
             </div>
             
-            <div class="card">
-                <div class="card-header">
-                    <h2>Quick Actions</h2>
-                </div>
-                <div class="quick-actions">
-                    <a href="article-create.php" class="quick-action-card">
-                        <h3>New Article</h3>
-                        <p>Create a new blog post</p>
-                    </a>
-                    <a href="users.php" class="quick-action-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                        <h3>Manage Users</h3>
-                        <p>View and edit users</p>
-                    </a>
-                    <a href="subscriptions.php" class="quick-action-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);">
-                        <h3>Subscriptions</h3>
-                        <p>Monitor subscriptions</p>
-                    </a>
-                    <a href="settings.php" class="quick-action-card" style="background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);">
-                        <h3>Settings</h3>
-                        <p>Configure your site</p>
-                    </a>
-                </div>
+            <div class="quick-actions">
+                <a href="article-create.php" class="quick-action-card">
+                    <div class="quick-action-icon">✨</div>
+                    <h3>New Article</h3>
+                    <p>Create a new blog post</p>
+                </a>
+                <a href="users.php" class="quick-action-card card-green">
+                    <div class="quick-action-icon">👥</div>
+                    <h3>Manage Users</h3>
+                    <p>View and edit users</p>
+                </a>
+                <a href="subscriptions.php" class="quick-action-card card-orange">
+                    <div class="quick-action-icon">📊</div>
+                    <h3>Subscriptions</h3>
+                    <p>Monitor subscriptions</p>
+                </a>
+                <a href="settings.php" class="quick-action-card card-blue">
+                    <div class="quick-action-icon">⚙️</div>
+                    <h3>Settings</h3>
+                    <p>Configure your site</p>
+                </a>
             </div>
             
             <div class="card">
                 <div class="card-header">
                     <h2>Recent Articles</h2>
-                    <a href="articles.php" class="btn btn-sm btn-primary">View All</a>
+                    <a href="articles.php" class="btn btn-sm btn-primary">View All →</a>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Status</th>
-                            <th>Views</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentArticles as $article): ?>
-                        <tr>
-                            <td><strong><?php echo htmlspecialchars($article['title']); ?></strong></td>
-                            <td><?php echo htmlspecialchars($article['author_name']); ?></td>
-                            <td>
-                                <?php if ($article['is_published']): ?>
-                                    <span class="badge badge-success">Published</span>
-                                <?php else: ?>
-                                    <span class="badge badge-warning">Draft</span>
-                                <?php endif; ?>
-                                <?php if ($article['is_premium']): ?>
-                                    <span class="badge badge-info">Premium</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo number_format($article['views']); ?></td>
-                            <td><?php echo timeAgo($article['created_at']); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Published</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recentArticles as $article): ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars($article['title']); ?></strong></td>
+                                <td><?php echo htmlspecialchars($article['author_name']); ?></td>
+                                <td>
+                                    <?php if ($article['is_published']): ?>
+                                        <span class="badge badge-success">Published</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-warning">Draft</span>
+                                    <?php endif; ?>
+                                    <?php if ($article['is_premium']): ?>
+                                        <span class="badge badge-purple">Premium</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo number_format($article['views']); ?></td>
+                                <td><?php echo timeAgo($article['created_at']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
                     <h2>Recent Subscriptions</h2>
-                    <a href="subscriptions.php" class="btn btn-sm btn-primary">View All</a>
+                    <a href="subscriptions.php" class="btn btn-sm btn-primary">View All →</a>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Email</th>
-                            <th>Plan</th>
-                            <th>Status</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentSubscriptions as $sub): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($sub['full_name']); ?></td>
-                            <td><?php echo htmlspecialchars($sub['email']); ?></td>
-                            <td><span class="badge badge-info"><?php echo ucfirst($sub['plan_type']); ?></span></td>
-                            <td>
-                                <?php if ($sub['status'] === 'active'): ?>
-                                    <span class="badge badge-success">Active</span>
-                                <?php else: ?>
-                                    <span class="badge badge-warning"><?php echo ucfirst($sub['status']); ?></span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo timeAgo($sub['created_at']); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Plan</th>
+                                <th>Status</th>
+                                <th>Subscribed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recentSubscriptions as $sub): ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars($sub['full_name']); ?></strong></td>
+                                <td><?php echo htmlspecialchars($sub['email']); ?></td>
+                                <td><span class="badge badge-info"><?php echo ucfirst($sub['plan_type']); ?></span></td>
+                                <td>
+                                    <?php if ($sub['status'] === 'active'): ?>
+                                        <span class="badge badge-success">Active</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-warning"><?php echo ucfirst($sub['status']); ?></span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?php echo timeAgo($sub['created_at']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
             <div class="card">
                 <div class="card-header">
                     <h2>Recent Activity</h2>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Action</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentActivity as $activity): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($activity['full_name'] ?: 'System'); ?></td>
-                            <td><?php echo htmlspecialchars(str_replace('_', ' ', ucwords($activity['action'], '_'))); ?></td>
-                            <td><?php echo timeAgo($activity['created_at']); ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recentActivity as $activity): ?>
+                            <tr>
+                                <td><strong><?php echo htmlspecialchars($activity['full_name'] ?: 'System'); ?></strong></td>
+                                <td><?php echo htmlspecialchars(str_replace('_', ' ', ucwords($activity['action'], '_'))); ?></td>
+                                <td><?php echo timeAgo($activity['created_at']); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
+    
+    <script>
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        // Close sidebar when clicking menu items on mobile
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    toggleMenu();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
