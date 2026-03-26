@@ -24,14 +24,228 @@ if (!$article) {
     redirect('index.php');
 }
 
-// Check if user can read this article
-$canRead = canReadArticle($article['id']);
+// ============= ENHANCED USAGE LIMIT ENFORCEMENT =============
+$canRead = false;
+$blockReason = '';
 $hasSubscription = isLoggedIn() ? hasActiveSubscription($_SESSION['user_id']) : false;
 $freeRemaining = getFreeArticlesRemaining();
 
-// Record article view if user can read
-if ($canRead) {
-    recordArticleRead($article['id']);
+// Determine if user can read this article
+if (!$article['is_premium']) {
+    // Free articles are always accessible
+    $canRead = true;
+} elseif (isLoggedIn()) {
+    // User is logged in - check subscription or free limit
+    if ($hasSubscription) {
+        // Premium subscriber - full access
+        $canRead = true;
+    } else {
+        // Not a subscriber - check free articles remaining
+        if ($freeRemaining > 0) {
+            // Has free articles left
+            $canRead = true;
+            
+            // Record this view and decrement count
+            recordArticleRead($article['id']);
+        } else {
+            // No free articles remaining
+            $canRead = false;
+            $blockReason = 'limit_reached';
+        }
+    }
+} else {
+    // Not logged in and article is premium
+    $canRead = false;
+    $blockReason = 'not_logged_in';
+}
+
+// If blocked, show paywall page and exit
+if (!$canRead && $article['is_premium']) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Premium Content - <?php echo SITE_NAME; ?></title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px;
+            }
+            .paywall-container {
+                max-width: 600px;
+                text-align: center;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                border-radius: 24px;
+                padding: 64px 48px;
+                box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+                color: #1a1a1a;
+            }
+            .paywall-icon {
+                font-size: 80px;
+                margin-bottom: 24px;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+            h1 {
+                font-size: 40px;
+                font-weight: 900;
+                margin-bottom: 16px;
+                font-family: 'Playfair Display', serif;
+                color: #0a0a0a;
+                line-height: 1.2;
+            }
+            p {
+                font-size: 18px;
+                margin-bottom: 32px;
+                color: #4a5568;
+                line-height: 1.6;
+            }
+            .stats-box {
+                background: linear-gradient(135deg, #FF6B6B 0%, #E74C3C 100%);
+                color: white;
+                padding: 32px;
+                border-radius: 16px;
+                margin-bottom: 32px;
+            }
+            .stats-box .number {
+                font-size: 64px;
+                font-weight: 900;
+                font-family: 'Playfair Display', serif;
+                margin-bottom: 8px;
+            }
+            .stats-box .label {
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                opacity: 0.9;
+            }
+            .benefits {
+                text-align: left;
+                margin: 32px 0;
+                background: #f9fafb;
+                padding: 28px;
+                border-radius: 12px;
+            }
+            .benefit {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 14px;
+                font-size: 16px;
+                color: #1a1a1a;
+            }
+            .benefit::before {
+                content: '✓';
+                color: #10b981;
+                font-weight: 900;
+                font-size: 20px;
+                flex-shrink: 0;
+            }
+            .btn {
+                display: inline-block;
+                padding: 16px 40px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 16px;
+                transition: all 0.3s;
+                margin: 8px;
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }
+            .btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 30px rgba(102, 126, 234, 0.5);
+            }
+            .btn-outline {
+                background: transparent;
+                border: 2px solid #667eea;
+                color: #667eea;
+                box-shadow: none;
+            }
+            .btn-outline:hover {
+                background: #667eea;
+                color: white;
+            }
+            @media (max-width: 640px) {
+                .paywall-container { padding: 48px 32px; }
+                h1 { font-size: 32px; }
+                .paywall-icon { font-size: 64px; }
+                .stats-box .number { font-size: 48px; }
+                .btn { display: block; margin: 8px 0; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="paywall-container">
+            <div class="paywall-icon">🔒</div>
+            
+            <?php if ($blockReason === 'not_logged_in'): ?>
+                <h1>Premium Content</h1>
+                <p>Sign in to access this premium article and start your free reading allowance.</p>
+                
+                <div class="stats-box">
+                    <div class="number">5</div>
+                    <div class="label">Free Premium Articles</div>
+                </div>
+                
+                <div class="benefits">
+                    <div class="benefit">Read 5 free premium articles every month</div>
+                    <div class="benefit">No credit card required to start</div>
+                    <div class="benefit">Upgrade anytime for unlimited access</div>
+                </div>
+                
+                <a href="login.php?redirect=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn">Sign In to Read</a>
+                <a href="register.php" class="btn btn-outline">Create Free Account</a>
+                
+            <?php else: // limit_reached ?>
+                <h1>You've Reached Your Limit</h1>
+                <p>You've read all your free premium articles this month. Subscribe for unlimited access to our entire library.</p>
+                
+                <div class="stats-box">
+                    <div class="number">0</div>
+                    <div class="label">Free Articles Remaining</div>
+                </div>
+                
+                <div class="benefits">
+                    <div class="benefit">Unlimited access to all premium content</div>
+                    <div class="benefit">Ad-free reading experience</div>
+                    <div class="benefit">Support quality journalism</div>
+                    <div class="benefit">Cancel anytime, no strings attached</div>
+                </div>
+                
+                <a href="pricing.php" class="btn">View Subscription Plans</a>
+                <a href="index.php" class="btn btn-outline">Back to Home</a>
+            <?php endif; ?>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
+// If user can read, update view count (only once per session)
+if ($canRead && !isset($_SESSION['viewed_article_' . $article['id']])) {
+    $updateViews = $db->prepare("UPDATE articles SET views = views + 1 WHERE id = ?");
+    $updateViews->execute([$article['id']]);
+    $_SESSION['viewed_article_' . $article['id']] = true;
 }
 
 // Get related articles
@@ -256,22 +470,22 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         /* Featured Image */
         .featured-image {
             width: 100%;
-            max-width: 740px;  /* Match article content width */
-            margin: 32px auto;  /* Reduced from 48px */
+            max-width: 740px;
+            margin: 32px auto;
             padding: 0 24px;
         }
         
         .featured-image img {
             width: 100%;
             height: auto;
-            max-height: 420px;  /* ADD THIS - caps the height */
-            object-fit: cover;  /* ADD THIS - crops intelligently */
+            max-height: 420px;
+            object-fit: cover;
             display: block;
-            border-radius: 8px;  /* Reduced from 12px for subtlety */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);  /* Softer shadow */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         
-        /* Article Content - THE MOST IMPORTANT PART */
+        /* Article Content */
         .article-content {
             max-width: 680px;
             margin: 0 auto 64px;
@@ -358,11 +572,11 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
         .article-content img {
             width: 100%;
             height: auto;
-            max-height: 500px;  
-            object-fit: cover;  
-            border-radius: 6px;  
-            margin: 32px 0;  
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);  
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin: 32px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
         
         .article-content code {
@@ -405,137 +619,6 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             border: none;
             border-top: 2px solid var(--border);
             margin: 48px 0;
-        }
-        
-        /* Paywall */
-        .paywall-overlay {
-            position: relative;
-            max-width: 680px;
-            margin: 40px auto;
-            padding: 0 24px;
-        }
-        
-        .blurred-content {
-            filter: blur(8px);
-            user-select: none;
-            pointer-events: none;
-            opacity: 0.4;
-        }
-        
-        .paywall-box {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border-radius: 16px;
-            padding: 48px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            border: 1px solid var(--border);
-        }
-        
-        .paywall-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        
-        .paywall-box h2 {
-            font-size: 32px;
-            margin-bottom: 16px;
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
-        }
-        
-        .paywall-box p {
-            font-size: 17px;
-            margin-bottom: 28px;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-        
-        .paywall-stats {
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--secondary) 100%);
-            padding: 32px;
-            margin-bottom: 28px;
-            border-radius: 12px;
-            border: 2px solid var(--border);
-        }
-        
-        .paywall-stats .number {
-            font-size: 56px;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 8px;
-            font-family: 'Playfair Display', serif;
-        }
-        
-        .paywall-stats .label {
-            font-size: 14px;
-            color: var(--text-lighter);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-        }
-        
-        .paywall-benefits {
-            text-align: left;
-            margin: 28px 0;
-        }
-        
-        .paywall-benefit {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-            font-size: 15px;
-            color: var(--text);
-        }
-        
-        .paywall-benefit::before {
-            content: '✓';
-            color: var(--accent);
-            font-weight: 900;
-            font-size: 18px;
-        }
-        
-        .btn {
-            padding: 14px 32px;
-            border: none;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-        }
-        
-        .btn-primary:hover {
-            background: var(--accent-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-            margin-left: 12px;
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary);
-            color: var(--secondary);
         }
         
         /* Related Articles */
@@ -668,25 +751,6 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
                 margin: 32px 0;
             }
             
-            .paywall-box {
-                padding: 32px 24px;
-            }
-            
-            .paywall-stats {
-                padding: 24px;
-            }
-            
-            .paywall-stats .number {
-                font-size: 48px;
-            }
-            
-            .btn-outline {
-                margin-left: 0;
-                margin-top: 12px;
-                display: block;
-                width: 100%;
-            }
-            
             .article-meta {
                 flex-direction: column;
                 align-items: flex-start;
@@ -696,15 +760,13 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             .related-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        @media (max-width: 768px) {
+            
             .featured-image {
-                margin: 24px auto;  /* Even tighter on mobile */
+                margin: 24px auto;
             }
             
             .featured-image img {
-                max-height: 280px;  /* Mobile-friendly height */
+                max-height: 280px;
                 border-radius: 6px;
             }
         }
@@ -784,55 +846,9 @@ $readingTime = ceil($wordCount / 200); // Average reading speed: 200 words/min
             </div>
         <?php endif; ?>
         
-        <?php if ($canRead): ?>
-            <div class="article-content">
-                <?php echo $article['content']; ?>
-            </div>
-        <?php else: ?>
-            <div class="paywall-overlay">
-                <div class="article-content blurred-content">
-                    <?php echo substr(strip_tags($article['content']), 0, 400); ?>...
-                </div>
-                
-                <div class="paywall-box">
-                    <div class="paywall-icon">🔒</div>
-                    <h2>Continue Reading</h2>
-                    
-                    <?php if (!isLoggedIn()): ?>
-                        <p>Join thousands of readers getting premium insights delivered daily.</p>
-                        
-                        <div class="paywall-stats">
-                            <div class="number"><?php echo $freeRemaining; ?></div>
-                            <div class="label">Free articles remaining</div>
-                        </div>
-                        
-                        <div class="paywall-benefits">
-                            <div class="paywall-benefit">Unlimited access to all articles</div>
-                            <div class="paywall-benefit">Ad-free reading experience</div>
-                            <div class="paywall-benefit">Support quality journalism</div>
-                        </div>
-                        
-                        <a href="register.php" class="btn btn-primary">Subscribe Now</a>
-                        <a href="login.php" class="btn btn-outline">Sign In</a>
-                    <?php else: ?>
-                        <p>Upgrade to premium and unlock unlimited access to our entire library of in-depth articles.</p>
-                        
-                        <div class="paywall-stats">
-                            <div class="number">₹299</div>
-                            <div class="label">Per month</div>
-                        </div>
-                        
-                        <div class="paywall-benefits">
-                            <div class="paywall-benefit">Unlimited premium articles</div>
-                            <div class="paywall-benefit">Exclusive member content</div>
-                            <div class="paywall-benefit">Cancel anytime</div>
-                        </div>
-                        
-                        <a href="pricing.php" class="btn btn-primary">Upgrade Now</a>
-                    <?php endif; ?>
-                </div>
-            </div>
-        <?php endif; ?>
+        <div class="article-content">
+            <?php echo $article['content']; ?>
+        </div>
     </article>
 
     <?php if (!empty($relatedArticles)): ?>

@@ -717,6 +717,102 @@ $freeRemaining = getFreeArticlesRemaining();
         .empty-state p {
             font-size: 16px;
         }
+
+        /* Usage Popup Styles */
+        .usage-popup {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .popup-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .popup-content {
+            position: relative;
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            animation: slideUp 0.3s;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: var(--text-lighter);
+            transition: color 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .popup-close:hover {
+            color: var(--text);
+            background: var(--bg-light);
+        }
+
+        .popup-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .popup-content h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+        }
+
+        .popup-content p {
+            color: var(--text-light);
+            font-size: 16px;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         
         /* Responsive Design */
         @media (max-width: 1024px) {
@@ -790,6 +886,7 @@ $freeRemaining = getFreeArticlesRemaining();
                 font-size: 13px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -853,13 +950,25 @@ $freeRemaining = getFreeArticlesRemaining();
         </div>
     </header>
 
-    <!-- Subscription Banner -->
-    <?php if (!$hasSubscription && isLoggedIn() && $freeRemaining <= 1): ?>
-    <div class="subscription-banner">
-        <div class="container">
-            <div class="remaining"><?php echo $freeRemaining; ?></div>
-            <p>Free articles remaining</p>
-            <a href="pricing.php" class="btn btn-primary" style="margin-top: 8px; background: white; color: var(--accent);">Subscribe for Unlimited Access →</a>
+    <!-- Subscription Reminder Popup (instead of banner) -->
+    <?php if (!$hasSubscription && isLoggedIn() && $freeRemaining <= 2): ?>
+    <div class="usage-popup" id="usagePopup" style="display: none;">
+        <div class="popup-overlay" onclick="closeUsagePopup()"></div>
+        <div class="popup-content">
+            <button class="popup-close" onclick="closeUsagePopup()">×</button>
+            <div class="popup-icon">
+                <?php if ($freeRemaining == 0): ?>
+                    🔒
+                <?php else: ?>
+                    ⚠️
+                <?php endif; ?>
+            </div>
+            <h3><?php echo $freeRemaining == 0 ? 'No Free Articles Remaining' : $freeRemaining . ' Free Article' . ($freeRemaining > 1 ? 's' : '') . ' Remaining'; ?></h3>
+            <p><?php echo $freeRemaining == 0 ? 'Subscribe now to continue reading premium content' : 'Subscribe for unlimited access to all premium articles'; ?></p>
+            <div class="popup-actions">
+                <a href="pricing.php" class="btn btn-primary">View Plans</a>
+                <button onclick="closeUsagePopup()" class="btn btn-outline">Maybe Later</button>
+            </div>
         </div>
     </div>
     <?php endif; ?>
@@ -1034,5 +1143,42 @@ $freeRemaining = getFreeArticlesRemaining();
             document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
         }
     </script>
+
+    <script>
+    function toggleMobileMenu() {
+        const mobileNav = document.getElementById('mobileNav');
+        mobileNav.classList.toggle('active');
+        document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+    }
+
+    // Usage popup functionality
+    function showUsagePopup() {
+        const popup = document.getElementById('usagePopup');
+        if (popup) {
+            popup.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    function closeUsagePopup() {
+        const popup = document.getElementById('usagePopup');
+        if (popup) {
+            popup.style.display = 'none';
+            document.body.style.overflow = '';
+            // Set cookie to not show again for 24 hours
+            document.cookie = 'usage_reminder_shown=1; max-age=86400; path=/';
+        }
+    }
+
+    // Show popup on page load if user has low remaining articles
+    window.addEventListener('DOMContentLoaded', function() {
+        <?php if (!$hasSubscription && isLoggedIn() && $freeRemaining <= 2): ?>
+            // Check if we've shown the popup recently
+            if (!document.cookie.includes('usage_reminder_shown=1')) {
+                setTimeout(showUsagePopup, 2000); // Show after 2 seconds
+            }
+        <?php endif; ?>
+    });
+</script>
 </body>
 </html>

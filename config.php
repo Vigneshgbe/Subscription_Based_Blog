@@ -352,6 +352,20 @@ function getFreeArticlesRemaining() {
     return max(0, $remaining);
 }
 
+function recordArticleView($userId, $articleId) {
+    $db = db();
+    
+    // Check if this view already exists (to prevent double counting)
+    $check = $db->prepare("SELECT id FROM reading_history WHERE user_id = ? AND article_id = ?");
+    $check->execute([$userId, $articleId]);
+    
+    if (!$check->fetch()) {
+        // Record new view
+        $stmt = $db->prepare("INSERT INTO reading_history (user_id, article_id, read_at) VALUES (?, ?, NOW())");
+        $stmt->execute([$userId, $articleId]);
+    }
+}
+
 // Auto-load any additional functions or classes
 // require_once 'functions.php';
 ?>
