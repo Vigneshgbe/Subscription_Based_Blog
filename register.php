@@ -126,9 +126,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -148,41 +148,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .auth-container {
             background: var(--secondary);
-            max-width: 520px;
+            max-width: 440px;
             width: 100%;
-            padding: 48px;
+            padding: 28px 32px;
             border-radius: 16px;
             box-shadow: var(--shadow-xl);
             position: relative;
             z-index: 1;
             border: 1px solid var(--border-light);
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+        
+        /* Custom scrollbar for better UX */
+        .auth-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .auth-container::-webkit-scrollbar-track {
+            background: var(--bg-lighter);
+            border-radius: 10px;
+        }
+        
+        .auth-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        
+        .auth-container::-webkit-scrollbar-thumb:hover {
+            background: var(--text-lighter);
         }
         
         .logo-section {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
         }
         
         .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
             letter-spacing: -0.5px;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             display: block;
         }
         
         .logo-tagline {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-light);
             font-weight: 500;
         }
         
         h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-align: center;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
@@ -192,21 +213,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .subtitle {
             text-align: center;
             color: var(--text-light);
-            margin-bottom: 40px;
-            font-size: 16px;
+            margin-bottom: 24px;
+            font-size: 14px;
             font-weight: 500;
         }
         
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
         
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: var(--text);
-            font-size: 14px;
+            font-size: 13px;
             letter-spacing: 0.2px;
         }
         
@@ -214,10 +235,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 14px;
             border: 2px solid var(--border);
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.2s;
             font-family: inherit;
             background: var(--secondary);
@@ -236,18 +257,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: var(--accent);
             color: var(--secondary);
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
             font-family: inherit;
             box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-            margin-top: 8px;
+            margin-top: 6px;
         }
         
         .btn:hover {
@@ -261,15 +282,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .alert {
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-left: 4px solid;
             font-weight: 500;
             border-radius: 8px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 13px;
             line-height: 1.5;
         }
         
@@ -281,11 +302,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .alert ul {
             margin: 0;
-            padding-left: 20px;
+            padding-left: 18px;
         }
         
         .alert li {
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         
         .alert li:last-child {
@@ -294,10 +315,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .link {
             text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 1px solid var(--border-light);
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-light);
         }
         
@@ -315,13 +336,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .back-home {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         
         .back-home a {
             color: var(--text-light);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
@@ -334,21 +355,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .back-home svg {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
         }
         
         .benefits {
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 1px solid var(--border-light);
         }
         
         .benefits-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -356,60 +377,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .benefit-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .benefit-item {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-light);
-            line-height: 1.5;
+            line-height: 1.4;
         }
         
         .benefit-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
             color: var(--secondary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             flex-shrink: 0;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         
         .password-hint {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-lighter);
-            margin-top: 6px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            margin-top: 5px;
         }
         
         @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
             .auth-container {
-                padding: 32px 24px;
+                padding: 24px 20px;
+                max-height: 98vh;
             }
             
             h1 {
-                font-size: 28px;
+                font-size: 24px;
             }
             
             .logo {
-                font-size: 28px;
+                font-size: 24px;
             }
-            
-            .form-row {
-                grid-template-columns: 1fr;
+        }
+        
+        @media (min-height: 800px) {
+            .auth-container {
+                max-height: none;
+                overflow-y: visible;
             }
         }
     </style>
@@ -425,17 +448,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
         </div>
         
-        <div class="logo-section">
+        <!-- <div class="logo-section">
             <span class="logo"><?php echo SITE_NAME; ?></span>
             <p class="logo-tagline">Premium insights for curious minds</p>
-        </div>
+        </div> -->
         
         <h1>Create Account</h1>
         <p class="subtitle">Join thousands of readers today</p>
         
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
-                <span style="font-size: 20px;">⚠️</span>
+                <span style="font-size: 18px;">⚠️</span>
                 <div>
                     <ul>
                         <?php foreach ($errors as $error): ?>
@@ -491,29 +514,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <button type="submit" class="btn">Create Account</button>
         </form>
-        
-        <div class="benefits">
-            <p class="benefits-title">What You Get</p>
-            <div class="benefit-list">
-                <div class="benefit-item">
-                    <span class="benefit-icon">✓</span>
-                    <span><strong>3 free premium articles</strong> to start your journey</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-icon">✓</span>
-                    <span><strong>Unlimited access</strong> to all free content</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-icon">✓</span>
-                    <span><strong>Personalized recommendations</strong> based on your interests</span>
-                </div>
-                <div class="benefit-item">
-                    <span class="benefit-icon">✓</span>
-                    <span><strong>Reading history</strong> across all your devices</span>
-                </div>
-            </div>
-        </div>
-        
+           
         <div class="link">
             Already have an account? <a href="login.php">Sign in</a>
         </div>

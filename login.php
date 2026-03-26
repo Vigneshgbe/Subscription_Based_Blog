@@ -100,9 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -122,9 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .auth-container {
             background: var(--secondary);
-            max-width: 480px;
+            max-width: 420px;
             width: 100%;
-            padding: 48px;
+            padding: 32px 36px;
             border-radius: 16px;
             box-shadow: var(--shadow-xl);
             position: relative;
@@ -134,29 +134,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .logo-section {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 28px;
         }
         
         .logo {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
             letter-spacing: -0.5px;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
-            margin-bottom: 12px;
+            margin-bottom: 6px;
             display: block;
         }
         
         .logo-tagline {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-light);
             font-weight: 500;
         }
         
         h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-align: center;
             color: var(--primary);
             font-family: 'Playfair Display', serif;
@@ -166,31 +166,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .subtitle {
             text-align: center;
             color: var(--text-light);
-            margin-bottom: 40px;
-            font-size: 16px;
+            margin-bottom: 28px;
+            font-size: 14px;
             font-weight: 500;
         }
         
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 18px;
         }
         
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-weight: 600;
             color: var(--text);
-            font-size: 14px;
+            font-size: 13px;
             letter-spacing: 0.2px;
         }
         
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 14px;
             border: 2px solid var(--border);
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.2s;
             font-family: inherit;
             background: var(--secondary);
@@ -211,19 +211,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         
         input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             border-radius: 4px;
             border: 2px solid var(--border);
         }
         
         .checkbox-label {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: var(--text);
             cursor: pointer;
@@ -231,12 +231,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: var(--accent);
             color: var(--secondary);
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
@@ -255,15 +255,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .alert {
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-left: 4px solid;
             font-weight: 500;
             border-radius: 8px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 13px;
             line-height: 1.5;
         }
         
@@ -287,14 +287,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .forgot-link {
             text-align: right;
-            margin-top: -12px;
-            margin-bottom: 24px;
+            margin-top: -8px;
+            margin-bottom: 18px;
         }
         
         .forgot-link a {
             color: var(--accent);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             transition: color 0.2s;
         }
@@ -304,39 +304,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-decoration: underline;
         }
         
-        .divider {
-            text-align: center;
-            margin: 32px 0;
-            position: relative;
-        }
-        
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: var(--border-light);
-        }
-        
-        .divider span {
-            background: var(--secondary);
-            padding: 0 16px;
-            color: var(--text-lighter);
-            font-size: 13px;
-            font-weight: 600;
-            position: relative;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
         .link {
             text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 24px;
+            padding-top: 20px;
             border-top: 1px solid var(--border-light);
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-light);
         }
         
@@ -354,13 +327,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .back-home {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
         
         .back-home a {
             color: var(--text-light);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             display: inline-flex;
             align-items: center;
@@ -373,55 +346,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .back-home svg {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
         }
         
         .features {
-            margin-top: 32px;
-            padding-top: 24px;
+            margin-top: 24px;
+            padding-top: 20px;
             border-top: 1px solid var(--border-light);
         }
         
         .feature-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .feature-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-light);
         }
         
         .feature-icon {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: var(--accent);
             color: var(--secondary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             flex-shrink: 0;
         }
         
         @media (max-width: 640px) {
+            body {
+                padding: 10px;
+            }
+            
             .auth-container {
-                padding: 32px 24px;
+                padding: 28px 24px;
             }
             
             h1 {
-                font-size: 28px;
+                font-size: 24px;
             }
             
             .logo {
-                font-size: 28px;
+                font-size: 24px;
             }
         }
     </style>
@@ -447,7 +424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger">
-                <span style="font-size: 20px;">⚠️</span>
+                <span style="font-size: 18px;">⚠️</span>
                 <div>
                     <?php foreach ($errors as $error): ?>
                         <?php echo htmlspecialchars($error); ?><br>
@@ -461,7 +438,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($flash):
         ?>
             <div class="alert alert-<?php echo $flash['type']; ?>">
-                <span style="font-size: 20px;">
+                <span style="font-size: 18px;">
                     <?php 
                     echo $flash['type'] === 'success' ? '✓' : 
                          ($flash['type'] === 'warning' ? '⚠️' : 'ℹ️'); 
@@ -505,23 +482,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <button type="submit" class="btn">Sign In</button>
         </form>
-        
-        <div class="features">
-            <div class="feature-list">
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>Access premium articles</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>Personalized reading experience</span>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">✓</span>
-                    <span>Track your reading history</span>
-                </div>
-            </div>
-        </div>
         
         <div class="link">
             Don't have an account? <a href="register.php">Create one now</a>
