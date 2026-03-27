@@ -1,6 +1,6 @@
 <?php
 // config.php - Central Configuration File
-// Security: Ensure this file is above web root in production
+require_once __DIR__ . '/vendor/autoload.php';
 
 // Error Reporting (Set to 0 in production)
 ini_set('display_errors', 1);
