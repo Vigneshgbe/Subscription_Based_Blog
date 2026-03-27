@@ -88,7 +88,7 @@ ob_end_clean();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings — <?php echo htmlspecialchars(SITE_NAME); ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -113,7 +113,7 @@ ob_end_clean();
         }
 
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--surface-2);
             color: var(--ink);
             min-height: 100vh;
@@ -149,7 +149,7 @@ ob_end_clean();
             font-family: 'Playfair Display', serif;
             font-size: 22px; font-weight: 900; color: var(--ink);
         }
-        .top-bar-sub { font-size: 13px; color: var(--ink-3); margin-top: 1px; }
+        .top-bar-sub { font-size: 14px; color: var(--ink-3); margin-top: 1px; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         /* ── Layout ── */
         .settings-layout {
@@ -179,6 +179,7 @@ ob_end_clean();
             padding: 11px 14px; border-radius: 10px;
             text-decoration: none; font-weight: 600; font-size: 14px;
             color: var(--ink-2); transition: all .18s; margin-bottom: 2px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .settings-nav a .nav-icon { font-size: 16px; flex-shrink: 0; }
         .settings-nav a:hover { background: var(--surface-3); color: var(--ink); }
@@ -214,13 +215,14 @@ ob_end_clean();
             font-family: 'Playfair Display', serif;
             font-size: 18px; font-weight: 700; color: var(--ink);
         }
-        .card-header p { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+        .card-header p { font-size: 14px; color: var(--ink-3); margin-top: 2px; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         /* ── Alerts ── */
         .alert {
             display: flex; align-items: flex-start; gap: 12px;
             padding: 14px 18px; border-radius: 12px; margin-bottom: 24px;
-            font-size: 14px; font-weight: 500;
+            font-size: 15px; font-weight: 500;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .alert-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
         .alert-success { background: var(--green-bg); border: 1px solid #bbf7d0; color: #065f46; }
@@ -244,19 +246,22 @@ ob_end_clean();
         .info-item:hover { border-color: var(--accent); }
         .info-item strong {
             display: block; font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px;
+            text-transform: uppercase; letter-spacing: 0.8px;
             color: var(--ink-3); margin-bottom: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .info-item span {
             font-size: 17px; font-weight: 700; color: var(--ink);
-            font-family: 'Playfair Display', serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.3px;
         }
-        .info-item .info-sub { font-size: 12px; color: var(--ink-3); font-family: 'DM Sans', sans-serif; font-weight: 400; display: block; margin-top: 2px; }
+        .info-item .info-sub { font-size: 12px; color: var(--ink-3); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 500; display: block; margin-top: 2px; }
 
         /* ── Mode badge ── */
         .mode-badge {
             display: inline-flex; align-items: center; gap: 6px;
-            padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700;
+            padding: 5px 14px; border-radius: 100px; font-size: 13px; font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
         .mode-badge.live    { background: #dcfce7; color: #15803d; }
         .mode-badge.test    { background: #fef9c3; color: #a16207; }
@@ -268,9 +273,10 @@ ob_end_clean();
         .form-group:last-of-type { margin-bottom: 0; }
 
         label {
-            display: block; font-size: 12px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: .8px;
+            display: block; font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .6px;
             color: var(--ink-2); margin-bottom: 7px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         input[type=text],
@@ -278,7 +284,7 @@ ob_end_clean();
         input[type=password] {
             width: 100%; padding: 12px 16px;
             border: 2px solid var(--border); border-radius: 10px;
-            font-size: 14px; font-family: 'DM Sans', sans-serif;
+            font-size: 15px; font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--ink); background: var(--surface);
             transition: border-color .2s, box-shadow .2s;
         }
@@ -302,7 +308,7 @@ ob_end_clean();
 
         .btn {
             padding: 11px 24px; border: none; border-radius: 10px;
-            font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+            font-size: 14px; font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif;
             cursor: pointer; transition: all .2s;
             display: inline-flex; align-items: center; gap: 8px;
             text-decoration: none;
@@ -334,7 +340,7 @@ ob_end_clean();
         .event-chip {
             background: var(--accent-bg); color: var(--accent);
             font-size: 12px; font-weight: 600;
-            padding: 4px 10px; border-radius: 6px;
+            padding: 5px 11px; border-radius: 6px;
             font-family: 'JetBrains Mono', monospace;
         }
 
