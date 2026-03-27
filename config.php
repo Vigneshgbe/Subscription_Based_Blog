@@ -20,27 +20,38 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Database Configuration
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'subscription_blog');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Load .env only if the file exists (works on both local and production)
+if (file_exists(__DIR__ . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+}
+
+// Helper to read from $_ENV with fallback
+function env($key, $default = '') {
+    return $_ENV[$key] ?? getenv($key) ?? $default;
+}
+
+// Database
+define('DB_HOST',    env('DB_HOST', 'localhost'));
+define('DB_NAME',    env('DB_NAME', 'subscription_blog'));
+define('DB_USER',    env('DB_USER', 'root'));
+define('DB_PASS',    env('DB_PASS', ''));
 define('DB_CHARSET', 'utf8mb4');
 
-// Stripe Configuration
-define('STRIPE_SECRET_KEY', 'sk_test_YOUR_STRIPE_SECRET_KEY'); // Replace with your Stripe secret key
-define('STRIPE_PUBLISHABLE_KEY', 'pk_test_YOUR_STRIPE_PUBLISHABLE_KEY'); // Replace with your Stripe publishable key
-define('STRIPE_WEBHOOK_SECRET', 'whsec_YOUR_WEBHOOK_SECRET'); // Replace with your webhook secret
+// Stripe
+define('STRIPE_SECRET_KEY',      env('STRIPE_SECRET_KEY'));
+define('STRIPE_PUBLISHABLE_KEY', env('STRIPE_PUBLISHABLE_KEY'));
+define('STRIPE_WEBHOOK_SECRET',  env('STRIPE_WEBHOOK_SECRET'));
 
 // Pricing Configuration (in INR)
 define('MONTHLY_PRICE', 29900); // ₹299.00 in paisa
 define('YEARLY_PRICE', 299900); // ₹2,999.00 in paisa
 
-// Site Configuration
-define('SITE_NAME', 'Premium Blog');
-define('SITE_URL', 'http://localhost/blog'); // Update for production
-define('SITE_EMAIL', 'noreply@yourblog.com');
-define('ADMIN_EMAIL', 'admin@yourblog.com');
+// Site
+define('SITE_NAME',  env('SITE_NAME',  'Premium Blog'));
+define('SITE_URL',   env('SITE_URL',   'http://localhost/blog'));
+define('SITE_EMAIL', env('SITE_EMAIL', 'noreply@yourblog.com'));
+define('ADMIN_EMAIL',env('ADMIN_EMAIL','admin@yourblog.com'));
 
 // ============================================================
 // FREE ARTICLE LIMIT — Single source of truth: 3
