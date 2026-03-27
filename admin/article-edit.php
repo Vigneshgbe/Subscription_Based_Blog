@@ -83,6 +83,7 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Article - Admin | <?php echo SITE_NAME; ?></title>
+    <link rel="icon" type="image/x-icon" href="https://png.pngtree.com/element_our/sm/20180518/sm_5aff60887f7d9.jpg">
     
     <!-- TinyMCE CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.7.0/tinymce.min.js" referrerpolicy="origin"></script>
