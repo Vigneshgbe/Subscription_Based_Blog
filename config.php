@@ -233,12 +233,12 @@ function logActivity($userId, $action, $entityType = null, $entityId = null, $de
 }
 
 function sendEmail($to, $subject, $message) {
-    // Basic email sending - Replace with proper SMTP in production
+    if (empty($to)) return false;
     $headers  = "From: " . SITE_EMAIL . "\r\n";
     $headers .= "Reply-To: " . SITE_EMAIL . "\r\n";
     $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    
-    return mail($to, $subject, $message, $headers);
+    // @ suppresses the SMTP warning on localhost — mail still attempts
+    return @mail($to, $subject, $message, $headers);
 }
 
 function getSessionId() {

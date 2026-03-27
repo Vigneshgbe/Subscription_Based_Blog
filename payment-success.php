@@ -1,4 +1,6 @@
 <?php
+ob_start(); // Buffer output
+
 require_once 'config.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -127,6 +129,8 @@ try {
     error_log('payment-success error: ' . $e->getMessage());
 }
 ?>
+<?php ob_end_clean(); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
