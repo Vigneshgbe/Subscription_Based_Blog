@@ -935,6 +935,8 @@ $freeRemaining = getFreeArticlesRemaining();
                 <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
                 <nav class="nav">
                     <a href="index.php">Home</a>
+                    <a href="about.php">About</a>
+                    <a href="contact.php">Contact Us</a>
                     <?php if (isLoggedIn()): ?>
                         <?php if (isAdmin()): ?>
                             <a href="admin/dashboard.php">Dashboard</a>
