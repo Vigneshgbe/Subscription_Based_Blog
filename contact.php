@@ -664,7 +664,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="index.php">Home</a>
             <a href="about.php">About</a>
             <a href="contact.php">Contact</a>
-            <a href="careers.php">Careers</a>
             <?php if (isLoggedIn()): ?>
                 <?php if (isAdmin()): ?>
                     <a href="admin/dashboard.php">Dashboard</a>
@@ -703,7 +702,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="index.php">Home</a>
                     <a href="about.php">About</a>
                     <a href="contact.php">Contact</a>
-                    <a href="careers.php">Careers</a>
                     <?php if (isLoggedIn()): ?>
                         <?php if (isAdmin()): ?>
                             <a href="admin/dashboard.php">Dashboard</a>
@@ -755,23 +753,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">We typically respond within 24 hours</p>
                         </div>
 
-                        <div class="info-card">
+                        <!-- <div class="info-card">
                             <div class="info-card-header">
                                 <div class="info-icon">💬</div>
                                 <h3>Support</h3>
                             </div>
                             <p><a href="mailto:support@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">support@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
                             <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">For subscription & account help</p>
-                        </div>
+                        </div> -->
 
-                        <div class="info-card">
+                        <!-- <div class="info-card">
                             <div class="info-card-header">
                                 <div class="info-icon">🤝</div>
                                 <h3>Partnerships</h3>
                             </div>
                             <p><a href="mailto:partnerships@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">partnerships@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
                             <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">Collaborations & business inquiries</p>
-                        </div>
+                        </div> -->
 
                         <div class="info-card">
                             <div class="info-card-header">
@@ -851,10 +849,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="faq-answer">Please use the contact form above and select "Technical Support" as your subject. Include details about your device, browser, and what you were trying to do when the issue occurred.</div>
                 </div>
 
-                <div class="faq-item">
-                    <div class="faq-question">Are you hiring?</div>
-                    <div class="faq-answer">Check out our <a href="careers.php" style="color: var(--accent); text-decoration: none; font-weight: 600;">Careers page</a> for current openings. We're always looking for talented writers, editors, and technologists who share our mission.</div>
-                </div>
             </div>
         </div>
     </section>
@@ -873,9 +867,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3>Navigation</h3>
                     <div class="footer-links">
                         <a href="index.php">Home</a>
-                        <a href="about.php">About</a>
-                        <a href="contact.php">Contact</a>
-                        <a href="careers.php">Careers</a>
                         <a href="pricing.php">Pricing</a>
                     </div>
                 </div>
@@ -884,7 +875,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="footer-links">
                         <a href="about.php">About</a>
                         <a href="contact.php">Contact</a>
-                        <a href="careers.php">Careers</a>
                     </div>
                 </div>
                 <div class="footer-section">

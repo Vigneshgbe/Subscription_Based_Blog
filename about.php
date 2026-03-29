@@ -624,7 +624,6 @@ $freeRemaining = getFreeArticlesRemaining();
             <a href="index.php">Home</a>
             <a href="about.php">About</a>
             <a href="contact.php">Contact</a>
-            <a href="careers.php">Careers</a>
             <?php if (isLoggedIn()): ?>
                 <?php if (isAdmin()): ?>
                     <a href="admin/dashboard.php">Dashboard</a>
@@ -663,7 +662,6 @@ $freeRemaining = getFreeArticlesRemaining();
                     <a href="index.php">Home</a>
                     <a href="about.php">About</a>
                     <a href="contact.php">Contact</a>
-                    <a href="careers.php">Careers</a>
                     <?php if (isLoggedIn()): ?>
                         <?php if (isAdmin()): ?>
                             <a href="admin/dashboard.php">Dashboard</a>
@@ -806,12 +804,12 @@ $freeRemaining = getFreeArticlesRemaining();
                     <div class="team-role">Senior Business Analyst</div>
                     <p class="team-bio">MBA from Wharton, former strategy consultant. Makes complex economics accessible.</p>
                 </div>
-                <div class="team-card">
+                <!-- <div class="team-card">
                     <div class="team-avatar">DK</div>
                     <h3>David Kim</h3>
                     <div class="team-role">Culture & Society Editor</div>
                     <p class="team-bio">Cultural critic and sociologist. Explores how we live, work, and think in the modern world.</p>
-                </div>
+                </div> -->
             </div>
         </div>
     </section>
@@ -839,9 +837,6 @@ $freeRemaining = getFreeArticlesRemaining();
                     <h3>Navigation</h3>
                     <div class="footer-links">
                         <a href="index.php">Home</a>
-                        <a href="about.php">About</a>
-                        <a href="contact.php">Contact</a>
-                        <a href="careers.php">Careers</a>
                         <a href="pricing.php">Pricing</a>
                     </div>
                 </div>
@@ -850,7 +845,6 @@ $freeRemaining = getFreeArticlesRemaining();
                     <div class="footer-links">
                         <a href="about.php">About</a>
                         <a href="contact.php">Contact</a>
-                        <a href="careers.php">Careers</a>
                     </div>
                 </div>
                 <div class="footer-section">
