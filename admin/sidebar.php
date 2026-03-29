@@ -166,6 +166,11 @@ $_sidebar_page = basename($_SERVER['PHP_SELF']);
             </a>
         </li>
         <li>
+            <a href="contact-us.php" class="<?php echo $_sidebar_page === 'contact-us.php' ? 'active' : ''; ?>">
+                <span class="icon">📩</span> Messages
+            </a>
+        </li>
+        <li>
             <a href="subscriptions.php" class="<?php echo $_sidebar_page === 'subscriptions.php' ? 'active' : ''; ?>">
                 <span class="icon">💳</span> Subscriptions
             </a>
