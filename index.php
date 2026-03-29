@@ -1117,9 +1117,9 @@ $freeRemaining = getFreeArticlesRemaining();
                 <div class="footer-section">
                     <h3>Company</h3>
                     <div class="footer-links">
-                        <a href="#">About</a>
-                        <a href="#">Contact</a>
-                        <a href="#">Careers</a>
+                        <a href="about.php">About</a>
+                        <a href="contact.php">Contact</a>
+                        <a href="careers.php">Careers</a>
                     </div>
                 </div>
                 <div class="footer-section">
