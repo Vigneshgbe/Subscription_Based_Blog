@@ -17,13 +17,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         setFlashMessage('Please enter a valid email address', 'danger');
     } else {
-        // Here you would typically save to database or send email
-        // For now, we'll just show a success message
-        setFlashMessage('Thank you for your message! We\'ll get back to you within 24 hours.', 'success');
-        
-        // Redirect to prevent form resubmission
-        header('Location: contact.php');
-        exit;
+        try {
+            // Insert contact message into database
+            $stmt = $pdo->prepare("
+                INSERT INTO contact_messages (name, email, subject, message, status, created_at) 
+                VALUES (:name, :email, :subject, :message, 'unread', NOW())
+            ");
+            
+            $result = $stmt->execute([
+                ':name' => $name,
+                ':email' => $email,
+                ':subject' => $subject,
+                ':message' => $message
+            ]);
+            
+            if ($result) {
+                setFlashMessage('Thank you for your message! We\'ll get back to you within 24 hours.', 'success');
+                
+                // Optional: Send email notification to admin
+                // You can uncomment and configure this section if you want email notifications
+                /*
+                $to = "admin@" . strtolower(str_replace(' ', '', SITE_NAME)) . ".com";
+                $email_subject = "New Contact Form Submission: " . $subject;
+                $email_body = "Name: $name\nEmail: $email\nSubject: $subject\n\nMessage:\n$message";
+                $headers = "From: noreply@" . strtolower(str_replace(' ', '', SITE_NAME)) . ".com";
+                mail($to, $email_subject, $email_body, $headers);
+                */
+                
+                // Redirect to prevent form resubmission
+                header('Location: contact.php');
+                exit;
+            } else {
+                setFlashMessage('Sorry, there was an error sending your message. Please try again.', 'danger');
+            }
+        } catch (PDOException $e) {
+            error_log("Contact form error: " . $e->getMessage());
+            setFlashMessage('Sorry, there was an error sending your message. Please try again.', 'danger');
+        }
     }
 }
 ?>
