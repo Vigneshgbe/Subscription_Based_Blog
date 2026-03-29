@@ -1125,9 +1125,9 @@ $freeRemaining = getFreeArticlesRemaining();
                 <div class="footer-section">
                     <h3>Legal</h3>
                     <div class="footer-links">
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Cookie Policy</a>
+                        <a href="terms.php">Terms of Service</a>
+                        <a href="privacy.php">Privacy Policy</a>
+                        <a href="cookies.php">Cookie Policy</a>
                     </div>
                 </div>
             </div>
