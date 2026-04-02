@@ -500,7 +500,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="info-box">
-                <p><strong>📧 Check your inbox</strong></p>
+                <p><strong>Check your inbox</strong></p>
                 <p>If you don't see the email within a few minutes, please check your spam folder.</p>
             </div>
         <?php endif; ?>
