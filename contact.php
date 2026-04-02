@@ -64,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - <?php echo SITE_NAME; ?></title>
     <meta name="description" content="Get in touch with our team. We'd love to hear from you.">
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Vigneshgbe/Subscription_Based_Blog/refs/heads/main/assets/Logo.png">
+    <link rel="icon" type="image/x-icon" href="https://png.pngtree.com/element_our/sm/20180518/sm_5aff60887f7d9.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -76,69 +76,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         :root {
-            --primary: #0a0a0a;
-            --secondary: #ffffff;
-            --accent: #FF6B6B;
-            --accent-dark: #E74C3C;
-            --text: #1a1a1a;
-            --text-light: #6b7280;
-            --text-lighter: #9ca3af;
-            --border: #e5e7eb;
-            --border-light: #f3f4f6;
-            --bg-light: #fafafa;
-            --bg-lighter: #f9fafb;
-            --premium: #FFD700;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --navy:        #0d0b2e;
+            --navy-mid:    #13114a;
+            --navy-light:  #1e1b5e;
+            --purple:      #6B3FA0;
+            --purple-mid:  #7C3AED;
+            --purple-light:#9d6fe8;
+            --gold:        #C9952A;
+            --gold-bright: #F0B429;
+            --gold-light:  #ffd166;
+            --gold-pale:   #fff3cd;
+            --white:       #ffffff;
+            --off-white:   #f8f6f0;
+            --text:        #1a1830;
+            --text-mid:    #4a4570;
+            --text-light:  #7a75a0;
+            --text-lighter:#a8a4c8;
+            --border:      #e4dfff;
+            --border-light:#f0eeff;
+            --bg-tinted:   #faf9ff;
+            --shadow-gold: 0 4px 24px rgba(201,149,42,0.18);
+            --shadow-purple: 0 4px 24px rgba(107,63,160,0.18);
+            --shadow-navy: 0 8px 32px rgba(13,11,46,0.18);
+            --shadow-lg:   0 16px 48px rgba(13,11,46,0.12);
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'DM Sans', sans-serif;
             line-height: 1.6;
             color: var(--text);
-            background: var(--secondary);
+            background: var(--white);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         
-        /* Header Styles */
+        /* ─── HEADER ─────────────────────────────────────── */
         .header {
-            background: var(--secondary);
+            background: var(--white);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 2px 16px rgba(13,11,46,0.07);
         }
         
         .header-top {
-            background: var(--primary);
-            color: var(--secondary);
+            background: linear-gradient(90deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
+            color: var(--white);
             padding: 10px 0;
             font-size: 13px;
             font-weight: 500;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
         
         .header-top-content {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .premium-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            background: var(--premium);
-            color: var(--primary);
-            padding: 2px 8px;
-            border-radius: 4px;
+            gap: 5px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
+            padding: 3px 10px;
+            border-radius: 20px;
             font-weight: 700;
             font-size: 11px;
+            letter-spacing: 0.5px;
+            font-family: 'Cinzel', serif;
         }
         
         .container {
@@ -151,41 +160,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 18px 0;
             gap: 32px;
         }
         
         .logo {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
             text-decoration: none;
-            font-family: 'Playfair Display', serif;
-            transition: opacity 0.2s;
+            gap: 2px;
         }
         
-        .logo:hover {
-            opacity: 0.8;
+        .logo-name {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+        
+        .logo-tagline {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: var(--purple);
+            text-transform: uppercase;
+        }
+        
+        .logo:hover .logo-name {
+            opacity: 0.85;
         }
         
         .nav {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             align-items: center;
         }
         
         .nav a {
-            color: var(--text);
+            color: var(--text-mid);
             text-decoration: none;
             font-weight: 500;
-            font-size: 15px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
             transition: color 0.2s;
             position: relative;
         }
         
         .nav a:hover {
-            color: var(--accent);
+            color: var(--purple);
         }
         
         .nav a::after {
@@ -195,15 +224,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--gold), var(--purple));
             transition: width 0.3s;
+            border-radius: 2px;
         }
         
         .nav a:hover::after {
             width: 100%;
         }
         
-        /* Button Styles */
+        /* ─── BUTTONS ─────────────────────────────────────── */
         .btn {
             padding: 10px 24px;
             border: none;
@@ -216,19 +246,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             gap: 8px;
             border-radius: 8px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.3px;
         }
         
         .btn-primary {
-            background: var(--accent);
-            color: var(--secondary);
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
+            font-weight: 700;
+            box-shadow: var(--shadow-gold);
         }
         
         .btn-primary:hover {
-            background: var(--accent-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 8px 28px rgba(201,149,42,0.35);
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
         }
 
         .btn-submit {
@@ -238,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center;
         }
         
-        /* Mobile Menu */
+        /* ─── MOBILE MENU ─────────────────────────────────── */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -256,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             width: 100%;
             height: 100vh;
-            background: var(--secondary);
+            background: var(--navy);
             z-index: 2000;
             padding: 24px;
             overflow-y: auto;
@@ -270,7 +302,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
         
         .mobile-close {
@@ -278,30 +310,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: none;
             font-size: 32px;
             cursor: pointer;
-            color: var(--text);
+            color: var(--gold);
         }
         
         .mobile-nav-links {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 8px;
         }
         
         .mobile-nav-links a {
-            color: var(--text);
+            color: rgba(255,255,255,0.85);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 18px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-light);
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(201,149,42,0.2);
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
         }
         
-        /* Hero Section */
+        .mobile-nav-links a:hover {
+            color: var(--gold-bright);
+        }
+        
+        /* ─── HERO ────────────────────────────────────────── */
         .hero {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
-            color: var(--secondary);
-            padding: 80px 0;
-            margin-bottom: 80px;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 45%, var(--navy-light) 100%);
+            color: var(--white);
+            padding: 88px 0 80px;
+            margin-bottom: 64px;
             position: relative;
             overflow: hidden;
         }
@@ -309,14 +347,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 50%, rgba(107,63,160,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(201,149,42,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(124,58,237,0.12) 0%, transparent 45%);
             pointer-events: none;
+        }
+        
+        .hero::after {
+            content: '✦';
+            position: absolute;
+            top: 32px;
+            right: 10%;
+            font-size: 28px;
+            color: var(--gold);
+            opacity: 0.4;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50%       { opacity: 0.8; transform: scale(1.2); }
         }
         
         .hero-content {
@@ -328,12 +380,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 56px;
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 24px;
             letter-spacing: -1px;
-            font-family: 'Playfair Display', serif;
         }
         
         .hero p {
@@ -343,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 300;
         }
 
-        /* Contact Section */
+        /* ─── CONTACT SECTION ─────────────────────────────── */
         .contact-section {
             padding: 0 0 80px;
         }
@@ -357,16 +409,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* Contact Info */
         .contact-info h2 {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 36px;
             font-weight: 800;
             margin-bottom: 24px;
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
+            color: var(--navy);
         }
 
         .contact-info p {
             font-size: 17px;
-            color: var(--text-light);
+            color: var(--text-mid);
             line-height: 1.8;
             margin-bottom: 40px;
         }
@@ -378,16 +430,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .info-card {
-            background: var(--bg-lighter);
+            background: var(--bg-tinted);
             padding: 28px;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 1px solid var(--border-light);
             transition: all 0.3s;
         }
 
         .info-card:hover {
-            border-color: var(--accent);
-            box-shadow: var(--shadow-lg);
+            border-color: var(--purple);
+            box-shadow: var(--shadow-purple);
+            transform: translateY(-2px);
         }
 
         .info-card-header {
@@ -401,42 +454,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 28px;
             width: 56px;
             height: 56px;
-            background: var(--accent);
-            color: var(--secondary);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: var(--shadow-gold);
         }
 
         .info-card h3 {
-            font-size: 18px;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
             font-weight: 700;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
+            letter-spacing: 1px;
         }
 
         .info-card p {
             color: var(--text);
             margin: 0;
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.7;
         }
 
         .info-card a {
-            color: var(--accent);
+            color: var(--purple);
             text-decoration: none;
             font-weight: 600;
             transition: color 0.2s;
         }
 
         .info-card a:hover {
-            color: var(--accent-dark);
+            color: var(--purple-mid);
         }
 
         /* Contact Form */
         .contact-form {
-            background: var(--secondary);
+            background: var(--white);
             padding: 48px;
             border-radius: 16px;
             border: 1px solid var(--border-light);
@@ -450,11 +505,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group label {
             display: block;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             margin-bottom: 8px;
             color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-family: 'Cinzel', serif;
         }
 
         .form-group input,
@@ -462,12 +518,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group textarea {
             width: 100%;
             padding: 14px 18px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 15px;
-            font-family: inherit;
+            font-family: 'DM Sans', sans-serif;
             color: var(--text);
-            background: var(--secondary);
+            background: var(--white);
             transition: all 0.2s;
         }
 
@@ -475,8 +531,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(107,63,160,0.1);
         }
 
         .form-group textarea {
@@ -488,7 +544,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
         }
 
-        /* Alerts */
+        /* ─── ALERTS ──────────────────────────────────────── */
         .alert {
             padding: 16px 24px;
             margin-bottom: 32px;
@@ -512,9 +568,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #991b1b;
         }
 
-        /* FAQ Section */
+        /* ─── FAQ SECTION ─────────────────────────────────── */
         .faq-section {
-            background: var(--bg-lighter);
+            background: var(--bg-tinted);
             padding: 80px 0;
             margin-top: 80px;
         }
@@ -526,16 +582,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .faq-header h2 {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 42px;
             font-weight: 800;
             margin-bottom: 16px;
-            font-family: 'Playfair Display', serif;
-            color: var(--primary);
+            color: var(--navy);
         }
 
         .faq-header p {
             font-size: 18px;
-            color: var(--text-light);
+            color: var(--text-mid);
         }
 
         .faq-list {
@@ -544,9 +600,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .faq-item {
-            background: var(--secondary);
+            background: var(--white);
             padding: 32px;
-            border-radius: 12px;
+            border-radius: 14px;
             margin-bottom: 20px;
             border: 1px solid var(--border-light);
             transition: all 0.3s;
@@ -554,71 +610,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .faq-item:hover {
             box-shadow: var(--shadow-lg);
+            border-color: var(--border);
         }
 
         .faq-question {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 12px;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
         }
 
         .faq-answer {
-            color: var(--text-light);
+            color: var(--text-mid);
             line-height: 1.8;
             font-size: 16px;
         }
         
-        /* Footer */
+        /* ─── FOOTER ──────────────────────────────────────── */
         .footer {
-            background: var(--primary);
-            color: var(--secondary);
-            padding: 64px 0 32px;
+            background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+            color: var(--white);
+            padding: 72px 0 36px;
             margin-top: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 80% 0%, rgba(201,149,42,0.08) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        
+        .footer-divider {
+            width: 48px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+            margin: 12px 0 18px;
+            border-radius: 2px;
         }
         
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 48px;
-            margin-bottom: 48px;
+            margin-bottom: 52px;
+            position: relative;
         }
         
         .footer-section h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            margin-bottom: 6px;
+        }
+        
+        .footer-brand-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
         }
         
         .footer-links {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255,255,255,0.65);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
+            font-weight: 400;
+            font-size: 14px;
             transition: color 0.2s;
+            letter-spacing: 0.2px;
         }
         
-        .footer a:hover {
-            color: var(--accent);
+        .footer a:hover { 
+            color: var(--gold-bright); 
         }
         
         .footer-bottom {
             padding-top: 32px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(201,149,42,0.15);
             text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            color: rgba(255,255,255,0.45);
+            font-size: 13px;
         }
         
-        /* Responsive Design */
+        /* ─── RESPONSIVE ──────────────────────────────────── */
         @media (max-width: 1024px) {
             .contact-grid {
                 grid-template-columns: 1fr;
@@ -658,10 +749,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .faq-header h2 {
                 font-size: 32px;
             }
-
-            .logo {
-                font-size: 22px;
-            }
             
             .container {
                 padding: 0 16px;
@@ -680,6 +767,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .faq-question {
                 font-size: 18px;
             }
+
+            .logo-name {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -687,7 +778,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Mobile Navigation -->
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
+            <div class="logo">
+                <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                <span class="logo-tagline" style="color: rgba(201,149,42,0.7);">Create. Share. Inspire.</span>
+            </div>
             <button class="mobile-close" onclick="toggleMobileMenu()">×</button>
         </div>
         <nav class="mobile-nav-links">
@@ -715,23 +809,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php if (isLoggedIn()): ?>
                         Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                         <?php if ($hasSubscription): ?>
-                            <span class="premium-badge">✓ Premium Member</span>
+                            <span class="premium-badge">✦ Premium Member</span>
                         <?php else: ?>
-                            • <?php echo $freeRemaining; ?> free articles remaining
+                            &nbsp;·&nbsp; <?php echo $freeRemaining; ?> free articles remaining
                         <?php endif; ?>
                     <?php else: ?>
-                        Get unlimited access • Subscribe today
+                        Unlock unlimited access &nbsp;·&nbsp; Subscribe today
                     <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="container">
             <div class="header-content">
-                <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
+                <a href="index.php" class="logo">
+                    <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                    <span class="logo-tagline">Create. Share. Inspire.</span>
+                </a>
                 <nav class="nav">
                     <a href="index.php">Home</a>
                     <a href="about.php">About</a>
-                    <a href="contact.php">Contact Us</a>
+                    <a href="contact.php">Contact</a>
                     <?php if (isLoggedIn()): ?>
                         <?php if (isAdmin()): ?>
                             <a href="admin/dashboard.php">Dashboard</a>
@@ -782,24 +879,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p><a href="mailto:hello@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">hello@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
                             <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">We typically respond within 24 hours</p>
                         </div>
-
-                        <!-- <div class="info-card">
-                            <div class="info-card-header">
-                                <div class="info-icon">💬</div>
-                                <h3>Support</h3>
-                            </div>
-                            <p><a href="mailto:support@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">support@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
-                            <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">For subscription & account help</p>
-                        </div> -->
-
-                        <!-- <div class="info-card">
-                            <div class="info-card-header">
-                                <div class="info-icon">🤝</div>
-                                <h3>Partnerships</h3>
-                            </div>
-                            <p><a href="mailto:partnerships@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">partnerships@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
-                            <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">Collaborations & business inquiries</p>
-                        </div> -->
 
                         <div class="info-card">
                             <div class="info-card-header">
@@ -888,20 +967,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3><?php echo SITE_NAME; ?></h3>
-                    <p style="color: rgba(255, 255, 255, 0.7); margin-top: 12px; line-height: 1.6;">
-                        Premium insights and analysis for those who want to stay ahead.
+                    <div class="footer-brand-name"><?php echo SITE_NAME; ?></div>
+                    <div class="footer-divider"></div>
+                    <p style="color: rgba(255,255,255,0.55); line-height: 1.7; font-size: 14px; max-width: 260px;">
+                        Premium insights and analysis for those who want to stay ahead — and inspired.
                     </p>
                 </div>
                 <div class="footer-section">
-                    <h3>Navigation</h3>
+                    <h3>Navigate</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
                         <a href="index.php">Home</a>
                         <a href="pricing.php">Pricing</a>
+                        <?php if (isLoggedIn()): ?>
+                            <a href="my-account.php">My Account</a>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="footer-section">
                     <h3>Company</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
                         <a href="about.php">About</a>
                         <a href="contact.php">Contact</a>
@@ -909,15 +994,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div class="footer-section">
                     <h3>Legal</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Cookie Policy</a>
+                        <a href="terms.php">Terms of Service</a>
+                        <a href="privacy.php">Privacy Policy</a>
+                        <a href="cookies.php">Cookie Policy</a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
+                <span>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</span>
             </div>
         </div>
     </footer>
