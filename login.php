@@ -64,11 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - <?php echo SITE_NAME; ?></title>
-    <meta name="description" content="Sign in to access premium content">
     <link rel="icon" type="image/x-icon" href="https://png.pngtree.com/element_our/sm/20180518/sm_5aff60887f7d9.jpg">
+    <meta name="description" content="Sign in to access premium content">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -77,26 +77,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         :root {
-            --primary: #0a0a0a;
-            --secondary: #ffffff;
-            --accent: #FF6B6B;
-            --accent-dark: #E74C3C;
-            --text: #1a1a1a;
-            --text-light: #6b7280;
-            --text-lighter: #9ca3af;
-            --border: #e5e7eb;
-            --border-light: #f3f4f6;
-            --bg-light: #fafafa;
-            --bg-lighter: #f9fafb;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --navy:        #0d0b2e;
+            --navy-mid:    #13114a;
+            --navy-light:  #1e1b5e;
+            --purple:      #6B3FA0;
+            --purple-mid:  #7C3AED;
+            --purple-light:#9d6fe8;
+            --gold:        #C9952A;
+            --gold-bright: #F0B429;
+            --gold-light:  #ffd166;
+            --gold-pale:   #fff3cd;
+            --white:       #ffffff;
+            --off-white:   #f8f6f0;
+            --text:        #1a1830;
+            --text-mid:    #4a4570;
+            --text-light:  #7a75a0;
+            --text-lighter:#a8a4c8;
+            --border:      #e4dfff;
+            --border-light:#f0eeff;
+            --bg-tinted:   #faf9ff;
+            --shadow-gold: 0 4px 24px rgba(201,149,42,0.18);
+            --shadow-purple: 0 4px 24px rgba(107,63,160,0.18);
+            --shadow-navy: 0 8px 32px rgba(13,11,46,0.18);
+            --shadow-lg:   0 16px 48px rgba(13,11,46,0.12);
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -116,21 +124,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+                radial-gradient(ellipse at 15% 50%, rgba(107,63,160,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(201,149,42,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(124,58,237,0.12) 0%, transparent 45%);
             pointer-events: none;
         }
         
+        /* Decorative sparkle */
+        body::after {
+            content: '✦';
+            position: absolute;
+            top: 8%;
+            right: 12%;
+            font-size: 32px;
+            color: var(--gold);
+            opacity: 0.3;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50%       { opacity: 0.7; transform: scale(1.2); }
+        }
+        
         .auth-container {
-            background: var(--secondary);
-            max-width: 420px;
+            background: var(--white);
+            max-width: 460px;
             width: 100%;
-            padding: 32px 36px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-xl);
+            padding: 40px 36px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
             position: relative;
             z-index: 1;
-            border: 1px solid var(--border-light);
+            border: 1px solid rgba(201,149,42,0.1);
+        }
+        
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--purple), var(--gold));
+            border-radius: 20px 20px 0 0;
         }
         
         .logo-section {
@@ -139,41 +176,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .logo {
-            font-size: 28px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 6px;
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            margin-bottom: 8px;
             display: block;
         }
         
         .logo-tagline {
-            font-size: 13px;
-            color: var(--text-light);
-            font-weight: 500;
+            font-size: 11px;
+            color: var(--purple);
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         
         h1 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 8px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
             text-align: center;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
             letter-spacing: -0.5px;
         }
         
         .subtitle {
             text-align: center;
-            color: var(--text-light);
+            color: var(--text-mid);
             margin-bottom: 28px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 400;
         }
         
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
         
         label {
@@ -182,26 +225,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 600;
             color: var(--text);
             font-size: 13px;
-            letter-spacing: 0.2px;
+            letter-spacing: 0.3px;
         }
         
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 12px 14px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
+            padding: 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
             font-size: 14px;
             transition: all 0.2s;
-            font-family: inherit;
-            background: var(--secondary);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
             color: var(--text);
         }
         
         input:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(107,63,160,0.1);
         }
         
         input::placeholder {
@@ -220,7 +263,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             height: 18px;
             cursor: pointer;
             border-radius: 4px;
-            border: 2px solid var(--border);
+            border: 1.5px solid var(--border);
+            accent-color: var(--purple);
         }
         
         .checkbox-label {
@@ -233,22 +277,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn {
             width: 100%;
             padding: 14px;
-            background: var(--accent);
-            color: var(--secondary);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            font-family: inherit;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: var(--shadow-gold);
+            margin-top: 8px;
+            letter-spacing: 0.3px;
         }
         
         .btn:hover {
-            background: var(--accent-dark);
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 8px 28px rgba(201,149,42,0.35);
         }
         
         .btn:active {
@@ -256,16 +302,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .alert {
-            padding: 12px 16px;
+            padding: 14px 18px;
             border-left: 4px solid;
             font-weight: 500;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-radius: 10px;
+            margin-bottom: 22px;
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
             font-size: 13px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
         
         .alert-danger {
@@ -293,42 +339,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .forgot-link a {
-            color: var(--accent);
+            color: var(--purple);
             text-decoration: none;
             font-size: 13px;
             font-weight: 600;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(107,63,160,0.3);
+            padding-bottom: 1px;
         }
         
         .forgot-link a:hover {
-            color: var(--accent-dark);
-            text-decoration: underline;
+            color: var(--gold);
+            border-color: rgba(201,149,42,0.4);
         }
         
         .link {
             text-align: center;
             margin-top: 24px;
-            padding-top: 20px;
+            padding-top: 24px;
             border-top: 1px solid var(--border-light);
             font-size: 14px;
-            color: var(--text-light);
+            color: var(--text-mid);
         }
         
         .link a {
-            color: var(--accent);
+            color: var(--gold);
             text-decoration: none;
             font-weight: 700;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(201,149,42,0.3);
+            padding-bottom: 1px;
         }
         
         .link a:hover {
-            color: var(--accent-dark);
-            text-decoration: underline;
+            color: var(--purple);
+            border-color: rgba(107,63,160,0.4);
         }
         
         .back-home {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         
         .back-home a {
@@ -339,11 +389,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: color 0.2s;
+            transition: all 0.2s;
+            padding: 6px 12px;
+            border-radius: 8px;
         }
         
         .back-home a:hover {
-            color: var(--text);
+            color: var(--purple);
+            background: var(--bg-tinted);
         }
         
         .back-home svg {
@@ -353,29 +406,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .features {
             margin-top: 24px;
-            padding-top: 20px;
+            padding-top: 24px;
             border-top: 1px solid var(--border-light);
         }
         
         .feature-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         
         .feature-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
             font-size: 13px;
-            color: var(--text-light);
+            color: var(--text-mid);
+            line-height: 1.5;
         }
         
         .feature-icon {
-            width: 18px;
-            height: 18px;
-            background: var(--accent);
-            color: var(--secondary);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--white);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -383,6 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 11px;
             font-weight: 700;
             flex-shrink: 0;
+            margin-top: 1px;
         }
         
         @media (max-width: 640px) {
@@ -391,15 +446,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             .auth-container {
-                padding: 28px 24px;
+                padding: 32px 24px;
             }
             
             h1 {
-                font-size: 24px;
+                font-size: 28px;
             }
             
             .logo {
-                font-size: 24px;
+                font-size: 22px;
             }
         }
     </style>
@@ -417,7 +472,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <div class="logo-section">
             <span class="logo"><?php echo SITE_NAME; ?></span>
-            <p class="logo-tagline">Premium insights for curious minds</p>
+            <p class="logo-tagline">Create. Share. Inspire.</p>
         </div>
         
         <h1>Welcome Back</h1>
