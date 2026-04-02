@@ -165,9 +165,22 @@ $freeRemaining = getFreeArticlesRemaining();
 
         .logo {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .logo-image {
+            height: 48px;
+            width: auto;
+            display: block;
+        }
+
+        .logo-text {
+            display: flex;
             flex-direction: column;
             line-height: 1;
-            text-decoration: none;
             gap: 2px;
         }
 
@@ -192,7 +205,7 @@ $freeRemaining = getFreeArticlesRemaining();
             text-transform: uppercase;
         }
 
-        .logo:hover .logo-name {
+        .logo:hover {
             opacity: 0.85;
         }
 
@@ -346,6 +359,16 @@ $freeRemaining = getFreeArticlesRemaining();
 
         .mobile-nav-links a:hover {
             color: var(--gold-bright);
+        }
+
+        /* Mobile logo in nav */
+        .mobile-nav .logo {
+            flex-direction: row;
+            gap: 10px;
+        }
+
+        .mobile-nav .logo-image {
+            height: 40px;
         }
 
         /* ─── HERO ────────────────────────────────────────── */
@@ -1077,6 +1100,14 @@ $freeRemaining = getFreeArticlesRemaining();
             .nav { display: none; }
             .mobile-menu-btn { display: block; }
 
+            .logo-image {
+                height: 40px;
+            }
+
+            .logo-text {
+                display: none;
+            }
+
             .hero { padding: 52px 0 48px; }
             .hero h1 { font-size: 42px; }
             .hero p  { font-size: 16px; }
@@ -1112,10 +1143,13 @@ $freeRemaining = getFreeArticlesRemaining();
     <!-- Mobile Navigation -->
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <div class="logo">
-                <span class="logo-name"><?php echo SITE_NAME; ?></span>
-                <span class="logo-tagline" style="color: rgba(201,149,42,0.7);">Create. Share. Inspire.</span>
-            </div>
+            <a href="index.php" class="logo">
+                <img src="assets/images/logo.png" alt="<?php echo SITE_NAME; ?> Logo" class="logo-image">
+                <div class="logo-text">
+                    <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                    <span class="logo-tagline" style="color: rgba(201,149,42,0.7);">Create. Share. Inspire.</span>
+                </div>
+            </a>
             <button class="mobile-close" onclick="toggleMobileMenu()">×</button>
         </div>
         <nav class="mobile-nav-links">
@@ -1154,8 +1188,11 @@ $freeRemaining = getFreeArticlesRemaining();
         <div class="container">
             <div class="header-content">
                 <a href="index.php" class="logo">
-                    <span class="logo-name"><?php echo SITE_NAME; ?></span>
-                    <span class="logo-tagline">Create. Share. Inspire.</span>
+                    <img src="https://github.com/Vigneshgbe/Subscription_Based_Blog/blob/main/assets/Logo.png?raw=true" alt="<?php echo SITE_NAME; ?> Logo" class="logo-image">
+                    <div class="logo-text">
+                        <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                        <span class="logo-tagline">Create. Share. Inspire.</span>
+                    </div>
                 </a>
                 <nav class="nav">
                     <a href="index.php">Home</a>
