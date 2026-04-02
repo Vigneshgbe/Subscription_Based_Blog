@@ -1251,14 +1251,18 @@ $freeRemaining = getFreeArticlesRemaining();
                     </div>
                 </div>
                 <!-- Decorative SVG ornament echoing the logo circle -->
-                <svg class="hero-ornament" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- <svg class="hero-ornament" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="200" cy="200" r="190" stroke="white" stroke-width="2" opacity="0.3"/>
                     <circle cx="200" cy="200" r="160" stroke="white" stroke-width="1" stroke-dasharray="4 8" opacity="0.3"/>
                     <circle cx="200" cy="200" r="100" stroke="white" stroke-width="2" opacity="0.3"/>
                     <path d="M200 10 L200 390 M10 200 L390 200" stroke="white" stroke-width="1" opacity="0.2"/>
                     <image href="https://github.com/Vigneshgbe/Subscription_Based_Blog/blob/main/assets/Logo.jpeg?raw=true" 
                         x="50" y="50" width="300" height="300" opacity="0.85" preserveAspectRatio="xMidYMid meet"/>
-                </svg>
+                </svg> -->
+                <img src="https://github.com/Vigneshgbe/Subscription_Based_Blog/blob/main/assets/Logo.png?raw=true" 
+                    alt="Slice Life Logo" 
+                    class="hero-ornament"
+                    style="opacity: 1; object-fit: contain;">
             </div>
         </div>
     </div>
