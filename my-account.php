@@ -76,7 +76,6 @@ $hasSubscription = hasActiveSubscription($userId);
             --shadow-purple: 0 4px 24px rgba(107,63,160,0.18);
             --shadow-navy: 0 8px 32px rgba(13,11,46,0.18);
             --shadow-lg:   0 16px 48px rgba(13,11,46,0.12);
-            --shadow-card: 0 8px 24px rgba(13,11,46,0.08);
         }
         
         body {
@@ -99,9 +98,9 @@ $hasSubscription = hasActiveSubscription($userId);
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(ellipse at 20% 30%, rgba(107,63,160,0.2) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(201,149,42,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 80%, rgba(124,58,237,0.12) 0%, transparent 45%);
+                radial-gradient(ellipse at 15% 50%, rgba(107,63,160,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(201,149,42,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(124,58,237,0.12) 0%, transparent 45%);
             pointer-events: none;
             z-index: 0;
         }
@@ -112,16 +111,16 @@ $hasSubscription = hasActiveSubscription($userId);
             position: fixed;
             top: 10%;
             right: 15%;
-            font-size: 28px;
+            font-size: 48px;
             color: var(--gold);
-            opacity: 0.25;
+            opacity: 0.2;
             animation: float 6s ease-in-out infinite;
             z-index: 0;
         }
         
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.25; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.4; }
+            0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 0.2; }
+            50% { transform: translate(20px, -20px) rotate(180deg); opacity: 0.4; }
         }
         
         .container {
@@ -132,14 +131,14 @@ $hasSubscription = hasActiveSubscription($userId);
         }
         
         .header {
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             animation: slideDown 0.6s ease-out;
         }
         
         @keyframes slideDown {
             from {
                 opacity: 0;
-                transform: translateY(-30px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -148,7 +147,7 @@ $hasSubscription = hasActiveSubscription($userId);
         }
         
         .back-link {
-            color: var(--gold-bright);
+            color: var(--gold);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -158,7 +157,7 @@ $hasSubscription = hasActiveSubscription($userId);
             font-size: 14px;
             padding: 8px 16px;
             border-radius: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(201,149,42,0.2);
@@ -166,7 +165,7 @@ $hasSubscription = hasActiveSubscription($userId);
         
         .back-link:hover {
             background: rgba(201,149,42,0.15);
-            transform: translateX(-5px);
+            transform: translateX(-4px);
             border-color: rgba(201,149,42,0.4);
             box-shadow: var(--shadow-gold);
         }
@@ -174,25 +173,29 @@ $hasSubscription = hasActiveSubscription($userId);
         .back-link svg {
             width: 16px;
             height: 16px;
+            transition: transform 0.3s;
+        }
+        
+        .back-link:hover svg {
+            transform: translateX(-2px);
         }
         
         h1 {
             font-family: 'Cormorant Garamond', serif;
             font-size: 48px;
             margin-bottom: 12px;
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold-light) 100%);
+            background: linear-gradient(135deg, var(--white) 0%, var(--gold-light) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 700;
             letter-spacing: -1px;
-            font-weight: 600;
         }
         
         .subtitle {
-            color: var(--gold-light);
+            color: var(--text-lighter);
             font-size: 16px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            font-weight: 400;
         }
         
         .grid {
@@ -205,18 +208,14 @@ $hasSubscription = hasActiveSubscription($userId);
         .card {
             background: rgba(255, 255, 255, 0.98);
             border-radius: 20px;
-            padding: 36px;
-            box-shadow: var(--shadow-card);
+            padding: 32px;
+            box-shadow: var(--shadow-lg);
             border: 1px solid rgba(201,149,42,0.1);
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             animation: fadeInUp 0.6s ease-out backwards;
         }
-        
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
         
         @keyframes fadeInUp {
             from {
@@ -229,6 +228,10 @@ $hasSubscription = hasActiveSubscription($userId);
             }
         }
         
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        
         .card::before {
             content: '';
             position: absolute;
@@ -238,13 +241,13 @@ $hasSubscription = hasActiveSubscription($userId);
             height: 4px;
             background: linear-gradient(90deg, var(--gold), var(--purple), var(--gold));
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s;
         }
         
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            border-color: rgba(201,149,42,0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(13,11,46,0.2);
+            border-color: rgba(201,149,42,0.3);
         }
         
         .card:hover::before {
@@ -253,21 +256,21 @@ $hasSubscription = hasActiveSubscription($userId);
         
         .card h2 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 28px;
-            margin-bottom: 28px;
+            font-size: 26px;
+            margin-bottom: 24px;
             color: var(--navy);
             font-weight: 600;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 12px;
-            letter-spacing: -0.5px;
         }
         
         .card h2::before {
             content: '';
             width: 4px;
             height: 24px;
-            background: linear-gradient(180deg, var(--gold), var(--purple));
+            background: linear-gradient(135deg, var(--gold), var(--gold-bright));
             border-radius: 2px;
         }
         
@@ -275,22 +278,22 @@ $hasSubscription = hasActiveSubscription($userId);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 18px 0;
+            padding: 16px 0;
             border-bottom: 1px solid var(--border-light);
-            transition: all 0.3s ease;
-        }
-        
-        .info-row:hover {
-            padding-left: 8px;
-            background: var(--bg-tinted);
-            margin: 0 -8px;
-            padding-left: 16px;
-            padding-right: 8px;
-            border-radius: 8px;
+            transition: all 0.2s;
         }
         
         .info-row:last-child {
             border-bottom: none;
+        }
+        
+        .info-row:hover {
+            background: linear-gradient(90deg, transparent 0%, var(--bg-tinted) 50%, transparent 100%);
+            padding-left: 12px;
+            padding-right: 12px;
+            margin-left: -12px;
+            margin-right: -12px;
+            border-radius: 8px;
         }
         
         .info-label {
@@ -313,9 +316,9 @@ $hasSubscription = hasActiveSubscription($userId);
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s;
         }
         
         .badge:hover {
@@ -328,7 +331,7 @@ $hasSubscription = hasActiveSubscription($userId);
         }
         
         .badge-warning {
-            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
             color: var(--navy);
         }
         
@@ -344,12 +347,12 @@ $hasSubscription = hasActiveSubscription($userId);
             text-decoration: none;
             font-weight: 700;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             border: none;
             cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
             font-size: 14px;
             letter-spacing: 0.3px;
-            font-family: 'DM Sans', sans-serif;
         }
         
         .btn-primary {
@@ -361,21 +364,20 @@ $hasSubscription = hasActiveSubscription($userId);
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(201,149,42,0.35);
+            box-shadow: 0 8px 28px rgba(201,149,42,0.35);
         }
         
         .btn-outline {
             background: transparent;
             border: 2px solid var(--purple);
             color: var(--purple);
-            box-shadow: var(--shadow-purple);
         }
         
         .btn-outline:hover {
             background: var(--purple);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(107,63,160,0.35);
+            box-shadow: var(--shadow-purple);
         }
         
         .history-list {
@@ -385,37 +387,40 @@ $hasSubscription = hasActiveSubscription($userId);
         .history-item {
             padding: 18px 0;
             border-bottom: 1px solid var(--border-light);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             position: relative;
-            padding-left: 20px;
-        }
-        
-        .history-item::before {
-            content: '◆';
-            position: absolute;
-            left: 0;
-            top: 18px;
-            color: var(--gold);
-            font-size: 10px;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-        }
-        
-        .history-item:hover {
-            padding-left: 28px;
-            background: var(--bg-tinted);
-            margin: 0 -12px;
-            padding-right: 12px;
-            border-radius: 8px;
-        }
-        
-        .history-item:hover::before {
-            opacity: 1;
-            transform: scale(1.2);
         }
         
         .history-item:last-child {
             border-bottom: none;
+        }
+        
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        .history-item:hover {
+            padding-left: 16px;
+            background: linear-gradient(90deg, var(--bg-tinted) 0%, transparent 100%);
+            margin-left: -16px;
+            margin-right: -16px;
+            padding-right: 16px;
+            border-radius: 10px;
+        }
+        
+        .history-item:hover::before {
+            opacity: 1;
+            left: 0;
         }
         
         .history-item a {
@@ -423,20 +428,28 @@ $hasSubscription = hasActiveSubscription($userId);
             text-decoration: none;
             font-weight: 600;
             font-size: 15px;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+            display: inline-block;
         }
         
         .history-item a:hover {
             color: var(--gold);
-            border-bottom-color: rgba(201,149,42,0.4);
+            transform: translateX(4px);
         }
         
         .history-time {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-light);
             margin-top: 6px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .history-time::before {
+            content: '🕐';
+            font-size: 14px;
         }
         
         .full-width {
@@ -447,55 +460,51 @@ $hasSubscription = hasActiveSubscription($userId);
             text-align: center;
             padding: 40px 20px;
             color: var(--text-mid);
-            font-size: 15px;
-            line-height: 1.6;
         }
         
         .empty-state::before {
             content: '📚';
-            display: block;
             font-size: 48px;
+            display: block;
             margin-bottom: 16px;
-            opacity: 0.6;
+            opacity: 0.5;
         }
         
-        /* Subscription card special styling */
-        .subscription-card {
-            background: linear-gradient(135deg, rgba(107,63,160,0.05) 0%, rgba(201,149,42,0.05) 100%);
-        }
-        
-        .subscription-card::after {
-            content: '✦';
-            position: absolute;
-            top: 36px;
-            right: 36px;
-            font-size: 32px;
-            color: var(--gold);
-            opacity: 0.15;
-            animation: pulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.15; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(1.1); }
-        }
-        
-        /* Profile card icon */
-        .profile-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--purple) 0%, var(--purple-mid) 100%);
-            border-radius: 50%;
+        /* Decorative icon styles */
+        .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 24px;
-            font-weight: 700;
-            font-family: 'Cinzel', serif;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-purple);
-            border: 3px solid white;
+            font-size: 20px;
+            box-shadow: var(--shadow-gold);
+            transition: all 0.3s;
+        }
+        
+        .card:hover .icon-wrapper {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        /* Responsive background sparkles */
+        .sparkle {
+            position: fixed;
+            color: var(--gold);
+            opacity: 0.15;
+            pointer-events: none;
+            animation: twinkle 4s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        .sparkle:nth-child(1) { top: 20%; left: 10%; font-size: 24px; animation-delay: 0s; }
+        .sparkle:nth-child(2) { top: 60%; right: 20%; font-size: 32px; animation-delay: 1s; }
+        .sparkle:nth-child(3) { bottom: 20%; left: 25%; font-size: 28px; animation-delay: 2s; }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(1.3); }
         }
         
         @media (max-width: 768px) {
@@ -512,28 +521,27 @@ $hasSubscription = hasActiveSubscription($userId);
             }
             
             .card {
-                padding: 28px 24px;
+                padding: 24px;
             }
             
             .card h2 {
-                font-size: 24px;
+                font-size: 22px;
             }
         }
         
-        /* Loading animation for dynamic content */
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        
-        .loading {
-            background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
-            background-size: 1000px 100%;
-            animation: shimmer 2s infinite;
+        /* Loading animation for page entrance */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
+    <!-- Decorative sparkles -->
+    <div class="sparkle">✦</div>
+    <div class="sparkle">✦</div>
+    <div class="sparkle">✦</div>
+    
     <div class="container">
         <div class="header">
             <a href="index.php" class="back-link">
@@ -548,9 +556,6 @@ $hasSubscription = hasActiveSubscription($userId);
         
         <div class="grid">
             <div class="card">
-                <div class="profile-icon">
-                    <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
-                </div>
                 <h2>Profile Information</h2>
                 <div class="info-row">
                     <span class="info-label">Name</span>
@@ -576,7 +581,7 @@ $hasSubscription = hasActiveSubscription($userId);
                 </div>
             </div>
             
-            <div class="card subscription-card">
+            <div class="card">
                 <h2>Subscription</h2>
                 <?php if ($subscription): ?>
                     <div class="info-row">
@@ -607,8 +612,8 @@ $hasSubscription = hasActiveSubscription($userId);
                         <?php endif; ?>
                     </div>
                 <?php else: ?>
-                    <div class="empty-state" style="padding: 20px 0;">
-                        <p style="color: var(--text-mid); margin-bottom: 20px; font-size: 14px;">You don't have an active subscription yet. Unlock premium content and exclusive features.</p>
+                    <div class="empty-state" style="padding: 30px 20px;">
+                        <p style="color: var(--text-mid); margin-bottom: 20px; font-weight: 500;">You don't have an active subscription.</p>
                         <a href="pricing.php" class="btn btn-primary" style="width: 100%;">View Plans</a>
                     </div>
                 <?php endif; ?>
@@ -618,7 +623,7 @@ $hasSubscription = hasActiveSubscription($userId);
                 <h2>Reading History</h2>
                 <?php if (empty($readingHistory)): ?>
                     <div class="empty-state">
-                        No reading history yet. Start exploring our articles and build your knowledge!
+                        <p style="font-weight: 500;">No reading history yet. Start exploring our articles!</p>
                     </div>
                 <?php else: ?>
                     <ul class="history-list">
@@ -635,26 +640,5 @@ $hasSubscription = hasActiveSubscription($userId);
             </div>
         </div>
     </div>
-    
-    <script>
-        // Add smooth scroll behavior
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-        
-        // Add stagger animation on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
-            });
-        });
-    </script>
 </body>
 </html>
