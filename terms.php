@@ -10,10 +10,10 @@ $db = db();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - <?php echo SITE_NAME; ?></title>
     <meta name="description" content="Terms of Service for <?php echo SITE_NAME; ?> - Please read these terms carefully before using our service">
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Vigneshgbe/Subscription_Based_Blog/refs/heads/main/assets/Logo.png">
+    <link rel="icon" type="image/x-icon" href="https://png.pngtree.com/element_our/sm/20180518/sm_5aff60887f7d9.jpg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -22,70 +22,78 @@ $db = db();
         }
         
         :root {
-            --primary: #0a0a0a;
-            --secondary: #ffffff;
-            --accent: #FF6B6B;
-            --accent-dark: #E74C3C;
-            --text: #1a1a1a;
-            --text-light: #6b7280;
-            --text-lighter: #9ca3af;
-            --border: #e5e7eb;
-            --border-light: #f3f4f6;
-            --bg-light: #fafafa;
-            --bg-lighter: #f9fafb;
-            --premium: #FFD700;
-            --premium-dark: #F4C430;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --navy:        #0d0b2e;
+            --navy-mid:    #13114a;
+            --navy-light:  #1e1b5e;
+            --purple:      #6B3FA0;
+            --purple-mid:  #7C3AED;
+            --purple-light:#9d6fe8;
+            --gold:        #C9952A;
+            --gold-bright: #F0B429;
+            --gold-light:  #ffd166;
+            --gold-pale:   #fff3cd;
+            --white:       #ffffff;
+            --off-white:   #f8f6f0;
+            --text:        #1a1830;
+            --text-mid:    #4a4570;
+            --text-light:  #7a75a0;
+            --text-lighter:#a8a4c8;
+            --border:      #e4dfff;
+            --border-light:#f0eeff;
+            --bg-tinted:   #faf9ff;
+            --shadow-gold: 0 4px 24px rgba(201,149,42,0.18);
+            --shadow-purple: 0 4px 24px rgba(107,63,160,0.18);
+            --shadow-navy: 0 8px 32px rgba(13,11,46,0.18);
+            --shadow-lg:   0 16px 48px rgba(13,11,46,0.12);
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'DM Sans', sans-serif;
             line-height: 1.6;
             color: var(--text);
-            background: var(--secondary);
+            background: var(--white);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         
-        /* Header Styles */
+        /* ─── HEADER ─────────────────────────────────────── */
         .header {
-            background: var(--secondary);
+            background: var(--white);
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            box-shadow: 0 2px 16px rgba(13,11,46,0.07);
         }
         
         .header-top {
-            background: var(--primary);
-            color: var(--secondary);
+            background: linear-gradient(90deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
+            color: var(--white);
             padding: 10px 0;
             font-size: 13px;
             font-weight: 500;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
         }
         
         .header-top-content {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .premium-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            background: var(--premium);
-            color: var(--primary);
-            padding: 2px 8px;
-            border-radius: 4px;
+            gap: 5px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
+            padding: 3px 10px;
+            border-radius: 20px;
             font-weight: 700;
             font-size: 11px;
+            letter-spacing: 0.5px;
+            font-family: 'Cinzel', serif;
         }
         
         .container {
@@ -98,41 +106,61 @@ $db = db();
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 18px 0;
             gap: 32px;
         }
         
         .logo {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
             text-decoration: none;
-            font-family: 'Playfair Display', serif;
-            transition: opacity 0.2s;
+            gap: 2px;
         }
         
-        .logo:hover {
-            opacity: 0.8;
+        .logo-name {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 50%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+        }
+        
+        .logo-tagline {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            color: var(--purple);
+            text-transform: uppercase;
+        }
+        
+        .logo:hover .logo-name {
+            opacity: 0.85;
         }
         
         .nav {
             display: flex;
-            gap: 32px;
+            gap: 28px;
             align-items: center;
         }
         
         .nav a {
-            color: var(--text);
+            color: var(--text-mid);
             text-decoration: none;
             font-weight: 500;
-            font-size: 15px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
             transition: color 0.2s;
             position: relative;
         }
         
         .nav a:hover {
-            color: var(--accent);
+            color: var(--purple);
         }
         
         .nav a::after {
@@ -142,15 +170,16 @@ $db = db();
             left: 0;
             width: 0;
             height: 2px;
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--gold), var(--purple));
             transition: width 0.3s;
+            border-radius: 2px;
         }
         
         .nav a:hover::after {
             width: 100%;
         }
         
-        /* Button Styles */
+        /* ─── BUTTONS ─────────────────────────────────────── */
         .btn {
             padding: 10px 24px;
             border: none;
@@ -163,33 +192,35 @@ $db = db();
             align-items: center;
             gap: 8px;
             border-radius: 8px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.3px;
         }
         
         .btn-primary {
-            background: var(--accent);
-            color: var(--secondary);
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            color: var(--navy);
+            font-weight: 700;
+            box-shadow: var(--shadow-gold);
         }
         
         .btn-primary:hover {
-            background: var(--accent-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 8px 28px rgba(201,149,42,0.35);
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
         }
         
         .btn-outline {
             background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
+            border: 2px solid var(--purple);
+            color: var(--purple);
         }
         
         .btn-outline:hover {
-            background: var(--primary);
-            color: var(--secondary);
+            background: var(--purple);
+            color: var(--white);
         }
         
-        /* Mobile Menu */
+        /* ─── MOBILE MENU ─────────────────────────────────── */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -207,7 +238,7 @@ $db = db();
             left: 0;
             width: 100%;
             height: 100vh;
-            background: var(--secondary);
+            background: var(--navy);
             z-index: 2000;
             padding: 24px;
             overflow-y: auto;
@@ -221,7 +252,7 @@ $db = db();
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
         
         .mobile-close {
@@ -229,29 +260,35 @@ $db = db();
             border: none;
             font-size: 32px;
             cursor: pointer;
-            color: var(--text);
+            color: var(--gold);
         }
         
         .mobile-nav-links {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 8px;
         }
         
         .mobile-nav-links a {
-            color: var(--text);
+            color: rgba(255,255,255,0.85);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 18px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-light);
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(201,149,42,0.2);
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
         }
         
-        /* Hero Section */
+        .mobile-nav-links a:hover {
+            color: var(--gold-bright);
+        }
+        
+        /* ─── HERO ────────────────────────────────────────── */
         .hero {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
-            color: var(--secondary);
-            padding: 64px 0;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 45%, var(--navy-light) 100%);
+            color: var(--white);
+            padding: 72px 0 64px;
             margin-bottom: 48px;
             position: relative;
             overflow: hidden;
@@ -260,14 +297,28 @@ $db = db();
         .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 15% 50%, rgba(107,63,160,0.25) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 20%, rgba(201,149,42,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 90%, rgba(124,58,237,0.12) 0%, transparent 45%);
             pointer-events: none;
+        }
+        
+        .hero::after {
+            content: '✦';
+            position: absolute;
+            top: 32px;
+            right: 10%;
+            font-size: 28px;
+            color: var(--gold);
+            opacity: 0.4;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50%       { opacity: 0.8; transform: scale(1.2); }
         }
         
         .hero-content {
@@ -277,12 +328,12 @@ $db = db();
         }
         
         .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 48px;
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 16px;
             letter-spacing: -1px;
-            font-family: 'Playfair Display', serif;
         }
         
         .hero p {
@@ -299,27 +350,28 @@ $db = db();
             font-weight: 400;
         }
         
-        /* Legal Content Styles */
+        /* ─── LEGAL CONTENT ───────────────────────────────── */
         .legal-content {
             max-width: 900px;
             margin: 0 auto 80px;
-            background: var(--secondary);
+            background: var(--white);
         }
         
         .toc {
-            background: var(--bg-lighter);
+            background: var(--bg-tinted);
             border: 1px solid var(--border-light);
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 32px;
             margin-bottom: 48px;
+            box-shadow: var(--shadow-lg);
         }
         
         .toc h2 {
-            font-size: 20px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
         }
         
         .toc ol {
@@ -347,13 +399,14 @@ $db = db();
         .toc a::before {
             content: counter(toc-counter) ".";
             font-weight: 700;
-            color: var(--accent);
+            color: var(--gold);
             margin-right: 12px;
             min-width: 24px;
+            font-family: 'Cinzel', serif;
         }
         
         .toc a:hover {
-            color: var(--accent);
+            color: var(--purple);
         }
         
         .legal-section {
@@ -362,11 +415,11 @@ $db = db();
         }
         
         .legal-section h2 {
+            font-family: 'Cormorant Garamond', serif;
             font-size: 32px;
             font-weight: 700;
             margin-bottom: 20px;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
             padding-top: 16px;
             border-top: 2px solid var(--border-light);
         }
@@ -377,15 +430,16 @@ $db = db();
         }
         
         .legal-section h3 {
-            font-size: 22px;
+            font-family: 'Cinzel', serif;
+            font-size: 18px;
             font-weight: 600;
             margin: 32px 0 16px;
-            color: var(--text);
-            font-family: 'Playfair Display', serif;
+            color: var(--purple);
+            letter-spacing: 0.5px;
         }
         
         .legal-section p {
-            color: var(--text-light);
+            color: var(--text-mid);
             margin-bottom: 20px;
             font-size: 16px;
             line-height: 1.8;
@@ -398,7 +452,7 @@ $db = db();
         }
         
         .legal-section li {
-            color: var(--text-light);
+            color: var(--text-mid);
             margin-bottom: 12px;
             font-size: 16px;
             line-height: 1.8;
@@ -410,82 +464,123 @@ $db = db();
         }
         
         .highlight-box {
-            background: linear-gradient(135deg, rgba(255, 107, 107, 0.05) 0%, rgba(255, 107, 107, 0.02) 100%);
-            border-left: 4px solid var(--accent);
+            background: linear-gradient(135deg, rgba(201,149,42,0.08) 0%, rgba(201,149,42,0.03) 100%);
+            border-left: 4px solid var(--gold);
             padding: 24px;
             margin: 32px 0;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(201,149,42,0.1);
         }
         
         .highlight-box p {
             margin-bottom: 0;
+            color: var(--text);
         }
         
         .info-box {
-            background: var(--bg-lighter);
-            border: 1px solid var(--border-light);
+            background: var(--bg-tinted);
+            border: 1px solid var(--border);
             padding: 24px;
             margin: 32px 0;
-            border-radius: 8px;
+            border-radius: 10px;
         }
         
         .info-box h4 {
-            font-size: 18px;
+            font-family: 'Cinzel', serif;
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 12px;
-            color: var(--primary);
-            font-family: 'Playfair Display', serif;
+            color: var(--navy);
+            letter-spacing: 0.5px;
         }
         
-        /* Footer */
+        .info-box p {
+            color: var(--text);
+        }
+        
+        /* ─── FOOTER ──────────────────────────────────────── */
         .footer {
-            background: var(--primary);
-            color: var(--secondary);
-            padding: 64px 0 32px;
+            background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+            color: var(--white);
+            padding: 72px 0 36px;
             margin-top: 96px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 80% 0%, rgba(201,149,42,0.08) 0%, transparent 55%);
+            pointer-events: none;
+        }
+        
+        .footer-divider {
+            width: 48px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+            margin: 12px 0 18px;
+            border-radius: 2px;
         }
         
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 48px;
-            margin-bottom: 48px;
+            margin-bottom: 52px;
+            position: relative;
         }
         
         .footer-section h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold-bright);
+            margin-bottom: 6px;
+        }
+        
+        .footer-brand-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
         }
         
         .footer-links {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
         
         .footer a {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255,255,255,0.65);
             text-decoration: none;
-            font-weight: 500;
-            font-size: 15px;
+            font-weight: 400;
+            font-size: 14px;
             transition: color 0.2s;
+            letter-spacing: 0.2px;
         }
         
-        .footer a:hover {
-            color: var(--accent);
+        .footer a:hover { 
+            color: var(--gold-bright); 
         }
         
         .footer-bottom {
             padding-top: 32px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(201,149,42,0.15);
             text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            color: rgba(255,255,255,0.45);
+            font-size: 13px;
         }
         
-        /* Responsive Design */
+        /* ─── RESPONSIVE ──────────────────────────────────── */
         @media (max-width: 768px) {
             .nav {
                 display: none;
@@ -507,10 +602,6 @@ $db = db();
                 font-size: 16px;
             }
             
-            .logo {
-                font-size: 22px;
-            }
-            
             .container {
                 padding: 0 16px;
             }
@@ -520,11 +611,15 @@ $db = db();
             }
             
             .legal-section h3 {
-                font-size: 20px;
+                font-size: 16px;
             }
             
             .toc {
                 padding: 20px;
+            }
+
+            .logo-name {
+                font-size: 18px;
             }
         }
         
@@ -548,7 +643,10 @@ $db = db();
     <!-- Mobile Navigation -->
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
+            <div class="logo">
+                <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                <span class="logo-tagline" style="color: rgba(201,149,42,0.7);">Create. Share. Inspire.</span>
+            </div>
             <button class="mobile-close" onclick="toggleMobileMenu()">×</button>
         </div>
         <nav class="mobile-nav-links">
@@ -574,17 +672,20 @@ $db = db();
                     <?php if (isLoggedIn()): ?>
                         Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                         <?php if (hasActiveSubscription($_SESSION['user_id'])): ?>
-                            <span class="premium-badge">✓ Premium Member</span>
+                            <span class="premium-badge">✦ Premium Member</span>
                         <?php endif; ?>
                     <?php else: ?>
-                        Get unlimited access • Subscribe today
+                        Unlock unlimited access &nbsp;·&nbsp; Subscribe today
                     <?php endif; ?>
                 </div>
             </div>
         </div>
         <div class="container">
             <div class="header-content">
-                <a href="index.php" class="logo"><?php echo SITE_NAME; ?></a>
+                <a href="index.php" class="logo">
+                    <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                    <span class="logo-tagline">Create. Share. Inspire.</span>
+                </a>
                 <nav class="nav">
                     <a href="index.php">Home</a>
                     <?php if (isLoggedIn()): ?>
@@ -903,13 +1004,15 @@ $db = db();
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3><?php echo SITE_NAME; ?></h3>
-                    <p style="color: rgba(255, 255, 255, 0.7); margin-top: 12px; line-height: 1.6;">
-                        Premium insights and analysis for those who want to stay ahead.
+                    <div class="footer-brand-name"><?php echo SITE_NAME; ?></div>
+                    <div class="footer-divider"></div>
+                    <p style="color: rgba(255,255,255,0.55); line-height: 1.7; font-size: 14px; max-width: 260px;">
+                        Premium insights and analysis for those who want to stay ahead — and inspired.
                     </p>
                 </div>
                 <div class="footer-section">
-                    <h3>Navigation</h3>
+                    <h3>Navigate</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
                         <a href="index.php">Home</a>
                         <a href="pricing.php">Pricing</a>
@@ -920,14 +1023,15 @@ $db = db();
                 </div>
                 <div class="footer-section">
                     <h3>Company</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
-                        <a href="#">About</a>
-                        <a href="#">Contact</a>
-                        <a href="#">Careers</a>
+                        <a href="about.php">About</a>
+                        <a href="contact.php">Contact</a>
                     </div>
                 </div>
                 <div class="footer-section">
                     <h3>Legal</h3>
+                    <div class="footer-divider"></div>
                     <div class="footer-links">
                         <a href="terms.php">Terms of Service</a>
                         <a href="privacy.php">Privacy Policy</a>
@@ -936,7 +1040,7 @@ $db = db();
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</p>
+                <span>&copy; <?php echo date('Y'); ?> <?php echo SITE_NAME; ?>. All rights reserved.</span>
             </div>
         </div>
     </footer>
