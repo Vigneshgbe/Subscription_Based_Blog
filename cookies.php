@@ -110,9 +110,22 @@ $db = db();
 
         .logo {
             display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .logo-image {
+            height: 48px;
+            width: auto;
+            display: block;
+        }
+
+        .logo-text {
+            display: flex;
             flex-direction: column;
             line-height: 1;
-            text-decoration: none;
             gap: 2px;
         }
 
@@ -754,8 +767,11 @@ $db = db();
         <div class="container">
             <div class="header-content">
                 <a href="index.php" class="logo">
-                    <span class="logo-name"><?php echo SITE_NAME; ?></span>
-                    <span class="logo-tagline">Create. Share. Inspire.</span>
+                    <img src="https://github.com/Vigneshgbe/Subscription_Based_Blog/blob/main/assets/Logo.png?raw=true" alt="<?php echo SITE_NAME; ?> Logo" class="logo-image">
+                    <div class="logo-text">
+                        <span class="logo-name"><?php echo SITE_NAME; ?></span>
+                        <span class="logo-tagline">Create. Share. Inspire.</span>
+                    </div>
                 </a>
                 <nav class="nav">
                     <a href="index.php">Home</a>
