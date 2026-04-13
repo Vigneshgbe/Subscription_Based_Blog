@@ -50,7 +50,6 @@ if (hasActiveSubscription($userId)) {
 try {
     $db = db();
 
-    // Get user
     $stmt = $db->prepare("SELECT id, email, full_name FROM users WHERE id = ? LIMIT 1");
     $stmt->execute([$userId]);
     $user = $stmt->fetch();
@@ -59,53 +58,46 @@ try {
         throw new Exception('User account not found');
     }
 
-    // Always create a fresh Stripe customer — avoids stale customer ID errors
+    // Always create fresh customer to avoid stale ID errors
     $customer = \Stripe\Customer::create([
         'email'    => $user['email'],
         'name'     => $user['full_name'],
         'metadata' => ['user_id' => (string)$userId]
     ]);
-    $customerId = $customer->id;
 
-    // Build line_items using Price IDs from Stripe dashboard
-    $priceId = $planType === 'monthly' ? STRIPE_MONTHLY_PRICE_ID : STRIPE_YEARLY_PRICE_ID;
+    // CHF pricing — your Stripe account is CHF-based
+    // CHF 2.50/month ≈ ₹299 | CHF 25.00/year ≈ ₹2,999
+    if ($planType === 'monthly') {
+        $unitAmount  = 24900;  
+        $interval    = 'month';
+        $productName = SITE_NAME . ' — Monthly Subscription';
+        $productDesc = 'Unlimited premium articles — billed monthly (≈ ₹299/month)';
+    } else {
+        $unitAmount  = 249900;  
+        $interval    = 'year';
+        $productName = SITE_NAME . ' — Yearly Subscription';
+        $productDesc = 'Unlimited premium articles — billed yearly (≈ ₹2,999/year)';
+    }
 
-    // Fallback: if Price IDs not set, use inline price_data
-    if (empty($priceId) || strpos($priceId, 'price_xxx') !== false) {
-        // Use inline pricing (CHF to match your Stripe account currency)
-        $amount   = $planType === 'monthly' ? 299 * 100 : 2999 * 100; // in smallest currency unit
-        $interval = $planType === 'monthly' ? 'month' : 'year';
-        $lineItems = [[
+    $session = \Stripe\Checkout\Session::create([
+        'customer'             => $customer->id,
+        'payment_method_types' => ['card'],
+        'line_items'           => [[
             'price_data' => [
-                'currency'     => 'chf',  // matches your Stripe account currency- chf
+                'currency'     => 'inr',
                 'product_data' => [
-                    'name'        => SITE_NAME . ' — ' . ucfirst($planType) . ' Subscription',
-                    'description' => 'Unlimited access to all premium articles',
+                    'name'        => $productName,
+                    'description' => $productDesc,
                 ],
-                'unit_amount' => $amount,
+                'unit_amount' => $unitAmount,
                 'recurring'   => ['interval' => $interval],
             ],
             'quantity' => 1,
-        ]];
-    } else {
-        // Use Price IDs from dashboard (preferred)
-        $lineItems = [[
-            'price'    => $priceId,
-            'quantity' => 1,
-        ]];
-    }
-
-    $successUrl = rtrim(SITE_URL, '/') . '/payment-success.php?session_id={CHECKOUT_SESSION_ID}';
-    $cancelUrl  = rtrim(SITE_URL, '/') . '/pricing.php?canceled=1';
-
-    $session = \Stripe\Checkout\Session::create([
-        'customer'             => $customerId,
-        'payment_method_types' => ['card'],
-        'line_items'           => $lineItems,
-        'mode'                 => 'subscription',
-        'success_url'          => $successUrl,
-        'cancel_url'           => $cancelUrl,
-        'metadata'             => [
+        ]],
+        'mode'        => 'subscription',
+        'success_url' => rtrim(SITE_URL, '/') . '/payment-success.php?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url'  => rtrim(SITE_URL, '/') . '/pricing.php?canceled=1',
+        'metadata'    => [
             'user_id'   => (string)$userId,
             'plan_type' => $planType,
         ],
