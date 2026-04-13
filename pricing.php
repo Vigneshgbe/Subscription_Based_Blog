@@ -17,9 +17,7 @@ $currentSubscription = $stmt->fetch();
 
 $hasActiveSubscription = hasActiveSubscription($userId);
 $freeRemaining         = getFreeArticlesRemaining();
-
-// canceled=1 means user came back from Stripe after canceling checkout
-$canceled = isset($_GET['canceled']);
+$canceled              = isset($_GET['canceled']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -163,7 +161,6 @@ $canceled = isset($_GET['canceled']);
             margin: 0 auto;
             padding: 64px 24px 80px;
         }
-
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -211,13 +208,20 @@ $canceled = isset($_GET['canceled']);
 
         .price-row  { display: flex; align-items: flex-end; gap: 3px; margin-bottom: 5px; }
         .price-cur  { font-size: 19px; font-weight: 600; color: var(--accent); line-height: 1; margin-bottom: 9px; }
-        .price-amt  {
-            font-family: 'Playfair Display', serif;
-            font-size: 50px; font-weight: 900;
-            color: var(--ink); line-height: 1;
-        }
+        .price-amt  { font-family: 'Playfair Display', serif; font-size: 50px; font-weight: 900; color: var(--ink); line-height: 1; }
         .price-amt.muted { color: var(--ink-3); }
         .price-period { font-size: 13px; color: var(--ink-3); margin-bottom: 26px; }
+
+        /* Savings note under yearly price */
+        .price-saving {
+            display: inline-block;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--green);
+            font-size: 11px; font-weight: 700;
+            padding: 3px 10px; border-radius: 100px;
+            margin-bottom: 10px;
+        }
 
         .divider { height: 1px; background: var(--border); margin-bottom: 22px; }
 
@@ -313,16 +317,15 @@ $canceled = isset($_GET['canceled']);
             .hero { padding: 52px 20px 100px; }
             .pricing-wrap { padding: 48px 20px 64px; }
             .card { padding: 28px 20px 24px; border-radius: 16px; }
-            .plan-name  { font-size: 24px; }
-            .price-amt  { font-size: 42px; }
+            .plan-name { font-size: 24px; }
+            .price-amt { font-size: 42px; }
             .why-section { padding: 56px 20px 64px; }
             .why-grid { gap: 28px; }
         }
         @media (max-width: 480px) {
             .hero h1 { font-size: 28px; }
             .hero p   { font-size: 15px; }
-            .active-banner-wrap,
-            .free-counter-wrap { padding: 0 16px; }
+            .active-banner-wrap, .free-counter-wrap { padding: 0 16px; }
             .active-banner { flex-direction: column; text-align: center; gap: 10px; }
             .active-banner .chk-circle { margin: 0 auto; }
             .pricing-wrap { padding: 36px 16px 52px; }
@@ -391,7 +394,7 @@ $canceled = isset($_GET['canceled']);
             <div class="plan-label">Get started</div>
             <div class="plan-name">Free</div>
             <div class="price-row">
-                <span class="price-cur">₹</span>
+                <span class="price-cur">$</span>
                 <span class="price-amt muted">0</span>
             </div>
             <div class="price-period">Forever — no credit card needed</div>
@@ -411,8 +414,8 @@ $canceled = isset($_GET['canceled']);
             <div class="plan-label">For readers</div>
             <div class="plan-name">Monthly</div>
             <div class="price-row">
-                <span class="price-cur">₹</span>
-                <span class="price-amt">299</span>
+                <span class="price-cur">$</span>
+                <span class="price-amt">3</span>
             </div>
             <div class="price-period">Per month — cancel anytime</div>
             <div class="divider"></div>
@@ -428,7 +431,7 @@ $canceled = isset($_GET['canceled']);
                 <button class="btn btn-active" disabled>✓ Active Plan</button>
             <?php else: ?>
                 <button class="btn btn-accent" onclick="subscribe('monthly', this)" <?php echo $hasActiveSubscription ? 'disabled' : ''; ?>>
-                    Subscribe Now — ₹299/mo
+                    Subscribe Now — $3/mo
                 </button>
             <?php endif; ?>
             <div class="pay-msg" id="msg-monthly"></div>
@@ -436,14 +439,15 @@ $canceled = isset($_GET['canceled']);
 
         <!-- Yearly -->
         <div class="card">
-            <span class="pill pill-green">Save 30%</span>
+            <span class="pill pill-green">Save 17%</span>
             <div class="plan-label">Best value</div>
             <div class="plan-name">Yearly</div>
             <div class="price-row">
-                <span class="price-cur">₹</span>
-                <span class="price-amt">2,999</span>
+                <span class="price-cur">$</span>
+                <span class="price-amt">30</span>
             </div>
-            <div class="price-period">Per year — just ₹250/month</div>
+            <div class="price-period">Per year — just $2.50/month</div>
+            <span class="price-saving">2 months free vs monthly</span>
             <div class="divider"></div>
             <ul class="features">
                 <li><span class="chk">✓</span> Everything in Monthly</li>
@@ -457,7 +461,7 @@ $canceled = isset($_GET['canceled']);
                 <button class="btn btn-active" disabled>✓ Active Plan</button>
             <?php else: ?>
                 <button class="btn btn-accent" onclick="subscribe('yearly', this)" <?php echo $hasActiveSubscription ? 'disabled' : ''; ?>>
-                    Subscribe Now — ₹2,999/yr
+                    Subscribe Now — $30/yr
                 </button>
             <?php endif; ?>
             <div class="pay-msg" id="msg-yearly"></div>
@@ -527,7 +531,7 @@ $canceled = isset($_GET['canceled']);
             <span class="faq-arrow">▼</span>
         </div>
         <div class="faq-a">
-            We accept all major credit and debit cards (Visa, Mastercard, RuPay) via Stripe.
+            We accept all major credit and debit cards (Visa, Mastercard, Amex) via Stripe.
             Payments are processed securely — we never store your card details.
         </div>
     </div>
@@ -548,12 +552,12 @@ $canceled = isset($_GET['canceled']);
     const stripe = Stripe('<?php echo STRIPE_PUBLISHABLE_KEY; ?>');
 
     async function subscribe(planType, btn) {
-        const msgDiv      = document.getElementById('msg-' + planType);
+        const msgDiv       = document.getElementById('msg-' + planType);
         const originalText = btn.textContent;
 
-        btn.disabled     = true;
-        btn.textContent  = 'Redirecting to checkout…';
-        msgDiv.className = 'pay-msg';
+        btn.disabled       = true;
+        btn.textContent    = 'Redirecting to checkout…';
+        msgDiv.className   = 'pay-msg';
         msgDiv.textContent = '';
 
         try {
@@ -566,13 +570,12 @@ $canceled = isset($_GET['canceled']);
                 })
             });
 
-            // Read raw text first — avoids crash if PHP outputs a notice before JSON
             const rawText = await response.text();
             let data;
             try {
                 data = JSON.parse(rawText);
             } catch (parseErr) {
-                console.error('Non-JSON response from server:', rawText);
+                console.error('Non-JSON response:', rawText);
                 throw new Error('Server error. Please try again or contact support.');
             }
 
@@ -581,7 +584,6 @@ $canceled = isset($_GET['canceled']);
             }
 
             if (data.sessionId) {
-                // Redirect to Stripe Checkout
                 const result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
                 if (result.error) throw new Error(result.error.message);
             } else {

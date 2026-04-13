@@ -65,18 +65,17 @@ try {
         'metadata' => ['user_id' => (string)$userId]
     ]);
 
-    // CHF pricing — your Stripe account is CHF-based
-    // CHF 2.50/month ≈ ₹299 | CHF 25.00/year ≈ ₹2,999
+    // USD pricing: $3/month | $30/year
     if ($planType === 'monthly') {
-        $unitAmount  = 3;  
+        $unitAmount  = 300;    // $3.00 in cents
         $interval    = 'month';
         $productName = SITE_NAME . ' — Monthly Subscription';
-        $productDesc = 'Unlimited premium articles — billed monthly (≈ ₹299/month)';
+        $productDesc = 'Unlimited access to all premium articles — billed monthly';
     } else {
-        $unitAmount  = 30;  
+        $unitAmount  = 3000;   // $30.00 in cents
         $interval    = 'year';
         $productName = SITE_NAME . ' — Yearly Subscription';
-        $productDesc = 'Unlimited premium articles — billed yearly (≈ ₹2,999/year)';
+        $productDesc = 'Unlimited access to all premium articles — billed yearly (save 17%)';
     }
 
     $session = \Stripe\Checkout\Session::create([
