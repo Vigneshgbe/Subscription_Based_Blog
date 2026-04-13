@@ -2,6 +2,11 @@
 // config.php - Central Configuration File
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Config.php - SMTP Mailer Config added
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
+
 // Error Reporting (Set to 0 in production)
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -235,35 +240,33 @@ function logActivity($userId, $action, $entityType = null, $entityId = null, $de
 function sendEmail($to, $subject, $htmlBody) {
     if (empty($to)) return false;
 
-    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+    // Import inside function to avoid scope issues
+    $mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
 
     try {
-        // ── SMTP Settings ──────────────────────────────────
-        $mail->isSMTP();
-        $mail->Host       = env('MAIL_HOST', 'smtp.hostinger.com');
-        $mail->SMTPAuth   = true;
-        $mail->Username   = env('MAIL_USERNAME', SITE_EMAIL);
-        $mail->Password   = env('MAIL_PASSWORD', '');
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SSL;
-        $mail->Port       = (int) env('MAIL_PORT', 465);
-        $mail->CharSet    = 'UTF-8';
+        $mailer->isSMTP();
+        $mailer->Host       = env('MAIL_HOST', 'smtp.gmail.com');
+        $mailer->SMTPAuth   = true;
+        $mailer->Username   = env('MAIL_USERNAME', SITE_EMAIL);
+        $mailer->Password   = env('MAIL_PASSWORD', '');
+        $mailer->SMTPSecure = 'ssl';          // <-- string literal, not constant
+        $mailer->Port       = (int) env('MAIL_PORT', 465);
+        $mailer->CharSet    = 'UTF-8';
 
-        // ── Sender & Recipient ─────────────────────────────
-        $mail->setFrom(SITE_EMAIL, SITE_NAME);
-        $mail->addReplyTo(SITE_EMAIL, SITE_NAME);
-        $mail->addAddress($to);
+        $mailer->setFrom(SITE_EMAIL, SITE_NAME);
+        $mailer->addReplyTo(SITE_EMAIL, SITE_NAME);
+        $mailer->addAddress($to);
 
-        // ── Content ────────────────────────────────────────
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body    = $htmlBody;
-        $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
+        $mailer->isHTML(true);
+        $mailer->Subject = $subject;
+        $mailer->Body    = $htmlBody;
+        $mailer->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
 
-        $mail->send();
+        $mailer->send();
         return true;
 
     } catch (\PHPMailer\PHPMailer\Exception $e) {
-        error_log("sendEmail() failed to [{$to}] subject [{$subject}]: " . $mail->ErrorInfo);
+        error_log("sendEmail() failed to [{$to}]: " . $mailer->ErrorInfo);
         return false;
     }
 }
