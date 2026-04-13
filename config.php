@@ -49,6 +49,8 @@ define('DB_CHARSET', 'utf8mb4');
 define('STRIPE_SECRET_KEY',      env('STRIPE_SECRET_KEY'));
 define('STRIPE_PUBLISHABLE_KEY', env('STRIPE_PUBLISHABLE_KEY'));
 define('STRIPE_WEBHOOK_SECRET',  env('STRIPE_WEBHOOK_SECRET'));
+define('STRIPE_MONTHLY_PRICE_ID', env('STRIPE_MONTHLY_PRICE_ID'));
+define('STRIPE_YEARLY_PRICE_ID',  env('STRIPE_YEARLY_PRICE_ID'));
 
 // Pricing Configuration (in INR)
 define('MONTHLY_PRICE', 29900); // ₹299.00 in paisa

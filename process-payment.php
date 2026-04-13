@@ -5,6 +5,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 // Must be first output — no HTML before this
 header('Content-Type: application/json');
 
+// Errors - Displayer
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['error' => 'Method not allowed']);
@@ -82,28 +87,13 @@ try {
         $customerId = $customer->id;
     }
 
-    // Plan amounts and intervals
-    $amount   = $planType === 'monthly' ? MONTHLY_PRICE  : YEARLY_PRICE;
-    $interval = $planType === 'monthly' ? 'month' : 'year';
-
-    $planLabel = $planType === 'monthly'
-        ? 'Monthly Subscription (₹299/month)'
-        : 'Yearly Subscription (₹2,999/year — Save 30%)';
 
     // Create Stripe Checkout Session
     $session = \Stripe\Checkout\Session::create([
         'customer'             => $customerId,
         'payment_method_types' => ['card'],
-        'line_items'           => [[
-            'price_data' => [
-                'currency'     => 'inr',
-                'product_data' => [
-                    'name'        => SITE_NAME . ' — ' . $planLabel,
-                    'description' => 'Unlimited access to all premium articles',
-                ],
-                'unit_amount' => $amount,
-                'recurring'   => ['interval' => $interval],
-            ],
+        'line_items' => [[
+            'price'    => $planType === 'monthly' ? STRIPE_MONTHLY_PRICE_ID : STRIPE_YEARLY_PRICE_ID,
             'quantity' => 1,
         ]],
         'mode'        => 'subscription',
