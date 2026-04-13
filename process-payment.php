@@ -77,7 +77,7 @@ try {
         $interval = $planType === 'monthly' ? 'month' : 'year';
         $lineItems = [[
             'price_data' => [
-                'currency'     => 'chf',  // matches your Stripe account currency
+                'currency'     => 'chf',  // matches your Stripe account currency- chf
                 'product_data' => [
                     'name'        => SITE_NAME . ' — ' . ucfirst($planType) . ' Subscription',
                     'description' => 'Unlimited access to all premium articles',
