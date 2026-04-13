@@ -232,13 +232,40 @@ function logActivity($userId, $action, $entityType = null, $entityId = null, $de
     }
 }
 
-function sendEmail($to, $subject, $message) {
+function sendEmail($to, $subject, $htmlBody) {
     if (empty($to)) return false;
-    $headers  = "From: " . SITE_EMAIL . "\r\n";
-    $headers .= "Reply-To: " . SITE_EMAIL . "\r\n";
-    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-    // @ suppresses the SMTP warning on localhost — mail still attempts
-    return @mail($to, $subject, $message, $headers);
+
+    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        // ── SMTP Settings ──────────────────────────────────
+        $mail->isSMTP();
+        $mail->Host       = env('MAIL_HOST', 'smtp.hostinger.com');
+        $mail->SMTPAuth   = true;
+        $mail->Username   = env('MAIL_USERNAME', SITE_EMAIL);
+        $mail->Password   = env('MAIL_PASSWORD', '');
+        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SSL;
+        $mail->Port       = (int) env('MAIL_PORT', 465);
+        $mail->CharSet    = 'UTF-8';
+
+        // ── Sender & Recipient ─────────────────────────────
+        $mail->setFrom(SITE_EMAIL, SITE_NAME);
+        $mail->addReplyTo(SITE_EMAIL, SITE_NAME);
+        $mail->addAddress($to);
+
+        // ── Content ────────────────────────────────────────
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $htmlBody;
+        $mail->AltBody = strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $htmlBody));
+
+        $mail->send();
+        return true;
+
+    } catch (\PHPMailer\PHPMailer\Exception $e) {
+        error_log("sendEmail() failed to [{$to}] subject [{$subject}]: " . $mail->ErrorInfo);
+        return false;
+    }
 }
 
 function getSessionId() {
@@ -249,7 +276,6 @@ function getSessionId() {
 }
 
 // ── Subscription / Reading Logic ────────────────────────────
-
 function hasActiveSubscription($userId) {
     $db = db();
     $stmt = $db->prepare("
