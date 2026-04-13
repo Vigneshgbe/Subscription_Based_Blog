@@ -68,12 +68,12 @@ try {
     // CHF pricing — your Stripe account is CHF-based
     // CHF 2.50/month ≈ ₹299 | CHF 25.00/year ≈ ₹2,999
     if ($planType === 'monthly') {
-        $unitAmount  = 24900;  
+        $unitAmount  = 3;  
         $interval    = 'month';
         $productName = SITE_NAME . ' — Monthly Subscription';
         $productDesc = 'Unlimited premium articles — billed monthly (≈ ₹299/month)';
     } else {
-        $unitAmount  = 249900;  
+        $unitAmount  = 30;  
         $interval    = 'year';
         $productName = SITE_NAME . ' — Yearly Subscription';
         $productDesc = 'Unlimited premium articles — billed yearly (≈ ₹2,999/year)';
@@ -84,7 +84,7 @@ try {
         'payment_method_types' => ['card'],
         'line_items'           => [[
             'price_data' => [
-                'currency'     => 'inr',
+                'currency'     => 'usd',
                 'product_data' => [
                     'name'        => $productName,
                     'description' => $productDesc,
