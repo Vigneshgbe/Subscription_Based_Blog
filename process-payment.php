@@ -2,13 +2,7 @@
 require_once 'config.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Must be first output — no HTML before this
 header('Content-Type: application/json');
-
-// Errors - Displayer
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -30,7 +24,6 @@ if (!$input) {
     exit;
 }
 
-// CSRF validation
 if (empty($input['csrf_token']) || !verifyCSRFToken($input['csrf_token'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Invalid CSRF token. Please refresh the page and try again.']);
@@ -46,7 +39,6 @@ if (!in_array($planType, ['monthly', 'yearly'])) {
     exit;
 }
 
-// Block if already subscribed to same plan
 if (hasActiveSubscription($userId)) {
     http_response_code(400);
     echo json_encode(['error' => 'You already have an active subscription']);
@@ -67,39 +59,53 @@ try {
         throw new Exception('User account not found');
     }
 
-    // Get or create Stripe customer
-    $stmt = $db->prepare("
-        SELECT stripe_customer_id FROM subscriptions
-        WHERE user_id = ? AND stripe_customer_id IS NOT NULL
-        ORDER BY created_at DESC LIMIT 1
-    ");
-    $stmt->execute([$userId]);
-    $existingSub = $stmt->fetch();
-    $customerId  = $existingSub['stripe_customer_id'] ?? null;
+    // Always create a fresh Stripe customer — avoids stale customer ID errors
+    $customer = \Stripe\Customer::create([
+        'email'    => $user['email'],
+        'name'     => $user['full_name'],
+        'metadata' => ['user_id' => (string)$userId]
+    ]);
+    $customerId = $customer->id;
 
-    if (!$customerId) {
-        // Create new Stripe customer
-        $customer   = \Stripe\Customer::create([
-            'email'    => $user['email'],
-            'name'     => $user['full_name'],
-            'metadata' => ['user_id' => (string)$userId]
-        ]);
-        $customerId = $customer->id;
+    // Build line_items using Price IDs from Stripe dashboard
+    $priceId = $planType === 'monthly' ? STRIPE_MONTHLY_PRICE_ID : STRIPE_YEARLY_PRICE_ID;
+
+    // Fallback: if Price IDs not set, use inline price_data
+    if (empty($priceId) || strpos($priceId, 'price_xxx') !== false) {
+        // Use inline pricing (CHF to match your Stripe account currency)
+        $amount   = $planType === 'monthly' ? 299 * 100 : 2999 * 100; // in smallest currency unit
+        $interval = $planType === 'monthly' ? 'month' : 'year';
+        $lineItems = [[
+            'price_data' => [
+                'currency'     => 'chf',  // matches your Stripe account currency
+                'product_data' => [
+                    'name'        => SITE_NAME . ' — ' . ucfirst($planType) . ' Subscription',
+                    'description' => 'Unlimited access to all premium articles',
+                ],
+                'unit_amount' => $amount,
+                'recurring'   => ['interval' => $interval],
+            ],
+            'quantity' => 1,
+        ]];
+    } else {
+        // Use Price IDs from dashboard (preferred)
+        $lineItems = [[
+            'price'    => $priceId,
+            'quantity' => 1,
+        ]];
     }
 
+    $successUrl = rtrim(SITE_URL, '/') . '/payment-success.php?session_id={CHECKOUT_SESSION_ID}';
+    $cancelUrl  = rtrim(SITE_URL, '/') . '/pricing.php?canceled=1';
 
-    // Create Stripe Checkout Session
     $session = \Stripe\Checkout\Session::create([
         'customer'             => $customerId,
         'payment_method_types' => ['card'],
-        'line_items' => [[
-            'price'    => $planType === 'monthly' ? STRIPE_MONTHLY_PRICE_ID : STRIPE_YEARLY_PRICE_ID,
-            'quantity' => 1,
-        ]],
-        'mode'        => 'subscription',
-        'success_url' => SITE_URL . '/payment-success.php?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url'  => SITE_URL . '/pricing.php?canceled=1',
-        'metadata'    => [
+        'line_items'           => $lineItems,
+        'mode'                 => 'subscription',
+        'success_url'          => $successUrl,
+        'cancel_url'           => $cancelUrl,
+        'metadata'             => [
             'user_id'   => (string)$userId,
             'plan_type' => $planType,
         ],
@@ -109,8 +115,6 @@ try {
                 'plan_type' => $planType,
             ]
         ],
-        // Pre-fill customer email on Stripe checkout page
-        'customer_email' => $customerId ? null : $user['email'],
     ]);
 
     logActivity($userId, 'checkout_initiated', 'subscription', null, [
@@ -123,7 +127,7 @@ try {
 } catch (\Stripe\Exception\ApiErrorException $e) {
     http_response_code(500);
     error_log('Stripe API error: ' . $e->getMessage());
-    echo json_encode(['error' => 'Payment service error. Please try again or contact support.']);
+    echo json_encode(['error' => $e->getMessage()]);
 
 } catch (Exception $e) {
     http_response_code(500);
