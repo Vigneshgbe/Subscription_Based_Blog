@@ -103,8 +103,8 @@ $successfulTxns   = $db->query("SELECT COUNT(*) FROM transactions WHERE status='
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card"><strong>₹<?php echo number_format($totalRevenue, 0); ?></strong><span>Total Revenue</span></div>
-            <div class="stat-card"><strong>₹<?php echo number_format($monthlyRevenue, 0); ?></strong><span>This Month</span></div>
+            <div class="stat-card"><strong>$<?php echo number_format($totalRevenue, 0); ?></strong><span>Total Revenue</span></div>
+            <div class="stat-card"><strong>$<?php echo number_format($monthlyRevenue, 0); ?></strong><span>This Month</span></div>
             <div class="stat-card"><strong><?php echo $totalTxns; ?></strong><span>Total Transactions</span></div>
             <div class="stat-card"><strong><?php echo $successfulTxns; ?></strong><span>Successful</span></div>
         </div>
@@ -152,7 +152,7 @@ $successfulTxns   = $db->query("SELECT COUNT(*) FROM transactions WHERE status='
                     </td>
                     <td>
                         <span class="amount <?php echo $txn['status']==='succeeded'?'success':($txn['status']==='failed'?'failed':''); ?>">
-                            ₹<?php echo number_format($txn['amount'], 2); ?>
+                            $<?php echo number_format($txn['amount'], 2); ?>
                         </span>
                         <small style="color:#999"><?php echo strtoupper($txn['currency']); ?></small>
                     </td>

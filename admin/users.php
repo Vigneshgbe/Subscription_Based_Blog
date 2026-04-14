@@ -12,20 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($userId && $userId !== $_SESSION['user_id']) {
         if ($action === 'toggle_active') {
             $db->prepare("UPDATE users SET is_active = NOT is_active WHERE id = ?")->execute([$userId]);
-            setFlashMessage('User status updated.', 'success');
+            FlashMessage('User status updated.', 'success');
         } elseif ($action === 'toggle_role') {
             $stmt = $db->prepare("SELECT role FROM users WHERE id = ?");
             $stmt->execute([$userId]);
             $user = $stmt->fetch();
             $newRole = $user['role'] === 'admin' ? 'user' : 'admin';
             $db->prepare("UPDATE users SET role = ? WHERE id = ?")->execute([$newRole, $userId]);
-            setFlashMessage('User role updated.', 'success');
+            FlashMessage('User role updated.', 'success');
         } elseif ($action === 'delete') {
             $db->prepare("DELETE FROM users WHERE id = ?")->execute([$userId]);
-            setFlashMessage('User deleted.', 'success');
+            FlashMessage('User deleted.', 'success');
         }
     } else {
-        setFlashMessage('Cannot modify your own account or invalid user.', 'danger');
+        FlashMessage('Cannot modify your own account or invalid user.', 'danger');
     }
     header('Location: users.php?' . http_build_query(array_filter([
         'page'   => $_POST['current_page'] ?? 1,

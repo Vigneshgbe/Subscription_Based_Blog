@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $db->prepare("INSERT INTO categories (name, slug, description) VALUES (?,?,?)")
                    ->execute([$name, $slug, $desc]);
-                setFlashMessage('Category created!', 'success');
+                FlashMessage('Category created!', 'success');
                 header('Location: categories.php');
                 exit;
             }
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $db->prepare("UPDATE categories SET name=?,slug=?,description=? WHERE id=?")
                    ->execute([$name, $slug, $desc, $id]);
-                setFlashMessage('Category updated!', 'success');
+                FlashMessage('Category updated!', 'success');
                 header('Location: categories.php');
                 exit;
             }
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Unlink articles first
             $db->prepare("UPDATE articles SET category_id=NULL WHERE category_id=?")->execute([$id]);
             $db->prepare("DELETE FROM categories WHERE id=?")->execute([$id]);
-            setFlashMessage('Category deleted.', 'success');
+            FlashMessage('Category deleted.', 'success');
         }
         header('Location: categories.php');
         exit;

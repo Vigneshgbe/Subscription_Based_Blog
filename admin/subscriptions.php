@@ -10,10 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subId  = intval($_POST['sub_id'] ?? 0);
     if ($action === 'cancel' && $subId) {
         $db->prepare("UPDATE subscriptions SET status='canceled', cancel_at_period_end=1 WHERE id=?")->execute([$subId]);
-        setFlashMessage('Subscription marked for cancellation.', 'success');
+        FlashMessage('Subscription marked for cancellation.', 'success');
     } elseif ($action === 'reactivate' && $subId) {
         $db->prepare("UPDATE subscriptions SET status='active', cancel_at_period_end=0 WHERE id=?")->execute([$subId]);
-        setFlashMessage('Subscription reactivated.', 'success');
+        FlashMessage('Subscription reactivated.', 'success');
     }
     header('Location: subscriptions.php?page=' . intval($_POST['current_page'] ?? 1));
     exit;
