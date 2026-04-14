@@ -460,7 +460,7 @@ ob_end_clean();
                         </div>
                         <div class="info-item">
                             <strong>Currency</strong>
-                            <span>INR ₹</span>
+                            <span>USD $</span>
                         </div>
                     </div>
                 </div>
@@ -476,12 +476,12 @@ ob_end_clean();
                     <div class="info-grid">
                         <div class="info-item">
                             <strong>Monthly Plan</strong>
-                            <span>₹<?php echo defined('MONTHLY_PRICE') ? number_format(MONTHLY_PRICE / 100, 0) : '299'; ?></span>
+                            <span>$<?php echo defined('MONTHLY_PRICE') ? number_format(MONTHLY_PRICE / 100, 0) : '3'; ?></span>
                             <span class="info-sub">per month</span>
                         </div>
                         <div class="info-item">
                             <strong>Yearly Plan</strong>
-                            <span>₹<?php echo defined('YEARLY_PRICE') ? number_format(YEARLY_PRICE / 100, 0) : '2,999'; ?></span>
+                            <span>$<?php echo defined('YEARLY_PRICE') ? number_format(YEARLY_PRICE / 100, 0) : '30'; ?></span>
                             <span class="info-sub">per year</span>
                         </div>
                     </div>
