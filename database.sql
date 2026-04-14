@@ -1,152 +1,338 @@
--- Subscription Blog Platform Database Schema
--- Phase 1 - Complete Structure
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Apr 14, 2026 at 07:26 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.1.25
 
-CREATE DATABASE IF NOT EXISTS subscription_blog CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE subscription_blog;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Users table
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    full_name VARCHAR(255) NOT NULL,
-    role ENUM('user', 'admin') DEFAULT 'user',
-    is_active BOOLEAN DEFAULT TRUE,
-    email_verified BOOLEAN DEFAULT FALSE,
-    verification_token VARCHAR(64) DEFAULT NULL,
-    reset_token VARCHAR(64) DEFAULT NULL,
-    reset_token_expiry DATETIME DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login TIMESTAMP NULL DEFAULT NULL,
-    INDEX idx_email (email),
-    INDEX idx_role (role),
-    INDEX idx_verification_token (verification_token),
-    INDEX idx_reset_token (reset_token)
-) ENGINE=InnoDB;
 
--- Subscriptions table
-CREATE TABLE subscriptions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    stripe_customer_id VARCHAR(255) DEFAULT NULL,
-    stripe_subscription_id VARCHAR(255) DEFAULT NULL,
-    plan_type ENUM('free', 'monthly', 'yearly') DEFAULT 'free',
-    status ENUM('active', 'canceled', 'expired', 'past_due') DEFAULT 'active',
-    current_period_start DATETIME DEFAULT NULL,
-    current_period_end DATETIME DEFAULT NULL,
-    cancel_at_period_end BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_stripe_customer_id (stripe_customer_id),
-    INDEX idx_status (status)
-) ENGINE=InnoDB;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Articles table
-CREATE TABLE articles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(500) NOT NULL,
-    slug VARCHAR(500) NOT NULL UNIQUE,
-    excerpt TEXT,
-    content LONGTEXT NOT NULL,
-    featured_image VARCHAR(500) DEFAULT NULL,
-    author_id INT NOT NULL,
-    category_id INT DEFAULT NULL,
-    is_premium BOOLEAN DEFAULT FALSE,
-    is_published BOOLEAN DEFAULT FALSE,
-    views INT DEFAULT 0,
-    meta_title VARCHAR(255) DEFAULT NULL,
-    meta_description VARCHAR(500) DEFAULT NULL,
-    meta_keywords VARCHAR(500) DEFAULT NULL,
-    published_at DATETIME DEFAULT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_slug (slug),
-    INDEX idx_author_id (author_id),
-    INDEX idx_category_id (category_id),
-    INDEX idx_is_published (is_published),
-    INDEX idx_published_at (published_at),
-    FULLTEXT idx_search (title, excerpt, content)
-) ENGINE=InnoDB;
+--
+-- Database: `subscription_blog`
+--
 
--- Categories table
-CREATE TABLE categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL UNIQUE,
-    slug VARCHAR(255) NOT NULL UNIQUE,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_slug (slug)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- Reading history (for tracking free article limit)
-CREATE TABLE reading_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT DEFAULT NULL,
-    session_id VARCHAR(64) NOT NULL,
-    article_id INT NOT NULL,
-    ip_address VARCHAR(45),
-    user_agent VARCHAR(500),
-    read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_session_id (session_id),
-    INDEX idx_article_id (article_id),
-    INDEX idx_read_at (read_at),
-    UNIQUE KEY unique_read (user_id, session_id, article_id)
-) ENGINE=InnoDB;
+--
+-- Table structure for table `activity_logs`
+--
 
--- Payment transactions
-CREATE TABLE transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    stripe_payment_intent_id VARCHAR(255) DEFAULT NULL,
-    stripe_charge_id VARCHAR(255) DEFAULT NULL,
-    amount DECIMAL(10, 2) NOT NULL,
-    currency VARCHAR(3) DEFAULT 'INR',
-    status ENUM('pending', 'succeeded', 'failed', 'refunded') DEFAULT 'pending',
-    payment_method VARCHAR(50),
-    description TEXT,
-    metadata JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_status (status),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+CREATE TABLE `activity_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `entity_type` varchar(50) DEFAULT NULL,
+  `entity_id` int(11) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(500) DEFAULT NULL,
+  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`details`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Activity logs (for admin monitoring)
-CREATE TABLE activity_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT DEFAULT NULL,
-    action VARCHAR(100) NOT NULL,
-    entity_type VARCHAR(50),
-    entity_id INT,
-    ip_address VARCHAR(45),
-    user_agent VARCHAR(500),
-    details JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-    INDEX idx_user_id (user_id),
-    INDEX idx_action (action),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+--
+-- Table structure for table `articles`
+--
 
--- Add foreign key for articles category
-ALTER TABLE articles ADD FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL;
+CREATE TABLE `articles` (
+  `id` int(11) NOT NULL,
+  `title` varchar(500) NOT NULL,
+  `slug` varchar(500) NOT NULL,
+  `excerpt` text DEFAULT NULL,
+  `content` longtext NOT NULL,
+  `featured_image` varchar(500) DEFAULT NULL,
+  `author_id` int(11) NOT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `is_premium` tinyint(1) DEFAULT 0,
+  `is_published` tinyint(1) DEFAULT 0,
+  `views` int(11) DEFAULT 0,
+  `meta_title` varchar(255) DEFAULT NULL,
+  `meta_description` varchar(500) DEFAULT NULL,
+  `meta_keywords` varchar(500) DEFAULT NULL,
+  `published_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insert default admin user (password: Admin@123)
-INSERT INTO users (email, password_hash, full_name, role, is_active, email_verified) 
-VALUES ('admin@blog.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin User', 'admin', TRUE, TRUE);
+--
+-- Table structure for table `categories`
+--
 
--- Insert sample categories
-INSERT INTO categories (name, slug, description) VALUES
-('Technology', 'technology', 'Latest tech news and tutorials'),
-('Business', 'business', 'Business insights and strategies'),
-('Lifestyle', 'lifestyle', 'Health, wellness, and lifestyle tips'),
-('Finance', 'finance', 'Financial advice and investment tips'),
-('Education', 'education', 'Learning resources and educational content');
+CREATE TABLE `categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Table structure for table `contact_messages`
+--
+
+CREATE TABLE `contact_messages` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `status` enum('unread','read','replied') NOT NULL DEFAULT 'unread',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Table structure for table `reading_history`
+--
+
+CREATE TABLE `reading_history` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `session_id` varchar(64) NOT NULL,
+  `article_id` int(11) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(500) DEFAULT NULL,
+  `read_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Table structure for table `subscriptions`
+--
+
+CREATE TABLE `subscriptions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `stripe_customer_id` varchar(255) DEFAULT NULL,
+  `stripe_subscription_id` varchar(255) DEFAULT NULL,
+  `plan_type` enum('free','monthly','yearly') DEFAULT 'free',
+  `status` enum('active','canceled','expired','past_due') DEFAULT 'active',
+  `current_period_start` datetime DEFAULT NULL,
+  `current_period_end` datetime DEFAULT NULL,
+  `cancel_at_period_end` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Table structure for table `transactions`
+--
+
+CREATE TABLE `transactions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `stripe_payment_intent_id` varchar(255) DEFAULT NULL,
+  `stripe_charge_id` varchar(255) DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(3) DEFAULT 'INR',
+  `status` enum('pending','succeeded','failed','refunded') DEFAULT 'pending',
+  `payment_method` varchar(50) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `metadata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`metadata`)),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `full_name` varchar(255) NOT NULL,
+  `role` enum('user','admin') DEFAULT 'user',
+  `is_active` tinyint(1) DEFAULT 1,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `verification_token` varchar(64) DEFAULT NULL,
+  `reset_token` varchar(64) DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_login` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_action` (`action`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `articles`
+--
+ALTER TABLE `articles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `slug` (`slug`),
+  ADD KEY `idx_slug` (`slug`),
+  ADD KEY `idx_author_id` (`author_id`),
+  ADD KEY `idx_category_id` (`category_id`),
+  ADD KEY `idx_is_published` (`is_published`),
+  ADD KEY `idx_published_at` (`published_at`);
+ALTER TABLE `articles` ADD FULLTEXT KEY `idx_search` (`title`,`excerpt`,`content`);
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `slug` (`slug`),
+  ADD KEY `idx_slug` (`slug`);
+
+--
+-- Indexes for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `status` (`status`),
+  ADD KEY `created_at` (`created_at`);
+
+--
+-- Indexes for table `reading_history`
+--
+ALTER TABLE `reading_history`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_read` (`user_id`,`session_id`,`article_id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_session_id` (`session_id`),
+  ADD KEY `idx_article_id` (`article_id`),
+  ADD KEY `idx_read_at` (`read_at`);
+
+--
+-- Indexes for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_stripe_customer_id` (`stripe_customer_id`),
+  ADD KEY `idx_status` (`status`);
+
+--
+-- Indexes for table `transactions`
+--
+ALTER TABLE `transactions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_status` (`status`),
+  ADD KEY `idx_created_at` (`created_at`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_email` (`email`),
+  ADD KEY `idx_role` (`role`),
+  ADD KEY `idx_verification_token` (`verification_token`),
+  ADD KEY `idx_reset_token` (`reset_token`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+
+--
+-- AUTO_INCREMENT for table `articles`
+--
+ALTER TABLE `articles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `reading_history`
+--
+ALTER TABLE `reading_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+
+--
+-- AUTO_INCREMENT for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `transactions`
+--
+ALTER TABLE `transactions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `articles`
+--
+ALTER TABLE `articles`
+  ADD CONSTRAINT `articles_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `articles_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `reading_history`
+--
+ALTER TABLE `reading_history`
+  ADD CONSTRAINT `reading_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reading_history_ibfk_2` FOREIGN KEY (`article_id`) REFERENCES `articles` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `subscriptions`
+--
+ALTER TABLE `subscriptions`
+  ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `transactions`
+--
+ALTER TABLE `transactions`
+  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
