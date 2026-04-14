@@ -490,28 +490,6 @@ ob_end_clean();
                     </p>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-header-icon">🌐</div>
-                        <div>
-                            <h3>Stripe Webhook</h3>
-                            <p>Register this endpoint in your Stripe Dashboard</p>
-                        </div>
-                    </div>
-                    <p style="font-size:13px;color:var(--ink-3);margin-bottom:4px;">Webhook endpoint URL:</p>
-                    <div class="webhook-url">
-                        <?php echo (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>/webhook.php
-                    </div>
-                    <p style="font-size:13px;color:var(--ink-3);margin-bottom:8px;">Listen for these events:</p>
-                    <div class="event-chips">
-                        <span class="event-chip">checkout.session.completed</span>
-                        <span class="event-chip">invoice.payment_succeeded</span>
-                        <span class="event-chip">invoice.payment_failed</span>
-                        <span class="event-chip">customer.subscription.updated</span>
-                        <span class="event-chip">customer.subscription.deleted</span>
-                    </div>
-                </div>
-
             <!-- ── ACCOUNT ── -->
             <?php elseif ($section === 'account'): ?>
 
@@ -655,7 +633,7 @@ ob_end_clean();
                         </div>
                         <div class="info-item">
                             <strong>Total Revenue</strong>
-                            <span>₹<?php echo number_format($totalRev, 0); ?></span>
+                            <span>$<?php echo number_format($totalRev, 0); ?></span>
                         </div>
                         <div class="info-item">
                             <strong>Successful Txns</strong>

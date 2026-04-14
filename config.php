@@ -52,9 +52,9 @@ define('STRIPE_WEBHOOK_SECRET',  env('STRIPE_WEBHOOK_SECRET'));
 define('STRIPE_MONTHLY_PRICE_ID', env('STRIPE_MONTHLY_PRICE_ID'));
 define('STRIPE_YEARLY_PRICE_ID',  env('STRIPE_YEARLY_PRICE_ID'));
 
-// Pricing Configuration (in INR)
-define('MONTHLY_PRICE', 29900); // ₹299.00 in paisa
-define('YEARLY_PRICE', 299900); // ₹2,999.00 in paisa
+// Pricing Configuration (in USD)
+define('MONTHLY_PRICE', 300); 
+define('YEARLY_PRICE', 3000);
 
 // Site
 define('SITE_NAME',  env('SITE_NAME',  'Premium Blog'));
