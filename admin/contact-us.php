@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    header('Location: admin-contacts.php?' . http_build_query(array_filter([
+    header('Location: contact-us.php?' . http_build_query(array_filter([
         'page' => $_POST['current_page'] ?? 1,
         'search' => $_POST['current_search'] ?? '',
         'status' => $_POST['current_status'] ?? ''
@@ -220,7 +220,7 @@ $flash = getFlashMessage();
                 </select>
                 <button type="submit" class="btn btn-outline">Search</button>
                 <?php if ($search || $statusFilter): ?>
-                    <a href="admin-contacts.php" class="btn btn-sm" style="background:#f0f0f0;color:#333">Clear</a>
+                    <a href="contact-us.php" class="btn btn-sm" style="background:#f0f0f0;color:#333">Clear</a>
                 <?php endif; ?>
             </form>
 
