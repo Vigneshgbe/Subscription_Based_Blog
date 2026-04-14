@@ -1144,7 +1144,7 @@ $freeRemaining = getFreeArticlesRemaining();
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
             <a href="index.php" class="logo">
-                <img src="assets/images/logo.png" alt="<?php echo SITE_NAME; ?> Logo" class="logo-image">
+                <img src="https://raw.githubusercontent.com/Vigneshgbe/Subscription_Based_Blog/refs/heads/main/assets/Logo.png" alt="<?php echo SITE_NAME; ?> Logo" class="logo-image">
                 <div class="logo-text">
                     <span class="logo-name"><?php echo SITE_NAME; ?></span>
                     <span class="logo-tagline" style="color: rgba(201,149,42,0.7);">Create. Share. Inspire.</span>
