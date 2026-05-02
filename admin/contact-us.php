@@ -91,10 +91,10 @@ $stmt->execute($params);
 $messages = $stmt->fetchAll();
 
 // Get stats
-$unreadCount = $db->query("SELECT COUNT(*) FROM contact_messages WHERE status='unread'")->fetchColumn();
-$readCount = $db->query("SELECT COUNT(*) FROM contact_messages WHERE status='read'")->fetchColumn();
+$unreadCount  = $db->query("SELECT COUNT(*) FROM contact_messages WHERE status='unread'")->fetchColumn();
+$readCount    = $db->query("SELECT COUNT(*) FROM contact_messages WHERE status='read'")->fetchColumn();
 $repliedCount = $db->query("SELECT COUNT(*) FROM contact_messages WHERE status='replied'")->fetchColumn();
-$totalCount = $db->query("SELECT COUNT(*) FROM contact_messages")->fetchColumn();
+$totalCount   = $db->query("SELECT COUNT(*) FROM contact_messages")->fetchColumn();
 
 $flash = getFlashMessage();
 ?>
@@ -109,27 +109,24 @@ $flash = getFlashMessage();
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .main-content{flex:1;margin-left:280px;padding:30px}
-        @media(max-width:768px){
-            .main-content{margin-left:0;padding:15px}
-        }
-        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05);flex-wrap:wrap;gap:15px}
+
+        /* ── Main content ── */
+        .main-content{flex:1;margin-left:280px;padding:30px;min-width:0}
+
+        /* ── Top bar ── */
+        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
-        @media(max-width:768px){
-            .top-bar{padding:15px}
-            .top-bar h1{font-size:20px}
-        }
+
+        /* ── Card ── */
         .card{background:white;padding:30px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:30px}
-        @media(max-width:768px){
-            .card{padding:15px}
-        }
+
+        /* ── Toolbar ── */
         .toolbar{display:flex;gap:15px;margin-bottom:25px;flex-wrap:wrap;align-items:center}
         .toolbar input,.toolbar select{padding:10px 15px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit}
         .toolbar input:focus,.toolbar select:focus{outline:none;border-color:#667eea}
         .toolbar input{flex:1;min-width:200px}
-        @media(max-width:768px){
-            .toolbar input{min-width:100%;flex:none}
-        }
+
+        /* ── Buttons ── */
         .btn{padding:10px 20px;border:none;border-radius:6px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;font-size:14px;font-family:inherit}
         .btn-primary{background:#667eea;color:white}
         .btn-primary:hover{background:#5568d3}
@@ -144,47 +141,101 @@ $flash = getFlashMessage();
         .btn-sm{padding:5px 12px;font-size:12px}
         .btn-outline{background:transparent;border:2px solid #667eea;color:#667eea}
         .btn-outline:hover{background:#667eea;color:white}
-        table{width:100%;border-collapse:collapse}
+
+        /* ── Table ── */
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        table{width:100%;border-collapse:collapse;min-width:700px}
         th{text-align:left;padding:12px;background:#f8f9fa;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#666}
         td{padding:13px 12px;border-bottom:1px solid #f0f0f0;vertical-align:top}
         tr:last-child td{border-bottom:none}
         tr:hover td{background:#fafafa}
-        @media(max-width:1024px){
-            table{display:block;overflow-x:auto;white-space:nowrap}
-        }
+
+        /* ── Badges ── */
         .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
         .badge-danger{background:#f8d7da;color:#721c24}
         .badge-success{background:#d4edda;color:#155724}
         .badge-info{background:#d1ecf1;color:#0c5460}
         .badge-warning{background:#fff3cd;color:#856404}
+
+        /* ── Action buttons ── */
         .action-btns{display:flex;gap:6px;flex-wrap:wrap}
+
+        /* ── Alerts ── */
         .alert{padding:15px 20px;border-radius:8px;margin-bottom:20px;font-weight:600}
         .alert-success{background:#d4edda;color:#155724;border-left:4px solid #28a745}
         .alert-danger{background:#f8d7da;color:#721c24;border-left:4px solid #dc3545}
+
+        /* ── Pagination ── */
         .pagination{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
         .page-link{padding:8px 14px;border:2px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;font-weight:600;font-size:13px;transition:all .2s}
         .page-link:hover,.page-link.active{background:#667eea;color:white;border-color:#667eea}
+
+        /* ── Stats row ── */
         .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:25px}
         .mini-stat{background:#f8f9fa;border-radius:8px;padding:15px;text-align:center}
         .mini-stat strong{display:block;font-size:24px;font-weight:900;color:#667eea}
         .mini-stat span{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px}
+
+        /* ── Message cells ── */
         .message-preview{max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#666;font-size:13px}
         .sender-info strong{display:block;font-size:14px;margin-bottom:3px}
         .sender-info small{color:#999;font-size:12px}
+
+        /* ── Bulk actions bar ── */
         .bulk-actions{background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px;display:none;align-items:center;gap:15px;flex-wrap:wrap}
         .bulk-actions.active{display:flex}
-        .confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
-        .confirm-box{background:white;border-radius:12px;padding:30px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto}
+
+        /* ── Status select ── */
+        .status-select{padding:5px 10px;border:2px solid #e0e0e0;border-radius:4px;font-size:12px;font-weight:600}
+
+        /* ── Modals ── */
+        .confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:16px}
+        .confirm-box{background:white;border-radius:12px;padding:30px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto}
         .confirm-box h3{margin-bottom:10px;font-size:20px}
         .confirm-box .message-details{background:#f8f9fa;padding:20px;border-radius:8px;margin:20px 0;text-align:left}
         .confirm-box .message-details p{margin-bottom:10px;line-height:1.6}
         .confirm-box .message-details strong{display:block;color:#333;margin-bottom:5px}
         .confirm-box .btns{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
+
+        /* ══ MOBILE (≤768px) ═══════════════════════════════════════════ */
         @media(max-width:768px){
+            .main-content{
+                margin-left:0;
+                padding:80px 16px 24px;
+            }
+            .top-bar{
+                padding:16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            }
+            .top-bar h1{font-size:18px}
+            .card{padding:16px;border-radius:10px;margin-bottom:20px}
+            .toolbar{gap:10px;margin-bottom:18px}
+            .toolbar input{min-width:0}
+            .stats-row{gap:10px;margin-bottom:18px}
+            .mini-stat{padding:12px}
+            .mini-stat strong{font-size:20px}
+            .mini-stat span{font-size:11px}
+            .bulk-actions{gap:10px;padding:12px}
             .confirm-box{padding:20px}
-            .message-details{padding:15px}
+            .confirm-box .message-details{padding:14px}
+            .pagination{justify-content:center}
         }
-        .status-select{padding:5px 10px;border:2px solid #e0e0e0;border-radius:4px;font-size:12px;font-weight:600}
+
+        /* ══ SMALL PHONES (≤480px) ══════════════════════════════════════ */
+        @media(max-width:480px){
+            .main-content{padding:76px 12px 20px}
+            .top-bar{flex-direction:column;align-items:flex-start;gap:10px}
+            .top-bar h1{font-size:17px}
+            .top-bar > div{width:100%}
+            .top-bar > div .btn{width:100%;text-align:center}
+            .stats-row{grid-template-columns:repeat(2,1fr)}
+            .toolbar{flex-direction:column}
+            .toolbar input,.toolbar select,.toolbar .btn{width:100%}
+            .bulk-actions{flex-direction:column;align-items:flex-start}
+            .bulk-actions form{width:100%}
+            .message-preview{max-width:160px}
+        }
     </style>
 </head>
 <body>
@@ -214,8 +265,8 @@ $flash = getFlashMessage();
                 <input type="text" name="search" placeholder="Search name, email, subject, or message..." value="<?php echo htmlspecialchars($search); ?>">
                 <select name="status" onchange="this.form.submit()">
                     <option value="">All Status</option>
-                    <option value="unread" <?php echo $statusFilter==='unread'?'selected':''; ?>>Unread</option>
-                    <option value="read" <?php echo $statusFilter==='read'?'selected':''; ?>>Read</option>
+                    <option value="unread"  <?php echo $statusFilter==='unread'?'selected':''; ?>>Unread</option>
+                    <option value="read"    <?php echo $statusFilter==='read'?'selected':''; ?>>Read</option>
                     <option value="replied" <?php echo $statusFilter==='replied'?'selected':''; ?>>Replied</option>
                 </select>
                 <button type="submit" class="btn btn-outline">Search</button>
@@ -245,7 +296,7 @@ $flash = getFlashMessage();
             <?php if (empty($messages)): ?>
                 <p style="text-align:center;padding:40px;color:#999;font-size:16px">No messages found.</p>
             <?php else: ?>
-            <div style="overflow-x:auto">
+            <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -283,8 +334,8 @@ $flash = getFlashMessage();
                             <input type="hidden" name="current_search" value="<?php echo htmlspecialchars($search); ?>">
                             <input type="hidden" name="current_status" value="<?php echo htmlspecialchars($statusFilter); ?>">
                             <select name="status" class="status-select" onchange="this.form.submit()">
-                                <option value="unread" <?php echo $msg['status']==='unread'?'selected':''; ?>>Unread</option>
-                                <option value="read" <?php echo $msg['status']==='read'?'selected':''; ?>>Read</option>
+                                <option value="unread"  <?php echo $msg['status']==='unread'?'selected':''; ?>>Unread</option>
+                                <option value="read"    <?php echo $msg['status']==='read'?'selected':''; ?>>Read</option>
                                 <option value="replied" <?php echo $msg['status']==='replied'?'selected':''; ?>>Replied</option>
                             </select>
                         </form>
@@ -331,7 +382,7 @@ $flash = getFlashMessage();
 <div class="confirm-modal" id="deleteModal">
     <div class="confirm-box">
         <h3>🗑️ Delete Message</h3>
-        <p id="deleteMsg">Are you sure you want to delete this message? This cannot be undone.</p>
+        <p id="deleteMsg" style="color:#666;margin-bottom:25px">Are you sure you want to delete this message? This cannot be undone.</p>
         <div class="btns">
             <button onclick="closeModal('deleteModal')" class="btn" style="background:#f0f0f0;color:#333">Cancel</button>
             <form method="POST" id="deleteForm">
@@ -361,7 +412,6 @@ const messagesData = <?php echo json_encode($messages); ?>;
 function viewMessage(id) {
     const msg = messagesData.find(m => m.id == id);
     if (!msg) return;
-    
     document.getElementById('messageContent').innerHTML = `
         <p><strong>From:</strong> ${escapeHtml(msg.name)}</p>
         <p><strong>Email:</strong> <a href="mailto:${escapeHtml(msg.email)}">${escapeHtml(msg.email)}</a></p>
@@ -392,7 +442,7 @@ function escapeHtml(text) {
 }
 
 function getStatusBadge(status) {
-    return {unread:'danger',read:'info',replied:'success'}[status] || 'secondary';
+    return {unread:'danger', read:'info', replied:'success'}[status] || 'secondary';
 }
 
 document.querySelectorAll('.confirm-modal').forEach(modal => {
@@ -401,11 +451,8 @@ document.querySelectorAll('.confirm-modal').forEach(modal => {
     });
 });
 
-// Bulk actions
 function toggleAll(checkbox) {
-    document.querySelectorAll('.msg-checkbox').forEach(cb => {
-        cb.checked = checkbox.checked;
-    });
+    document.querySelectorAll('.msg-checkbox').forEach(cb => { cb.checked = checkbox.checked; });
     updateBulkCount();
 }
 
@@ -420,7 +467,6 @@ function updateBulkCount() {
 function toggleBulkActions() {
     const bulkDiv = document.getElementById('bulkActions');
     const isActive = bulkDiv.classList.contains('active');
-    
     if (isActive) {
         document.querySelectorAll('.msg-checkbox').forEach(cb => cb.checked = false);
         document.getElementById('selectAll').checked = false;
@@ -432,18 +478,12 @@ function toggleBulkActions() {
 
 function validateBulk() {
     const checked = document.querySelectorAll('.msg-checkbox:checked');
-    if (checked.length === 0) {
-        alert('Please select at least one message.');
-        return false;
-    }
-    
+    if (checked.length === 0) { alert('Please select at least one message.'); return false; }
     const container = document.getElementById('bulkIdsStatus');
     container.innerHTML = '';
     checked.forEach(cb => {
         const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'message_ids[]';
-        input.value = cb.value;
+        input.type = 'hidden'; input.name = 'message_ids[]'; input.value = cb.value;
         container.appendChild(input);
     });
     return true;
@@ -451,25 +491,15 @@ function validateBulk() {
 
 function bulkDelete() {
     const checked = document.querySelectorAll('.msg-checkbox:checked');
-    if (checked.length === 0) {
-        alert('Please select at least one message to delete.');
-        return;
-    }
-    
-    if (!confirm(`Delete ${checked.length} message(s)? This cannot be undone.`)) {
-        return;
-    }
-    
+    if (checked.length === 0) { alert('Please select at least one message to delete.'); return; }
+    if (!confirm(`Delete ${checked.length} message(s)? This cannot be undone.`)) return;
     const container = document.getElementById('bulkIdsDelete');
     container.innerHTML = '';
     checked.forEach(cb => {
         const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'message_ids[]';
-        input.value = cb.value;
+        input.type = 'hidden'; input.name = 'message_ids[]'; input.value = cb.value;
         container.appendChild(input);
     });
-    
     document.getElementById('bulkDeleteForm').submit();
 }
 </script>
