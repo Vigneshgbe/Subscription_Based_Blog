@@ -18,6 +18,8 @@ $_sidebar_page = basename($_SERVER['PHP_SELF']);
         color: white;
         padding: 0;
         position: fixed;
+        top: 0;
+        left: 0;
         height: 100vh;
         overflow-y: auto;
         z-index: 1000;
@@ -100,44 +102,68 @@ $_sidebar_page = basename($_SERVER['PHP_SELF']);
     .mobile-header {
         display: none;
         background: white;
-        padding: 16px 20px;
-        position: sticky;
+        padding: 14px 20px;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 998;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+        height: 60px;
+    }
+
+    .mobile-header h1 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.5px;
     }
 
     .menu-toggle {
         background: none;
-        border: none;
-        font-size: 24px;
+        border: 1px solid #e2e8f0;
+        font-size: 20px;
         cursor: pointer;
-        padding: 8px;
+        padding: 6px 10px;
         color: #1e293b;
+        border-radius: 8px;
+        line-height: 1;
     }
 
     /* ─── Responsive ───────────────────────────────────────────────── */
     @media (max-width: 768px) {
         .sidebar {
             transform: translateX(-100%);
+            top: 0;
+            z-index: 1001;
         }
 
         .sidebar.active {
             transform: translateX(0);
         }
 
+        .overlay.active {
+            z-index: 1000;
+        }
+
         .mobile-header {
             display: flex;
+        }
+
+        /* Ensure body doesn't scroll when sidebar is open */
+        body.sidebar-open {
+            overflow: hidden;
         }
     }
 </style>
 
-<!-- Mobile Header -->
-<div class="mobile-header">
+<!-- Mobile Header (fixed at top on mobile) -->
+<div class="mobile-header" id="mobileHeader">
     <button class="menu-toggle" onclick="toggleMenu()">☰</button>
     <h1><?php echo defined('SITE_NAME') ? htmlspecialchars(SITE_NAME) : 'Admin'; ?></h1>
+    <div style="width:40px;"></div><!-- spacer to center title -->
 </div>
 
 <!-- Overlay -->
@@ -207,14 +233,21 @@ $_sidebar_page = basename($_SERVER['PHP_SELF']);
     function toggleMenu() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
+        const isActive = sidebar.classList.toggle('active');
+        overlay.classList.toggle('active', isActive);
+        document.body.classList.toggle('sidebar-open', isActive);
     }
 
     // Auto-close sidebar on link click (mobile)
     document.querySelectorAll('.sidebar-menu a').forEach(link => {
         link.addEventListener('click', () => {
-            if (window.innerWidth <= 768) toggleMenu();
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            }
         });
     });
 </script>

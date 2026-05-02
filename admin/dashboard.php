@@ -95,9 +95,10 @@ $recentActivity = $db->query("
         /* ── Main content area ─────────────────────────────────────── */
         .main-content {
             flex: 1;
-            margin-left: 280px; /* matches sidebar width */
+            margin-left: 280px;
             padding: 32px;
             transition: margin-left 0.3s ease;
+            min-width: 0; /* prevents flex child overflow */
         }
         
         /* ── Top bar ───────────────────────────────────────────────── */
@@ -152,6 +153,7 @@ $recentActivity = $db->query("
             color: white;
             font-weight: 700;
             font-size: 16px;
+            flex-shrink: 0;
         }
         
         .user-details strong {
@@ -169,7 +171,7 @@ $recentActivity = $db->query("
         /* ── Stat Cards ────────────────────────────────────────────── */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 24px;
             margin-bottom: 32px;
         }
@@ -330,7 +332,7 @@ $recentActivity = $db->query("
         /* ── Quick Actions ──────────────────────────────────────────── */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
@@ -409,7 +411,7 @@ $recentActivity = $db->query("
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 700px;
+            min-width: 600px;
         }
         
         th {
@@ -469,23 +471,42 @@ $recentActivity = $db->query("
             background: #f3e8ff;
             color: #7c3aed;
         }
-        
-        /* ── Responsive ─────────────────────────────────────────────── */
+
+        /* ── Tablet ─────────────────────────────────────────────────── */
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
+        /* ── Mobile ─────────────────────────────────────────────────── */
         @media (max-width: 768px) {
             .main-content {
                 margin-left: 0;
-                padding: 20px 16px;
+                padding: 80px 16px 24px; /* 80px top = 60px mobile header + 20px gap */
             }
-            
+
             .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
             }
             
             .top-bar {
@@ -493,15 +514,88 @@ $recentActivity = $db->query("
             }
             
             .top-bar h1 {
-                font-size: 24px;
+                font-size: 22px;
+            }
+
+            .top-bar-time {
+                font-size: 13px;
             }
             
             .card {
-                padding: 20px;
+                padding: 16px;
+                margin-bottom: 20px;
+            }
+
+            .card-header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+
+            .card-header h2 {
+                font-size: 16px;
             }
             
             .quick-actions {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .quick-action-card {
+                padding: 18px 16px;
+            }
+
+            .quick-action-icon {
+                font-size: 22px;
+                margin-bottom: 4px;
+            }
+
+            .quick-action-card h3 {
+                font-size: 14px;
+            }
+
+            .quick-action-card p {
+                font-size: 12px;
+            }
+
+            .user-info {
+                padding: 6px 12px;
+            }
+
+            .user-details strong {
+                font-size: 13px;
+            }
+
+            td, th {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* ── Small phones ────────────────────────────────────────────── */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .top-bar-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 11px;
             }
         }
     </style>
