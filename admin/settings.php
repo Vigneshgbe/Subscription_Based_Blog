@@ -123,7 +123,7 @@ ob_end_clean();
 
         /* ── Admin layout ── */
         .admin-layout { display: flex; min-height: 100vh; }
-        .main-content { flex: 1; margin-left: 280px; padding: 32px; }
+        .main-content { flex: 1; margin-left: 280px; padding: 32px; min-width: 0; }
 
         /* ── Top bar ── */
         .top-bar {
@@ -134,6 +134,8 @@ ob_end_clean();
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
         }
@@ -144,7 +146,7 @@ ob_end_clean();
             width: 42px; height: 42px; border-radius: 12px;
             background: linear-gradient(135deg, var(--accent), var(--accent-2));
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px;
+            font-size: 20px; flex-shrink: 0;
         }
         .top-bar h1 {
             font-family: 'Playfair Display', serif;
@@ -152,7 +154,7 @@ ob_end_clean();
         }
         .top-bar-sub { font-size: 14px; color: var(--ink-3); margin-top: 1px; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        /* ── Layout ── */
+        /* ── Settings layout ── */
         .settings-layout {
             display: grid;
             grid-template-columns: 200px 1fr;
@@ -263,6 +265,7 @@ ob_end_clean();
             display: inline-flex; align-items: center; gap: 6px;
             padding: 5px 14px; border-radius: 100px; font-size: 13px; font-weight: 700;
             font-family: 'Plus Jakarta Sans', sans-serif;
+            white-space: nowrap;
         }
         .mode-badge.live    { background: #dcfce7; color: #15803d; }
         .mode-badge.test    { background: #fef9c3; color: #a16207; }
@@ -350,25 +353,58 @@ ob_end_clean();
             border: none; border-top: 2px solid var(--surface-3); margin: 24px 0;
         }
 
-        /* ── Responsive ── */
+        /* ══ LARGE TABLET (≤1100px) ═══════════════════════════════════ */
         @media (max-width: 1100px) {
             .main-content { padding: 24px; }
         }
+
+        /* ══ TABLET (≤900px) ══════════════════════════════════════════ */
         @media (max-width: 900px) {
             .settings-layout { grid-template-columns: 1fr; }
-            .settings-nav { position: static; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+            .settings-nav {
+                position: static;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 10px;
+            }
             .nav-label { display: none; }
             .settings-nav a { margin-bottom: 0; font-size: 13px; padding: 9px 12px; }
         }
+
+        /* ══ MOBILE (≤768px) ══════════════════════════════════════════ */
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; padding: 16px; }
-            .card { padding: 22px 20px; }
-            .info-grid { grid-template-columns: 1fr 1fr; }
+            .main-content {
+                margin-left: 0;
+                padding: 80px 16px 24px; /* 60px fixed mobile header + 20px gap */
+            }
+            .top-bar {
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+            }
+            .top-bar h1 { font-size: 18px; }
+            .top-bar-sub { font-size: 13px; }
+            .top-bar-icon { width: 36px; height: 36px; font-size: 17px; }
+            .card { padding: 18px 16px; margin-bottom: 16px; }
+            .card-header { margin-bottom: 18px; padding-bottom: 14px; }
+            .card-header h3 { font-size: 16px; }
+            .info-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .info-item { padding: 12px 14px; }
+            .info-item span { font-size: 15px; }
+            .settings-nav a { font-size: 13px; padding: 9px 11px; }
         }
+
+        /* ══ SMALL PHONES (≤480px) ════════════════════════════════════ */
         @media (max-width: 480px) {
+            .main-content { padding: 76px 12px 20px; }
+            .top-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
             .info-grid { grid-template-columns: 1fr; }
             .btn-row { flex-direction: column; }
             .btn { width: 100%; justify-content: center; }
+            input[type=text],
+            input[type=email],
+            input[type=password] { font-size: 16px; } /* prevent iOS zoom */
         }
     </style>
 </head>
