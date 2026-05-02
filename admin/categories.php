@@ -94,17 +94,30 @@ if ($editId) {
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .main-content{flex:1;margin-left:280px;padding:30px}
-        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+
+        /* ── Main content ── */
+        .main-content{flex:1;margin-left:280px;padding:30px;min-width:0}
+
+        /* ── Top bar ── */
+        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
+
+        /* ── Two-column layout ── */
         .grid-2{display:grid;grid-template-columns:1fr 380px;gap:25px;align-items:start}
+
+        /* ── Cards ── */
         .card{background:white;padding:25px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:25px}
         .card h3{font-size:16px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0}
+        .form-card{border:2px solid #667eea}
+
+        /* ── Form ── */
         .form-group{margin-bottom:16px}
         label{display:block;font-weight:600;font-size:13px;margin-bottom:6px;color:#333;text-transform:uppercase;letter-spacing:.5px}
         input[type=text],textarea{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit}
         input[type=text]:focus,textarea:focus{outline:none;border-color:#667eea}
         .hint{font-size:12px;color:#999;margin-top:4px}
+
+        /* ── Buttons ── */
         .btn{padding:10px 20px;border:none;border-radius:6px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;font-size:14px;font-family:inherit}
         .btn-primary{background:#667eea;color:white}
         .btn-primary:hover{background:#5568d3}
@@ -112,21 +125,70 @@ if ($editId) {
         .btn-warning{background:#ffc107;color:#333}
         .btn-sm{padding:5px 12px;font-size:12px}
         .btn-block{width:100%;text-align:center;margin-bottom:8px}
+
+        /* ── Alerts ── */
         .alert{padding:15px 20px;border-radius:8px;margin-bottom:20px;font-weight:600}
         .alert-success{background:#d4edda;color:#155724;border-left:4px solid #28a745}
         .alert-danger{background:#f8d7da;color:#721c24;border-left:4px solid #dc3545}
         .alert-danger ul{margin:8px 0 0 20px}
-        table{width:100%;border-collapse:collapse}
+
+        /* ── Table ── */
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        table{width:100%;border-collapse:collapse;min-width:480px}
         th{text-align:left;padding:12px;background:#f8f9fa;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#666}
         td{padding:13px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;font-size:14px}
         tr:last-child td{border-bottom:none}
         tr:hover td{background:#fafafa}
+
+        /* ── Badges ── */
         .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}
         .badge-info{background:#d1ecf1;color:#0c5460}
-        .action-btns{display:flex;gap:6px}
-        .cat-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px}
-        .form-card{border:2px solid #667eea}
-        @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+        /* ── Action buttons ── */
+        .action-btns{display:flex;gap:6px;flex-wrap:wrap}
+
+        /* ── Category icon ── */
+        .cat-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#667eea,#764ba2);display:inline-flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;flex-shrink:0}
+
+        /* ══ TABLET (≤1024px) ══════════════════════════════════════════ */
+        @media(max-width:1024px){
+            .grid-2{grid-template-columns:1fr 320px}
+        }
+
+        /* ══ TABLET / SMALL LAPTOP (≤900px) ═══════════════════════════ */
+        @media(max-width:900px){
+            .grid-2{grid-template-columns:1fr}
+        }
+
+        /* ══ MOBILE (≤768px) ═══════════════════════════════════════════ */
+        @media(max-width:768px){
+            .main-content{
+                margin-left:0;
+                padding:80px 16px 24px;
+            }
+            .top-bar{
+                padding:16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            }
+            .top-bar h1{font-size:18px}
+            .card{padding:16px;border-radius:10px;margin-bottom:16px}
+            .card h3{font-size:15px;margin-bottom:14px;padding-bottom:10px}
+            .form-group{margin-bottom:14px}
+            input[type=text],textarea{padding:9px 12px;font-size:15px}
+            label{font-size:12px}
+            .hint{font-size:11px}
+            .btn{padding:10px 16px;font-size:13px}
+        }
+
+        /* ══ SMALL PHONES (≤480px) ══════════════════════════════════════ */
+        @media(max-width:480px){
+            .main-content{padding:76px 12px 20px}
+            .top-bar{flex-direction:column;align-items:flex-start;gap:8px}
+            .top-bar h1{font-size:17px}
+            .card{padding:14px}
+            input[type=text],textarea{font-size:16px} /* prevent iOS zoom */
+        }
     </style>
 </head>
 <body>
@@ -150,6 +212,7 @@ if ($editId) {
                 <?php if (empty($categories)): ?>
                     <p style="text-align:center;padding:30px;color:#999">No categories yet. Create one!</p>
                 <?php else: ?>
+                <div class="table-wrap">
                 <table>
                     <thead>
                         <tr>
@@ -189,6 +252,7 @@ if ($editId) {
                     <?php endforeach; ?>
                     </tbody>
                 </table>
+                </div>
                 <?php endif; ?>
             </div>
 
