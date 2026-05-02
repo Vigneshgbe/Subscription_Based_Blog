@@ -59,38 +59,99 @@ $successfulTxns   = $db->query("SELECT COUNT(*) FROM transactions WHERE status='
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .main-content{flex:1;margin-left:280px;padding:30px}
-        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+
+        /* ── Main content ── */
+        .main-content{flex:1;margin-left:280px;padding:30px;min-width:0}
+
+        /* ── Top bar ── */
+        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
+
+        /* ── Stats grid ── */
         .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:25px}
         .stat-card{background:white;padding:20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);text-align:center}
         .stat-card strong{display:block;font-size:28px;font-weight:900;color:#667eea}
         .stat-card span{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;display:block}
+
+        /* ── Card ── */
         .card{background:white;padding:30px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+
+        /* ── Toolbar ── */
         .toolbar{display:flex;gap:15px;margin-bottom:25px;flex-wrap:wrap;align-items:center}
         .toolbar input,.toolbar select{padding:10px 15px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit}
         .toolbar input{flex:1;min-width:180px}
+
+        /* ── Buttons ── */
         .btn{padding:8px 16px;border:none;border-radius:6px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;font-size:13px;font-family:inherit}
         .btn-outline{background:transparent;border:2px solid #667eea;color:#667eea}
         .btn-outline:hover{background:#667eea;color:white}
-        table{width:100%;border-collapse:collapse}
+
+        /* ── Table ── */
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        table{width:100%;border-collapse:collapse;min-width:780px}
         th{text-align:left;padding:12px;background:#f8f9fa;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#666}
         td{padding:13px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle;font-size:14px}
         tr:last-child td{border-bottom:none}
         tr:hover td{background:#fafafa}
+
+        /* ── Badges ── */
         .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase}
         .badge-success{background:#d4edda;color:#155724}
         .badge-warning{background:#fff3cd;color:#856404}
         .badge-danger{background:#f8d7da;color:#721c24}
         .badge-secondary{background:#e2e3e5;color:#383d41}
+
+        /* ── Amount ── */
         .amount{font-weight:700;font-size:15px;color:#333}
         .amount.success{color:#28a745}
         .amount.failed{color:#dc3545;text-decoration:line-through}
+
+        /* ── Mono ── */
         .mono{font-family:monospace;font-size:12px;color:#999;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
-        .pagination{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
+
+        /* ── Pagination ── */
+        .pagination{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap}
         .page-link{padding:8px 14px;border:2px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;font-weight:600;font-size:13px;transition:all .2s}
         .page-link:hover,.page-link.active{background:#667eea;color:white;border-color:#667eea}
-        @media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+
+        /* ══ TABLET (≤900px) ═══════════════════════════════════════════ */
+        @media(max-width:900px){
+            .stats-grid{grid-template-columns:repeat(2,1fr)}
+        }
+
+        /* ══ MOBILE (≤768px) ═══════════════════════════════════════════ */
+        @media(max-width:768px){
+            .main-content{
+                margin-left:0;
+                padding:80px 16px 24px;
+            }
+            .top-bar{
+                padding:16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            }
+            .top-bar h1{font-size:18px}
+            .stats-grid{gap:12px;margin-bottom:20px}
+            .stat-card{padding:14px}
+            .stat-card strong{font-size:22px}
+            .stat-card span{font-size:11px}
+            .card{padding:16px;border-radius:10px}
+            .toolbar{gap:10px;margin-bottom:18px}
+            .toolbar input,.toolbar select{padding:9px 12px;font-size:14px}
+            .toolbar input{min-width:0}
+            .pagination{justify-content:center}
+        }
+
+        /* ══ SMALL PHONES (≤480px) ══════════════════════════════════════ */
+        @media(max-width:480px){
+            .main-content{padding:76px 12px 20px}
+            .top-bar{flex-direction:column;align-items:flex-start;gap:8px}
+            .top-bar h1{font-size:17px}
+            .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+            .stat-card strong{font-size:20px}
+            .toolbar{flex-direction:column}
+            .toolbar input,.toolbar select,.toolbar .btn{width:100%}
+        }
     </style>
 </head>
 <body>
@@ -128,7 +189,7 @@ $successfulTxns   = $db->query("SELECT COUNT(*) FROM transactions WHERE status='
             <?php if (empty($transactions)): ?>
                 <p style="text-align:center;padding:40px;color:#999">No transactions found.</p>
             <?php else: ?>
-            <div style="overflow-x:auto">
+            <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
