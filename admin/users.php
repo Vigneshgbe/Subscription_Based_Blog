@@ -58,7 +58,6 @@ $countStmt->execute($params);
 $total      = $countStmt->fetch()['total'];
 $totalPages = max(1, ceil($total / $perPage));
 
-// Fixed SQL query - removed the problematic reads calculation from main query
 $params[] = $perPage;
 $params[] = $offset;
 $stmt = $db->prepare("
@@ -93,16 +92,24 @@ $flash = getFlashMessage();
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .main-content{flex:1;margin-left:280px;padding:30px;transition:margin-left 0.3s ease}
-        .mobile-header{display:none;background:#1a1d29;color:white;padding:15px;position:sticky;top:0;z-index:999;align-items:center;justify-content:space-between}
-        .menu-toggle{background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:5px}
-        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05);flex-wrap:wrap;gap:10px}
+
+        /* ── Main content ── */
+        .main-content{flex:1;margin-left:280px;padding:30px;min-width:0}
+
+        /* ── Top bar ── */
+        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
+
+        /* ── Card ── */
         .card{background:white;padding:30px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:30px}
+
+        /* ── Toolbar ── */
         .toolbar{display:flex;gap:15px;margin-bottom:25px;flex-wrap:wrap;align-items:center}
         .toolbar input,.toolbar select{padding:10px 15px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit}
         .toolbar input:focus,.toolbar select:focus{outline:none;border-color:#667eea}
         .toolbar input{flex:1;min-width:200px}
+
+        /* ── Buttons ── */
         .btn{padding:8px 16px;border:none;border-radius:6px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;font-size:13px;font-family:inherit;white-space:nowrap}
         .btn-primary{background:#667eea;color:white}
         .btn-danger{background:#dc3545;color:white}
@@ -111,13 +118,17 @@ $flash = getFlashMessage();
         .btn-info{background:#17a2b8;color:white}
         .btn-outline{background:transparent;border:2px solid #667eea;color:#667eea}
         .btn-outline:hover{background:#667eea;color:white}
-        .btn:hover{opacity:0.9;transform:translateY(-1px)}
+        .btn:hover{opacity:.9;transform:translateY(-1px)}
+
+        /* ── Table ── */
         .table-container{overflow-x:auto;-webkit-overflow-scrolling:touch}
         table{width:100%;border-collapse:collapse;min-width:800px}
         th{text-align:left;padding:12px;background:#f8f9fa;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#666;white-space:nowrap}
         td{padding:13px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
         tr:last-child td{border-bottom:none}
         tr:hover td{background:#fafafa}
+
+        /* ── Badges ── */
         .badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
         .badge-success{background:#d4edda;color:#155724}
         .badge-warning{background:#fff3cd;color:#856404}
@@ -125,70 +136,78 @@ $flash = getFlashMessage();
         .badge-info{background:#d1ecf1;color:#0c5460}
         .badge-secondary{background:#e2e3e5;color:#383d41}
         .badge-purple{background:#e8d5ff;color:#6f42c1}
+
+        /* ── Action buttons ── */
         .action-btns{display:flex;gap:6px;flex-wrap:wrap}
+
+        /* ── Alerts ── */
         .alert{padding:15px 20px;border-radius:8px;margin-bottom:20px;font-weight:600}
         .alert-success{background:#d4edda;color:#155724;border-left:4px solid #28a745}
         .alert-danger{background:#f8d7da;color:#721c24;border-left:4px solid #dc3545}
+
+        /* ── Pagination ── */
         .pagination{display:flex;gap:8px;margin-top:20px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
         .page-link{padding:8px 14px;border:2px solid #e0e0e0;border-radius:6px;text-decoration:none;color:#333;font-weight:600;font-size:13px;transition:all .2s}
         .page-link:hover,.page-link.active{background:#667eea;color:white;border-color:#667eea}
+
+        /* ── Stats row ── */
         .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-bottom:25px}
         .mini-stat{background:#f8f9fa;border-radius:8px;padding:15px;text-align:center}
         .mini-stat strong{display:block;font-size:24px;font-weight:900;color:#667eea}
         .mini-stat span{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px}
+
+        /* ── User cell ── */
         .user-avatar{width:36px;height:36px;border-radius:50%;background:#667eea;color:white;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
         .user-cell{display:flex;align-items:center;gap:10px}
         .user-cell-info strong{display:block;font-size:14px}
         .user-cell-info small{color:#999;font-size:12px;word-break:break-all}
+
+        /* ── Delete modal ── */
         .confirm-delete{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px}
         .confirm-box{background:white;border-radius:12px;padding:30px;max-width:400px;width:100%;text-align:center}
         .confirm-box h3{margin-bottom:10px}
         .confirm-box p{color:#666;margin-bottom:25px}
         .confirm-box .btns{display:flex;gap:15px;justify-content:center;flex-wrap:wrap}
-        
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            .sidebar{transform:translateX(-100%)}
-            .sidebar.active{transform:translateX(0)}
-            .main-content{margin-left:0;padding:15px}
-            .mobile-header{display:flex}
-            .top-bar{padding:15px;border-radius:8px}
-            .top-bar h1{font-size:20px}
-            .card{padding:20px;border-radius:8px}
-            .toolbar{gap:10px}
+
+        /* ══ MOBILE (≤768px) ═══════════════════════════════════════════ */
+        @media(max-width:768px){
+            .main-content{
+                margin-left:0;
+                padding:80px 16px 24px;
+            }
+            .top-bar{
+                padding:16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            }
+            .top-bar h1{font-size:18px}
+            .card{padding:16px;border-radius:10px;margin-bottom:20px}
+            .toolbar{gap:10px;margin-bottom:18px}
             .toolbar input{min-width:150px;font-size:13px}
             .toolbar select{font-size:13px}
-            .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
+            .stats-row{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+            .mini-stat{padding:12px}
             .mini-stat strong{font-size:20px}
             .mini-stat span{font-size:11px}
-            .action-btns{flex-direction:column}
-            .action-btns .btn{width:100%;text-align:center}
             .pagination{justify-content:center}
             .page-link{padding:6px 10px;font-size:12px}
-            th,td{padding:10px 8px;font-size:12px}
-            .user-avatar{width:32px;height:32px;font-size:12px}
             .confirm-box{padding:20px}
         }
-        
-        @media (max-width: 480px) {
-            .top-bar{flex-direction:column;align-items:flex-start}
-            .stats-row{grid-template-columns:1fr}
-            .toolbar input{width:100%}
-            table{min-width:600px}
+
+        /* ══ SMALL PHONES (≤480px) ══════════════════════════════════════ */
+        @media(max-width:480px){
+            .main-content{padding:76px 12px 20px}
+            .top-bar{flex-direction:column;align-items:flex-start;gap:8px}
+            .top-bar h1{font-size:17px}
+            .stats-row{grid-template-columns:repeat(2,1fr)}
+            .toolbar{flex-direction:column}
+            .toolbar input,.toolbar select,.toolbar .btn{width:100%}
+            .action-btns{flex-direction:column}
+            .action-btns .btn{width:100%;text-align:center}
         }
-        
-        .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999}
-        .overlay.active{display:block}
     </style>
 </head>
 <body>
-<div class="mobile-header">
-    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
-    <h1><?php echo SITE_NAME; ?></h1>
-</div>
-
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
-
 <div class="admin-layout">
     <?php require_once 'sidebar.php'; ?>
 
@@ -330,6 +349,7 @@ $flash = getFlashMessage();
     </main>
 </div>
 
+<!-- Delete Confirmation Modal -->
 <div class="confirm-delete" id="deleteModal">
     <div class="confirm-box">
         <h3>🗑️ Delete User</h3>
@@ -347,35 +367,18 @@ $flash = getFlashMessage();
         </div>
     </div>
 </div>
-<script>
-function toggleMenu() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
 
+<script>
 function confirmDelete(id, name) {
     document.getElementById('deleteId').value = id;
     document.getElementById('deleteMsg').textContent = 'Delete "' + name + '"? This cannot be undone.';
     document.getElementById('deleteModal').style.display = 'flex';
 }
-
-function closeDelete() { 
-    document.getElementById('deleteModal').style.display = 'none'; 
+function closeDelete() {
+    document.getElementById('deleteModal').style.display = 'none';
 }
-
-document.getElementById('deleteModal').addEventListener('click', function(e){ 
-    if(e.target===this) closeDelete(); 
-});
-
-// Close sidebar when clicking on a link (mobile)
-document.querySelectorAll('.sidebar-menu a').forEach(link => {
-    link.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            toggleMenu();
-        }
-    });
+document.getElementById('deleteModal').addEventListener('click', function(e){
+    if(e.target===this) closeDelete();
 });
 </script>
 </body>
