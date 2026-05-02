@@ -868,7 +868,7 @@ $freeRemaining = getFreeArticlesRemaining();
         .footer-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 48px;
+            gap: 45px;
             margin-bottom: 52px;
             position: relative;
         }
@@ -1126,6 +1126,9 @@ $freeRemaining = getFreeArticlesRemaining();
             .subscription-banner .remaining { font-size: 42px; }
 
             .footer-bottom { justify-content: center; text-align: center; }
+
+            .footer-content { grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+            .footer-section:first-child { grid-column: 1 / -1; }
         }
 
         @media (max-width: 480px) {
