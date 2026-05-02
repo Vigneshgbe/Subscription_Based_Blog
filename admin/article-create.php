@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $formData['category_id'],
                 $formData['is_premium'], 
                 $formData['is_published'],
-                $authorId,  // ADD THIS
+                $authorId,
                 $formData['meta_title'], 
                 $formData['meta_description'], 
                 $formData['meta_keywords'],
@@ -98,51 +98,109 @@ $categories = $db->query("SELECT * FROM categories ORDER BY name")->fetchAll();
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f7fa}
         .admin-layout{display:flex;min-height:100vh}
-        .main-content{flex:1;margin-left:280px;padding:30px}
-        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+
+        /* ── Main content ── */
+        .main-content{flex:1;margin-left:280px;padding:30px;min-width:0}
+
+        /* ── Top bar ── */
+        .top-bar{background:white;padding:20px 30px;border-radius:12px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
         .top-bar h1{font-size:24px}
+
+        /* ── Two-column layout ── */
         .grid-2{display:grid;grid-template-columns:1fr 340px;gap:25px;align-items:start}
+
+        /* ── Cards ── */
         .card{background:white;padding:25px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);margin-bottom:25px}
         .card h3{font-size:16px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0}
+
+        /* ── Form elements ── */
         .form-group{margin-bottom:18px}
         label{display:block;font-weight:600;font-size:13px;margin-bottom:6px;color:#333;text-transform:uppercase;letter-spacing:.5px}
         input[type=text],input[type=url],textarea,select{width:100%;padding:10px 14px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s}
         input[type=text]:focus,input[type=url]:focus,textarea:focus,select:focus{outline:none;border-color:#667eea}
         textarea{resize:vertical;min-height:80px}
-        
-        /* TinyMCE Editor Styling */
+
+        /* ── TinyMCE wrapper ── */
         .editor-wrapper{border:2px solid #e0e0e0;border-radius:6px;overflow:hidden;transition:border-color .2s}
         .editor-wrapper:focus-within{border-color:#667eea}
-        
+
+        /* ── Toggles ── */
         .toggle-group{display:flex;flex-direction:column;gap:12px}
         .toggle-item{display:flex;align-items:center;gap:12px;padding:12px;background:#f8f9fa;border-radius:8px;cursor:pointer}
-        .toggle-item input{width:18px;height:18px;cursor:pointer;accent-color:#667eea}
+        .toggle-item input{width:18px;height:18px;cursor:pointer;accent-color:#667eea;flex-shrink:0}
         .toggle-item .toggle-info strong{display:block;font-size:14px;font-weight:600}
         .toggle-item .toggle-info small{color:#999;font-size:12px}
+
+        /* ── Buttons ── */
         .btn{padding:10px 20px;border:none;border-radius:6px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s;font-size:14px;font-family:inherit}
         .btn-primary{background:#667eea;color:white}
         .btn-primary:hover{background:#5568d3}
         .btn-outline{background:transparent;border:2px solid #e0e0e0;color:#333}
         .btn-outline:hover{border-color:#667eea;color:#667eea}
         .btn-block{width:100%;text-align:center;margin-bottom:10px}
+
+        /* ── Alerts ── */
         .alert{padding:15px 20px;border-radius:8px;margin-bottom:20px;font-weight:600}
         .alert-success{background:#d4edda;color:#155724;border-left:4px solid #28a745}
         .alert-danger{background:#f8d7da;color:#721c24;border-left:4px solid #dc3545}
         .alert-danger ul{margin:8px 0 0 20px}
+
+        /* ── Misc ── */
         .hint{font-size:12px;color:#999;margin-top:4px}
         .char-count{font-size:11px;color:#999;text-align:right;margin-top:3px}
-        
-        /* Editor info badge */
         .editor-info{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:#e8f4fd;border-radius:6px;font-size:12px;color:#0066cc;margin-top:8px}
         .editor-info i{font-style:normal;font-weight:700}
-        
-        /* Quick tips card */
         .quick-tips{background:#fff9e6;border-left:4px solid #ffc107;padding:15px;border-radius:6px;font-size:13px;margin-bottom:20px}
         .quick-tips h4{font-size:14px;font-weight:700;margin-bottom:10px;color:#856404}
         .quick-tips ul{margin-left:20px}
         .quick-tips li{margin-bottom:6px;color:#856404}
-        
-        @media(max-width:900px){.grid-2{grid-template-columns:1fr}}
+
+        /* ══ TABLET (≤1024px) ══════════════════════════════════════════ */
+        @media(max-width:1024px){
+            .grid-2{grid-template-columns:1fr 300px;gap:20px}
+        }
+
+        /* ══ TABLET / SMALL LAPTOP (≤900px) ═══════════════════════════ */
+        @media(max-width:900px){
+            .grid-2{grid-template-columns:1fr}
+        }
+
+        /* ══ MOBILE (≤768px) ═══════════════════════════════════════════ */
+        @media(max-width:768px){
+            .main-content{
+                margin-left:0;
+                padding:80px 16px 24px; /* 60px fixed header + 20px gap */
+            }
+            .top-bar{
+                padding:16px;
+                border-radius:10px;
+                margin-bottom:20px;
+            }
+            .top-bar h1{font-size:18px}
+            .card{padding:16px;border-radius:10px;margin-bottom:16px}
+            .card h3{font-size:15px;margin-bottom:14px;padding-bottom:10px}
+            .quick-tips{padding:12px;margin-bottom:16px}
+            .quick-tips h4{font-size:13px}
+            .quick-tips li{font-size:12px}
+            .form-group{margin-bottom:14px}
+            input[type=text],input[type=url],textarea,select{
+                padding:9px 12px;
+                font-size:15px; /* prevent iOS zoom (must be ≥16px or close) */
+            }
+            label{font-size:12px}
+            .hint{font-size:11px}
+            .btn{padding:10px 16px;font-size:13px}
+            .editor-info{font-size:11px;padding:6px 10px}
+        }
+
+        /* ══ SMALL PHONES (≤480px) ══════════════════════════════════════ */
+        @media(max-width:480px){
+            .main-content{padding:76px 12px 20px}
+            .top-bar{flex-direction:column;align-items:flex-start;gap:10px}
+            .top-bar h1{font-size:17px}
+            .card{padding:14px}
+            input[type=text],input[type=url],textarea,select{font-size:16px} /* prevent iOS zoom */
+        }
     </style>
 </head>
 <body>
@@ -328,7 +386,7 @@ slugInput.addEventListener('input', function() {
 // Initialize TinyMCE Rich Text Editor
 tinymce.init({
     selector: '#rich-text-editor',
-    height: 500,
+    height: window.innerWidth <= 768 ? 350 : 500,
     
     // Plugins for rich functionality
     plugins: [
@@ -398,72 +456,25 @@ tinymce.init({
             color: #333;
             padding: 15px;
         }
-        p { 
-            margin: 0 0 1em 0;
-            line-height: inherit;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            margin: 1.5em 0 0.5em 0;
-            font-weight: 600;
-            line-height: 1.3;
-        }
+        p { margin: 0 0 1em 0; line-height: inherit; }
+        h1, h2, h3, h4, h5, h6 { margin: 1.5em 0 0.5em 0; font-weight: 600; line-height: 1.3; }
         h1 { font-size: 2.5em; }
         h2 { font-size: 2em; }
         h3 { font-size: 1.75em; }
         h4 { font-size: 1.5em; }
         h5 { font-size: 1.25em; }
         h6 { font-size: 1em; }
-        ul, ol {
-            margin: 0 0 1em 0;
-            padding-left: 2em;
-        }
-        li {
-            margin-bottom: 0.5em;
-        }
-        blockquote {
-            border-left: 4px solid #667eea;
-            padding-left: 1em;
-            margin: 1em 0;
-            color: #666;
-            font-style: italic;
-        }
-        code {
-            background: #f4f4f4;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-        }
-        pre {
-            background: #f4f4f4;
-            padding: 1em;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 1em 0;
-        }
-        table td, table th {
-            border: 1px solid #ddd;
-            padding: 8px;
-        }
-        table th {
-            background-color: #f4f4f4;
-            font-weight: 600;
-        }
-        a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+        ul, ol { margin: 0 0 1em 0; padding-left: 2em; }
+        li { margin-bottom: 0.5em; }
+        blockquote { border-left: 4px solid #667eea; padding-left: 1em; margin: 1em 0; color: #666; font-style: italic; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        pre { background: #f4f4f4; padding: 1em; border-radius: 5px; overflow-x: auto; }
+        img { max-width: 100%; height: auto; }
+        table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+        table td, table th { border: 1px solid #ddd; padding: 8px; }
+        table th { background-color: #f4f4f4; font-weight: 600; }
+        a { color: #667eea; text-decoration: none; }
+        a:hover { text-decoration: underline; }
     `,
     
     // Image settings
@@ -487,7 +498,6 @@ tinymce.init({
     
     // Custom line height button
     setup: function(editor) {
-        // Add line height dropdown
         editor.ui.registry.addMenuButton('lineheight', {
             icon: 'line-height',
             tooltip: 'Line Height',
@@ -509,16 +519,13 @@ tinymce.init({
             }
         });
         
-        // Function to apply line height
         function applyLineHeight(editor, value) {
             editor.formatter.apply('lineheight', { value: value });
             const node = editor.selection.getNode();
             editor.dom.setStyle(node, 'line-height', value);
         }
         
-        // Set default content on init
         editor.on('init', function() {
-            // Editor is ready
             console.log('TinyMCE editor initialized');
         });
     },
@@ -545,10 +552,7 @@ tinymce.init({
 
 // Form validation before submit
 document.getElementById('articleForm').addEventListener('submit', function(e) {
-    // Update textarea with TinyMCE content
     tinymce.triggerSave();
-    
-    // Validate content
     const content = tinymce.get('rich-text-editor').getContent();
     if (!content || content.trim() === '') {
         e.preventDefault();
@@ -563,7 +567,6 @@ document.getElementById('articleForm').addEventListener('change', function() {
     formChanged = true;
 });
 
-// Also track TinyMCE changes
 tinymce.activeEditor && tinymce.activeEditor.on('change', function() {
     formChanged = true;
 });
@@ -575,7 +578,6 @@ window.addEventListener('beforeunload', function(e) {
     }
 });
 
-// Clear flag on submit
 document.getElementById('articleForm').addEventListener('submit', function() {
     formChanged = false;
 });
