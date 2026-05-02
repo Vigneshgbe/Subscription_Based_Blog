@@ -966,11 +966,11 @@ $freeRemaining = getFreeArticlesRemaining();
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="stat-number">50K+</span>
+                    <span class="stat-number">50+</span>
                     <span class="stat-label">Active Readers</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">1,200+</span>
+                    <span class="stat-number">10+</span>
                     <span class="stat-label">Articles Published</span>
                 </div>
                 <div class="stat-item">
@@ -1036,22 +1036,22 @@ $freeRemaining = getFreeArticlesRemaining();
             </div>
             <div class="team-grid">
                 <div class="team-card">
-                    <div class="team-avatar">SJ</div>
-                    <h3>Sarah Johnson</h3>
-                    <div class="team-role">Founder & Editor-in-Chief</div>
-                    <p class="team-bio">Former investigative journalist with 15 years at major publications. Believes great stories change minds.</p>
+                    <div class="team-avatar">AP</div>
+                    <h3>Arthy Paranitharan</h3>
+                    <div class="team-role">Founder & CEO</div>
+                    <p class="team-bio">Former journalist Believes great stories change minds.</p>
                 </div>
                 <div class="team-card">
-                    <div class="team-avatar">MC</div>
-                    <h3>Michael Chen</h3>
+                    <div class="team-avatar">VG</div>
+                    <h3>Vignesh G</h3>
                     <div class="team-role">Head of Technology</div>
-                    <p class="team-bio">Ex-Silicon Valley engineer turned writer. Demystifies tech for non-technical audiences.</p>
+                    <p class="team-bio">An Engineer turned writer. Demystifies tech for non-technical audiences.</p>
                 </div>
                 <div class="team-card">
-                    <div class="team-avatar">EP</div>
-                    <h3>Emily Patel</h3>
-                    <div class="team-role">Senior Business Analyst</div>
-                    <p class="team-bio">MBA from Wharton, former strategy consultant. Makes complex economics accessible.</p>
+                    <div class="team-avatar">AP</div>
+                    <h3>Abiram P</h3>
+                    <div class="team-role">Senior Business Development</div>
+                    <p class="team-bio">Former strategy consultant. Makes complex economics accessible.</p>
                 </div>
             </div>
         </div>

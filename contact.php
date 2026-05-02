@@ -892,7 +892,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="info-icon">✉️</div>
                                 <h3>Email Us</h3>
                             </div>
-                            <p><a href="mailto:hello@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com">hello@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com</a></p>
+                            <p><a href="mailto:contact@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.online">contact@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.online</a></p>
                             <p style="margin-top: 8px; font-size: 14px; color: var(--text-lighter);">We typically respond within 24 hours</p>
                         </div>
 
@@ -901,7 +901,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="info-icon">📍</div>
                                 <h3>Office</h3>
                             </div>
-                            <p>123 Innovation Street<br>Tech District, San Francisco<br>CA 94105, United States</p>
+                            <p>Hauentalstrasse 52,<br>8200 Schaffhausen<br>Switzerland</p>
                         </div>
                     </div>
                 </div>
@@ -911,12 +911,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form method="POST" action="">
                         <div class="form-group">
                             <label for="name">Your Name *</label>
-                            <input type="text" id="name" name="name" required placeholder="John Doe">
+                            <input type="text" id="name" name="name" required placeholder="Ex. Vignesh G">
                         </div>
 
                         <div class="form-group">
                             <label for="email">Email Address *</label>
-                            <input type="email" id="email" name="email" required placeholder="john@example.com">
+                            <input type="email" id="email" name="email" required placeholder="Ex. vignesh.g@thepadak.com">
                         </div>
 
                         <div class="form-group">
@@ -966,7 +966,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="faq-item">
                     <div class="faq-question">Do you accept guest contributions?</div>
-                    <div class="faq-answer">We occasionally publish guest articles from industry experts. If you have a compelling pitch, please email it to hello@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.com with "Guest Post" in the subject line.</div>
+                    <div class="faq-answer">We occasionally publish guest articles from industry experts. If you have a compelling pitch, please email it to contact@<?php echo strtolower(str_replace(' ', '', SITE_NAME)); ?>.online with "Guest Post" in the subject line.</div>
                 </div>
 
                 <div class="faq-item">
