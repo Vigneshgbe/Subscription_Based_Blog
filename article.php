@@ -762,10 +762,10 @@ $readingTime = max(1, ceil($wordCount / 200));
             <div class="footer-links">
                 <a href="index.php">Home</a>
                 <a href="pricing.php">Pricing</a>
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
+                <a href="about.php">About</a>
+                <a href="contact.php">Contact</a>
+                <a href="privacy.php">Privacy</a>
+                <a href="terms.php">Terms</a>
             </div>
             <p style="color:rgba(255,255,255,.5);font-size:13px;">
                 &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(SITE_NAME); ?>. All rights reserved.
